@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novan Agency | Painel de Gestão de Tráfego e Tarefas</title>
+    <!-- Carrega Tailwind CSS para estilização moderna e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carrega Chart.js para geração de gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <!-- Configuração da fonte Poppins e cores personalizadas do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'novan-primary': '#6D28D9', // Roxo principal
+                        'novan-secondary': '#0F172A', // Preto/Cinza Escuro (fundo)
+                        'novan-light': '#F8FAFC', // Cinza Claro (cards/inputs)
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        /* Estilos globais para a aplicação */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9; /* Fundo leve */
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sidebar-item {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sidebar-item.active {
+            background-color: #5B21B6; /* Roxo mais escuro */
+            border-left: 4px solid #FBBF24; /* Destaque amarelo para contraste */
+        }
+        /* Estilo para a tabela de resultados: Fontes menores e padding corrigido */
+        #resultsTable th {
+            padding: 8px 6px; /* Aumenta o espaçamento nas células do cabeçalho */
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+            font-size: 0.75rem; /* text-xs */
+            text-transform: uppercase;
+            letter-spacing: 0.05em; /* tracking-wider */
+        }
+        #resultsTable td {
+            padding: 8px 6px; /* Aumenta o espaçamento nas células de dados */
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+            font-size: 0.75rem; /* text-xs */
+        }
+        /* Estilos do calendário */
+        .calendar-day {
+            min-height: 100px;
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            transition: transform 0.1s;
+        }
+        .calendar-day:hover {
+            transform: scale(1.02);
+        }
+        .task-item {
+            font-size: 0.75rem;
+            padding: 4px 6px;
+            margin-top: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+    </style>
+</head>
+<body class="flex flex-col lg:flex-row min-h-screen">
+    
+    <!-- Tela de Login -->
+    <div id="login-page" class="flex items-center justify-center min-h-screen w-full bg-novan-secondary">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <h1 class="text-4xl font-bold text-center text-novan-primary mb-6">Novan Agency</h1>
+            <p class="text-center text-gray-600 mb-8">Acesso restrito. Faça login para continuar.</p>
+            
+            <form id="loginForm" class="space-y-4">
+                <input type="email" id="login_email" placeholder="Email" required 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                
+                <input type="password" id="login_password" placeholder="Senha" required 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                
+                <div class="flex items-center justify-between">
+                    <label for="rememberMe" class="flex items-center text-sm text-gray-600">
+                        <input type="checkbox" id="rememberMe" checked class="h-4 w-4 text-novan-primary border-gray-300 rounded focus:ring-novan-primary mr-2">
+                        Lembrar de Mim (Salvar Login)
+                    </label>
+                </div>
+
+                <button type="submit" id="loginButton" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-3 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                    Entrar
+                </button>
+            </form>
+            <p id="authError" class="text-center text-red-500 mt-4 text-sm hidden"></p>
+        </div>
+    </div>
+    <!-- Fim Tela de Login -->
+
+    <!-- Dashboard Principal (Escondido até o Login) -->
+    <div id="dashboard-container" class="hidden contents">
+
+        <!-- Sidebar de Navegação (Menu) -->
+        <aside id="sidebar" class="bg-novan-secondary text-white w-full lg:w-64 flex-shrink-0 p-4 shadow-2xl lg:shadow-none">
+            <div class="text-3xl font-bold mb-8 text-novan-primary border-b border-gray-700 pb-4">
+                Novan Agency
+            </div>
+            
+            <!-- Menu Items -->
+            <nav>
+                <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2 active" data-tab="resultados">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    Resultados de Campanhas
+                </div>
+                <div id="nav-calendario" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="calendario">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Calendário de Tarefas
+                </div>
+                <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="clientes">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                    Cadastro de Clientes
+                </div>
+                
+                <!-- NOVA ABA: GESTÃO DE TAREFAS -->
+                <div id="nav-gestao" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="gestao">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
+                    Gestão de Tarefas
+                </div>
+
+                <div id="nav-relatorios" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="relatorios">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                    Relatórios e Insights
+                </div>
+                
+                <!-- Botão de SAIR / LOGOUT -->
+                <div onclick="handleLogout()" class="sidebar-item p-3 rounded-lg flex items-center mb-2 mt-8 bg-red-600 hover:bg-red-700 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Sair (Logout)
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-grow p-4 md:p-8 overflow-x-hidden">
+            
+            <!-- Mensagem de feedback/alerta -->
+            <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
+
+            <!-- Tab 1: Resultados de Campanhas -->
+            <section id="resultados" class="tab-content active">
+                <h1 class="text-4xl font-bold text-novan-secondary mb-6">🧾 Resultados de Campanhas</h1>
+                
+                <!-- Formulário de Registro Diário -->
+                <div class="bg-novan-light p-6 rounded-xl shadow-lg mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-novan-primary">Registro Diário de Performance</h2>
+                    <form id="campaignForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- LINHA 1 -->
+                        <input type="date" id="res_data" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" value="" />
+                        <select id="res_cliente" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <option value="">Selecione o Cliente</option>
+                        </select>
+                        <select id="res_plataforma" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <option value="Meta">Meta Ads</option>
+                            <option value="Google">Google Ads</option>
+                            <option value="Outra">Outra</option>
+                        </select>
+                        <input type="number" step="0.01" id="res_investimento" placeholder="Gasto (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        
+                        <!-- LINHA 2 (Métricas Primárias e Vendas) -->
+                        <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="number" id="res_alcance" placeholder="Alcance" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="number" id="res_cliques" placeholder="Cliques no Site" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <!-- Vendas / Faturamento movido para a 4ª coluna da Linha 2 -->
+                        <input type="number" step="0.01" id="res_vendas" placeholder="Vendas / Faturamento (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        
+                        <!-- LINHA 3 (Conversão e Métricas Calculadas) -->
+                        <!-- BLOCO DE CONVERSÃO - Agora ocupa 2 colunas para mais visibilidade -->
+                        <div class="col-span-1 md:col-span-2 flex items-center space-x-2">
+                            <select id="res_conversion_type" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2">
+                                <option value="">Tipo Conversão</option>
+                                <option value="Ligue">Ligue</option>
+                                <option value="Mensagem">Mensagem</option>
+                                <option value="Compras">Compras</option>
+                                <option value="Formulario">Formulário</option>
+                                <option value="Visualizacao">Visualização</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                            <input type="number" id="res_conversion_count" placeholder="Total de Conversões" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2" />
+                        </div>
+                        <!-- Métricas Calculadas (CPA, ROAS, CPM) - Ocupa as 2 colunas restantes -->
+                        <div class="col-span-1 md:col-span-2 flex items-center space-x-4">
+                            <div class="text-sm font-medium text-gray-600">CPA: <span id="cpa_calc" class="font-bold text-red-600">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-600">ROAS: <span id="roas_calc" class="font-bold text-green-600">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-600">CPM: <span id="cpm_calc" class="font-bold text-blue-600">0.00</span></div>
+                        </div>
+                        
+                        <!-- LINHA 4 (Observações e Botões) -->
+                        <textarea id="res_observacoes" placeholder="Observações do dia" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-4"></textarea>
+
+                        <button type="submit" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Registrar Resultados
+                        </button>
+                        <button type="button" id="btnResumoDiario" class="col-span-1 bg-green-500 hover:bg-green-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Gerar Resumo Diário
+                        </button>
+                        <button type="button" id="btnResumoQuinzenal" class="col-span-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Gerar Resumo Quinzenal
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Modal para Resumos -->
+                <div id="summaryModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+                    <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg">
+                        <h3 id="summaryTitle" class="text-2xl font-bold mb-4 text-novan-primary"></h3>
+                        <div id="summaryContent" class="mb-4 text-gray-700 max-h-96 overflow-y-auto"></div>
+                        <button onclick="closeSummaryModal()" class="bg-red-500 hover:bg-red-600 text-white font-semibold p-2 rounded-lg w-full">Fechar</button>
+                    </div>
+                </div>
+
+                <!-- NOVO BLOCO DE FILTROS PARA O HISTÓRICO -->
+                <div class="bg-novan-light p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-end">
+                    <h2 class="text-xl font-semibold text-novan-secondary flex-grow basis-full md:basis-auto">Filtrar Histórico:</h2>
+                    <select id="results_filter_cliente" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow">
+                        <option value="">Todos os Clientes</option>
+                    </select>
+                    <input type="date" id="results_filter_start_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                    <span class="font-medium text-gray-600">até</span>
+                    <input type="date" id="results_filter_end_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                    <button onclick="renderResultsTable()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                        Aplicar Filtros
+                    </button>
+                </div>
+                <!-- FIM NOVO BLOCO DE FILTROS -->
+
+                <!-- Histórico de Resultados -->
+                <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+                    <h2 class="text-xl font-semibold mb-4 text-novan-secondary">Histórico e Evolução das Métricas</h2>
+                    <table id="resultsTable" class="w-full text-left">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Plataforma</th>
+                                <!-- Trocado Investimento por Gasto -->
+                                <th>Gasto (R$)</th>
+                                <th>Impr.</th>
+                                <th>Cliques</th>
+                                <!-- NOVO CPM HEADER -->
+                                <th class="text-blue-600">CPM (R$)</th>
+                                <!-- FIM NOVO CPM HEADER -->
+                                <!-- NOVO CAMPO UNIFICADO -->
+                                <th class="text-purple-500">Conversão</th>
+                                <!-- FIM NOVO CAMPO -->
+                                <th>Vendas (R$)</th>
+                                <th class="text-red-600">CPA (R$)</th>
+                                <th class="text-green-600">ROAS (X)</th>
+                                <th>Obs.</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Resultados serão injetados aqui via JS -->
+                        </tbody>
+                    </table>
+                    <p id="noResults" class="text-center text-gray-500 mt-4 hidden">Nenhum resultado registrado ainda.</p>
+                </div>
+            </section>
+
+            <!-- Tab 2: Calendário de Tarefas -->
+            <section id="calendario" class="tab-content">
+                <h1 class="text-4xl font-bold text-novan-secondary mb-6">📅 Calendário de Tarefas</h1>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Card de Cadastro de Tarefas -->
+                    <div class="lg:col-span-1 bg-novan-light p-6 rounded-xl shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4 text-novan-primary">Cadastrar Nova Tarefa</h2>
+                        <form id="taskForm" class="space-y-3">
+                            <select id="task_cliente" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="">Selecione o Cliente</option>
+                            </select>
+                            <select id="task_tipo" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="">Tipo de Tarefa</option>
+                                <option value="Campanha">Campanha Ads</option>
+                                <option value="Post">Post/Conteúdo</option>
+                                <option value="Reuniao">Reunião</option>
+                                <option value="Video">Entrega de Vídeo</option>
+                                <option value="Relatorio">Relatório</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                            <input type="datetime-local" id="task_data" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                            <select id="task_status" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="Pendente">Pendente</option>
+                                <option value="Em Andamento">Em Andamento</option>
+                                <option value="Concluido">Concluído</option>
+                            </select>
+                            <textarea id="task_observacoes" placeholder="Observações" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary"></textarea>
+                            <button type="submit" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                                Salvar Tarefa
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Card de Visualização do Calendário e Filtros -->
+                    <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg">
+                        <div class="flex flex-wrap items-center justify-between mb-4">
+                            <div class="flex space-x-2 mb-4 md:mb-0">
+                                <button id="prevMonth" class="bg-gray-200 hover:bg-gray-300 text-novan-secondary p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&lt;</button>
+                                <h2 id="currentMonthYear" class="text-2xl font-bold text-novan-secondary self-center"></h2>
+                                <button id="nextMonth" class="bg-gray-200 hover:bg-gray-300 text-novan-secondary p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&gt;</button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="filterClient" class="p-2 border border-gray-300 rounded-lg text-sm">
+                                    <option value="">Filtrar por Cliente</option>
+                                </select>
+                                <select id="filterType" class="p-2 border border-gray-300 rounded-lg text-sm">
+                                    <option value="">Filtrar por Tipo</option>
+                                    <option value="Campanha">Campanha Ads</option>
+                                    <option value="Post">Post/Conteúdo</option>
+                                    <option value="Reuniao">Reunião</option>
+                                    <option value="Video">Entrega de Vídeo</option>
+                                    <option value="Relatorio">Relatório</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                                <button class="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg text-sm">Ver Mês</button>
+                                <!-- Adicionar 'Ver Semana' se houver tempo, por enquanto 'Ver Mês' -->
+                            </div>
+                        </div>
+
+                        <!-- Grade do Calendário -->
+                        <div class="grid grid-cols-7 text-center font-semibold text-novan-primary border-b-2 pb-2 mb-2">
+                            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                        </div>
+                        <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+                            <!-- Dias serão injetados aqui -->
+                        </div>
+
+                        <!-- Notificações de Tarefas Próximas -->
+                        <div id="taskNotifications" class="mt-6 p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-lg hidden">
+                            <h4 class="font-semibold">⚠️ Alerta de Prazos Próximos:</h4>
+                            <ul id="notificationList" class="list-disc list-inside mt-1"></ul>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Tab 3: Cadastro de Clientes -->
+            <section id="clientes" class="tab-content">
+                <h1 class="text-4xl font-bold text-novan-secondary mb-6">👥 Cadastro de Clientes</h1>
+
+                <!-- Seletor de Tipo de Cliente -->
+                <div class="flex space-x-4 mb-6 justify-center">
+                    <button id="btn_type_traffic" onclick="showClientFormType('traffic')" class="client-type-btn px-6 py-2 rounded-full font-semibold shadow-md transition-all bg-novan-primary text-white">
+                        Novo Cliente - Tráfego Pago
+                    </button>
+                    <button id="btn_type_social" onclick="showClientFormType('social')" class="client-type-btn px-6 py-2 rounded-full font-semibold shadow-md transition-all bg-gray-200 text-novan-secondary hover:bg-novan-light">
+                        Novo Cliente - Social Media
+                    </button>
+                </div>
+
+
+                <!-- Formulário de Cadastro -->
+                <div class="bg-novan-light p-6 rounded-xl shadow-lg mb-8 max-w-2xl mx-auto">
+                    <h2 class="text-xl font-semibold mb-4 text-novan-primary" id="clientFormTitle">Formulário de Tráfego Pago</h2>
+                    <form id="clientForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Campo oculto para armazenar o tipo de serviço ativo -->
+                        <input type="hidden" id="cli_service_type" value="traffic">
+
+                        <!-- CAMPOS COMUNS -->
+                        <input type="text" id="cli_nome" placeholder="Nome da Empresa" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <select id="cli_responsavel" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <option value="">Selecione o Responsável da Agência</option>
+                        </select>
+                        <input type="tel" id="cli_telefone" placeholder="Telefone / WhatsApp" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" oninput="maskPhone(this)" maxlength="15" />
+                        <input type="url" id="cli_link" placeholder="Link (Site/Cardápio/Perfil)" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <!-- FIM CAMPOS COMUNS -->
+
+                        <!-- CAMPOS ESPECÍFICOS DE TRÁFEGO PAGO -->
+                        <div id="trafficFields" class="contents">
+                            <!-- Plataforma Principal -->
+                            <select id="cli_plataforma_traffic" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="Meta">Plataforma Principal: Meta Ads</option>
+                                <option value="Google">Plataforma Principal: Google Ads</option>
+                                <option value="Ambos">Plataforma Principal: Ambos</option>
+                            </select>
+                            
+                            <!-- Tipo e Valor do Orçamento -->
+                            <div>
+                                <select id="cli_budget_type_traffic" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                    <option value="">Selecione o Tipo de Orçamento</option>
+                                    <option value="Orçamento Diário">Orçamento Diário</option>
+                                    <option value="Orçamento de Campanha">Orçamento de Campanha</option>
+                                </select>
+                            </div>
+                            <input type="number" step="0.01" id="cli_budget_value_traffic" placeholder="Valor (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                            
+                            <!-- Meta de Conversão -->
+                            <select id="cli_conversion_goals_traffic" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="">Principal Meta de Conversão</option>
+                                <option value="Ligue">Ligue (Chamadas)</option>
+                                <option value="Mensagem">Mensagem (Leads)</option>
+                                <option value="Compras">Compras no Site</option>
+                                <option value="Formulário">Formulário (Leads)</option>
+                                <option value="Visualizacao">Visualização de Conteúdo</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <!-- FIM CAMPOS ESPECÍFICOS DE TRÁFEGO PAGO -->
+
+                        <!-- CAMPOS ESPECÍFICOS DE SOCIAL MEDIA -->
+                        <div id="socialMediaFields" class="hidden contents">
+                            <!-- Foco de Plataforma SM -->
+                            <select id="cli_sm_platform" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="Instagram">Foco Principal: Instagram</option>
+                                <option value="TikTok">Foco Principal: TikTok</option>
+                                <option value="LinkedIn">Foco Principal: LinkedIn</option>
+                                <option value="Pinterest">Foco Principal: Pinterest</option>
+                                <option value="AmbosSM">Ambos/Múltiplos</option>
+                            </select>
+
+                            <!-- Fee Mensal SM -->
+                            <input type="number" step="0.01" id="cli_sm_fee" placeholder="Fee Mensal (R$)" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                            
+                            <!-- Necessidade de Conteúdo SM -->
+                            <select id="cli_sm_needs" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <option value="Conteudo">Foco: Criação de Conteúdo</option>
+                                <option value="Design">Foco: Design/Branding</option>
+                                <option value="Estrategia">Foco: Estratégia/Planejamento</option>
+                            </select>
+                            
+                            <div class="col-span-1"></div> <!-- Espaçador para manter o grid -->
+                        </div>
+                        <!-- FIM CAMPOS ESPECÍFICOS DE SOCIAL MEDIA -->
+
+                        <textarea id="cli_observacoes" placeholder="Observações gerais e Nicho" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-2"></textarea>
+
+                        <button type="submit" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Cadastrar Cliente
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Lista de Clientes Cadastrados -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-novan-secondary">Clientes Ativos</h2>
+                    <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Cards de clientes serão injetados aqui via JS -->
+                    </div>
+                    <!-- O elemento noClients foi movido para fora do clientList para evitar ser apagado pelo innerHTML = '' -->
+                    <p id="noClients" class="text-center text-gray-500 col-span-full hidden mt-4">Nenhum cliente cadastrado ainda.</p>
+                </div>
+            </section>
+
+            <!-- Tab 5: Gestão de Tarefas (NOVA ABA) -->
+            <section id="gestao" class="tab-content">
+                <h1 class="text-4xl font-bold text-novan-secondary mb-6">✅ Gestão de Tarefas e Status</h1>
+                
+                <div class="bg-novan-light p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-center">
+                    <h2 class="text-xl font-semibold text-novan-primary">Filtros:</h2>
+                    <select id="task_manager_filter_client" class="p-2 border border-gray-300 rounded-lg">
+                        <option value="">Todos os Clientes</option>
+                    </select>
+                    <select id="task_manager_filter_status" class="p-2 border border-gray-300 rounded-lg">
+                        <option value="">Todos os Status</option>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluido">Concluído</option>
+                    </select>
+                    <button onclick="renderTaskManagement()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                        Aplicar Filtros
+                    </button>
+                </div>
+
+                <!-- Kanban-like Board (3 colunas para status) -->
+                <div id="taskManagementBoard" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Colunas de Status serão renderizadas aqui -->
+                </div>
+                
+                <p id="noTasksMessage" class="text-center text-gray-500 mt-8 hidden">Nenhuma tarefa encontrada para os filtros selecionados.</p>
+            </section>
+
+            <!-- Tab 4: Relatórios e Insights -->
+            <section id="relatorios" class="tab-content">
+                <h1 class="text-4xl font-bold text-novan-secondary mb-6">📊 Relatórios e Insights</h1>
+                
+                <div class="bg-novan-light p-6 rounded-xl shadow-lg mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-novan-primary">Filtros de Relatório</h2>
+                    <div class="flex flex-wrap gap-4 items-end">
+                        <select id="report_cliente" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow">
+                            <option value="">Todos os Clientes</option>
+                        </select>
+                        <input type="date" id="report_start_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <span class="font-medium text-gray-600">até</span>
+                        <input type="date" id="report_end_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <button onclick="generateReport()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Gerar Relatório
+                        </button>
+                        <button onclick="exportReport()" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Exportar (PDF/Excel)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Gráfico 1: Gasto vs Faturamento -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-novan-secondary">Gasto vs Faturamento (R$)</h3>
+                        <canvas id="investimentoFaturamentoChart"></canvas>
+                    </div>
+                    
+                    <!-- Gráfico 2: Impressões vs Cliques -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-novan-secondary">Impressões vs Cliques (Volume)</h3>
+                        <canvas id="impressoesCliquesChart"></canvas>
+                    </div>
+
+                    <!-- Gráfico 3: ROAS Médio por Período -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-2">
+                        <h3 class="text-lg font-semibold mb-4 text-novan-secondary">ROAS Médio Diário (X)</h3>
+                        <canvas id="roasChart"></canvas>
+                    </div>
+                    
+                    <p id="noReportData" class="text-center text-gray-500 col-span-full hidden">Selecione filtros e gere o relatório para visualizar os gráficos.</p>
+                </div>
+
+            </section>
+        </main>
+    </div>
+    <!-- Fim Dashboard Principal -->
+
+    <script type="module">
+        // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        
+        // Sua Configuração Firebase (fornecida pelo usuário)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJsx1cHtEsFoCFjk08OLz5bZCiUp8N7lw",
+            authDomain: "controle-de-agendamento-97eab.firebaseapp.com",
+            projectId: "controle-de-agendamento-97eab",
+            storageBucket: "controle-de-agendamento-97eab.firebasestorage.app",
+            messagingSenderId: "689700524307",
+            appId: "1:689700524307:web:816122032e551c2c6ecae6"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- Variáveis globais para armazenar dados e instâncias ---
+        let clients = [];
+        let results = [];
+        let tasks = [];
+        let currentMonth = new Date();
+        
+        let invFatChartInstance, imprCliquesChartInstance, roasChartInstance;
+        
+        // Lista global de responsáveis da agência
+        const AGENCY_RESPONSIBLES = ["Léo Begalli", "Fabio Franco", "Outro"];
+
+        const COLORS = {
+            primary: '#6D28D9',
+            secondary: '#0F172A',
+            investimento: '#EF4444', // Red 500
+            faturamento: '#10B981',  // Green 500
+            impressoes: '#3B82F6',   // Blue 500
+            cliques: '#EC4899',      // Pink 500
+            roas: '#F59E0B'          // Amber 500
+        };
+
+        // --- FUNÇÕES DE AUTENTICAÇÃO ---
+        
+        // Oculta a tela de login e mostra o dashboard
+        function showDashboard() {
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+            document.getElementById('dashboard-container').classList.add('flex');
+            
+            // Chama a inicialização da aplicação principal
+            initAppContent();
+        }
+
+        // Oculta o dashboard e mostra a tela de login
+        function showLogin() {
+            document.getElementById('dashboard-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('flex');
+            document.getElementById('login-page').classList.remove('hidden');
+        }
+
+        /** Lida com o Login */
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login_email').value;
+            const password = document.getElementById('login_password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const errorEl = document.getElementById('authError');
+            errorEl.classList.add('hidden');
+            
+            const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+            
+            try {
+                // 1. Define a persistência
+                await setPersistence(auth, persistenceType);
+                
+                // 2. Realiza o login
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // O onAuthStateChanged lidará com a transição para o dashboard
+
+            } catch (error) {
+                let errorMessage = "Erro de Autenticação. Verifique seu email e senha.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = "Credenciais inválidas. Tente novamente.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "O endereço de email é inválido.";
+                }
+                errorEl.textContent = errorMessage;
+                errorEl.classList.remove('hidden');
+                console.error("Erro de Login:", error);
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+        /** Lida com o Logout */
+        function handleLogout() {
+            signOut(auth).then(() => {
+                // O onAuthStateChanged lidará com a transição para a tela de login
+                showMessage("Sessão encerrada com sucesso.", true);
+            }).catch((error) => {
+                console.error("Erro ao fazer logout:", error);
+                showMessage("Erro ao sair. Verifique sua conexão.", true);
+            });
+        }
+
+        /** Observa o estado da autenticação (chamado automaticamente pelo Firebase) */
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuário logado
+                showDashboard();
+            } else {
+                // Usuário deslogado
+                showLogin();
+            }
+        });
+
+
+        // --- FUNÇÕES DE UTILIDADE E ARMAZENAMENTO (localStorage) ---
+
+        /** Carrega todos os dados do localStorage */
+        function loadData() {
+            clients = JSON.parse(localStorage.getItem('novan_clients')) || [];
+            results = JSON.parse(localStorage.getItem('novan_results')) || [];
+            tasks = JSON.parse(localStorage.getItem('novan_tasks')) || [];
+        }
+
+        /** Salva todos os dados no localStorage */
+        function saveData() {
+            localStorage.setItem('novan_clients', JSON.stringify(clients));
+            localStorage.setItem('novan_results', JSON.stringify(results));
+            localStorage.setItem('novan_tasks', JSON.stringify(tasks));
+        }
+
+        /** Exibe uma mensagem de feedback na tela */
+        function showMessage(text, duration = 3000, isError = false) {
+            const box = document.getElementById('messageBox');
+            box.textContent = text;
+            box.classList.remove('hidden', 'bg-red-500', 'bg-novan-primary');
+            box.classList.add(isError ? 'bg-red-500' : 'bg-novan-primary');
+            
+            setTimeout(() => {
+                box.classList.add('hidden');
+            }, duration);
+        }
+
+        /** Formata um número para moeda BRL */
+        function formatCurrency(value) {
+            // Garante que o valor seja um número válido antes de formatar
+            const num = parseFloat(value);
+            return isNaN(num) ? 'R$ 0,00' : num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        /** Formata um número para 2 casas decimais (ROAS/CPA/CPM) */
+        function formatNumber(value) {
+            const num = parseFloat(value);
+            return isNaN(num) ? '0.00' : num.toFixed(2);
+        }
+
+        // --- GESTÃO DE TABS ---
+
+        /** Muda a aba ativa na UI */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tabId}`).classList.add('active');
+            
+            // Ações específicas ao trocar de aba
+            if (tabId === 'clientes') {
+                renderClientList();
+                // Garante que o formulário de Tráfego Pago é o padrão ao entrar na aba
+                showClientFormType('traffic'); 
+            } else if (tabId === 'resultados') {
+                populateClientSelects();
+                renderResultsTable();
+            } else if (tabId === 'calendario') {
+                populateClientSelects();
+                renderCalendar();
+                renderTaskNotifications();
+            } else if (tabId === 'gestao') {
+                populateClientSelects();
+                renderTaskManagement();
+            } else if (tabId === 'relatorios') {
+                populateClientSelects();
+                // O gráfico é gerado sob demanda, mas garante que os clientes estejam na lista
+                document.getElementById('noReportData').classList.remove('hidden');
+            }
+        }
+
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => switchTab(item.dataset.tab));
+        });
+        
+        // --- ABA 3: CADASTRO DE CLIENTES ---
+
+        /** Aplica a máscara (00) 00000-0000 ao telefone */
+        function maskPhone(input) {
+            let value = input.value.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+
+            // Limita a 11 dígitos (incluindo o 9 extra de celular)
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            
+            // Aplica a máscara (XX) XXXXX-XXXX
+            value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+
+            input.value = value;
+        }
+
+        /** Popula o dropdown de Responsáveis */
+        function populateResponsiblesSelect() {
+            const select = document.getElementById('cli_responsavel');
+            if (!select) return;
+
+            // Limpa e adiciona a opção padrão
+            select.innerHTML = '<option value="">Selecione o Responsável da Agência</option>';
+
+            AGENCY_RESPONSIBLES.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+        }
+        
+        /** Alterna a visualização do formulário entre Tráfego Pago e Social Media */
+        function showClientFormType(type) {
+            const trafficFields = document.getElementById('trafficFields');
+            const socialMediaFields = document.getElementById('socialMediaFields');
+            const formTitle = document.getElementById('clientFormTitle');
+            const btnTraffic = document.getElementById('btn_type_traffic');
+            const btnSocial = document.getElementById('btn_type_social');
+            const cliServiceType = document.getElementById('cli_service_type');
+
+            if (type === 'traffic') {
+                // Configurações para Tráfego Pago
+                trafficFields.classList.remove('hidden');
+                socialMediaFields.classList.add('hidden');
+                formTitle.textContent = 'Formulário de Tráfego Pago';
+                btnTraffic.classList.replace('bg-gray-200', 'bg-novan-primary');
+                btnTraffic.classList.replace('text-novan-secondary', 'text-white');
+                btnSocial.classList.replace('bg-novan-primary', 'bg-gray-200');
+                btnSocial.classList.replace('text-white', 'text-novan-secondary');
+                cliServiceType.value = 'traffic';
+
+                // Torna campos de tráfego obrigatórios e de SM não-obrigatórios
+                document.getElementById('cli_plataforma_traffic').required = true;
+                document.getElementById('cli_budget_type_traffic').required = true;
+                document.getElementById('cli_budget_value_traffic').required = true;
+                document.getElementById('cli_conversion_goals_traffic').required = true;
+                document.getElementById('cli_sm_platform').required = false;
+                document.getElementById('cli_sm_fee').required = false;
+                document.getElementById('cli_sm_needs').required = false;
+                
+            } else if (type === 'social') {
+                // Configurações para Social Media
+                trafficFields.classList.add('hidden');
+                socialMediaFields.classList.remove('hidden');
+                formTitle.textContent = 'Formulário de Social Media';
+                btnSocial.classList.replace('bg-gray-200', 'bg-novan-primary');
+                btnSocial.classList.replace('text-novan-secondary', 'text-white');
+                btnTraffic.classList.replace('bg-novan-primary', 'bg-gray-200');
+                btnTraffic.classList.replace('text-white', 'text-novan-secondary');
+                cliServiceType.value = 'social';
+
+                // Torna campos de SM obrigatórios e de tráfego não-obrigatórios
+                document.getElementById('cli_plataforma_traffic').required = false;
+                document.getElementById('cli_budget_type_traffic').required = false;
+                document.getElementById('cli_budget_value_traffic').required = false;
+                document.getElementById('cli_conversion_goals_traffic').required = false;
+                document.getElementById('cli_sm_platform').required = true;
+                document.getElementById('cli_sm_fee').required = true;
+                document.getElementById('cli_sm_needs').required = true;
+            }
+        }
+
+
+        /** Renderiza a lista de clientes cadastrados */
+        function renderClientList() {
+            const listEl = document.getElementById('clientList');
+            const noClientsEl = document.getElementById('noClients');
+            
+            // Checagem de nulidade
+            if (!listEl || !noClientsEl) {
+                return;
+            }
+
+            // Limpa apenas o container dos cards
+            listEl.innerHTML = ''; 
+
+            if (clients.length === 0) {
+                noClientsEl.classList.remove('hidden');
+                return;
+            }
+            noClientsEl.classList.add('hidden');
+
+            clients.forEach(client => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-xl shadow-md border-t-4 border-novan-primary';
+                
+                let detailListHtml = '';
+                let mainPlatformDisplay = '';
+
+                if (client.serviceType === 'traffic') {
+                    // Dados de TRÁFEGO PAGO
+                    const budgetLabel = client.budgetType || 'Orçamento';
+                    const budgetValue = client.budgetValue ? formatCurrency(client.budgetValue) : 'N/A';
+                    const goal = client.conversionGoal || 'N/A';
+                    mainPlatformDisplay = client.platformTraffic || 'N/A';
+
+                    detailListHtml = `
+                        <li><span class="font-medium">${budgetLabel}:</span> ${budgetValue}</li> 
+                        <li><span class="font-medium">Meta Principal:</span> ${goal}</li> 
+                    `;
+                } else if (client.serviceType === 'social') {
+                    // Dados de SOCIAL MEDIA
+                    const feeValue = client.smFee ? formatCurrency(client.smFee) : 'N/A';
+                    const smNeeds = client.smNeeds || 'N/A';
+                    mainPlatformDisplay = client.platformSM || 'N/A';
+
+                    detailListHtml = `
+                        <li><span class="font-medium">Fee Mensal:</span> ${feeValue}</li>
+                        <li><span class="font-medium">Foco de Conteúdo:</span> ${smNeeds}</li>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <h4 class="font-bold text-lg text-novan-secondary">${client.nome}</h4>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${client.serviceType === 'traffic' ? 'bg-purple-200 text-novan-primary' : 'bg-pink-200 text-pink-700'}">
+                        ${client.serviceType === 'traffic' ? 'TRÁFEGO PAGO' : 'SOCIAL MEDIA'}
+                    </span>
+                    <p class="text-sm text-gray-600 my-2">Responsável: <span class="font-semibold">${client.responsavel}</span></p>
+                    <p class="text-sm text-gray-600 mb-2">${client.telefone}</p>
+                    <ul class="text-xs space-y-1">
+                        <li><span class="font-medium">Plataforma:</span> ${mainPlatformDisplay}</li>
+                        ${detailListHtml}
+                        <li><span class="font-medium">Link:</span> <a href="${client.link}" target="_blank" class="text-novan-primary hover:underline">${client.link ? 'Acessar' : 'N/A'}</a></li>
+                        <li class="mt-2"><span class="font-medium">Nicho/Obs.:</span> ${client.observacoes || 'N/A'}</li>
+                    </ul>
+                    <button onclick="deleteClient('${client.id}')" class="mt-3 text-red-500 hover:text-red-700 text-xs">Excluir</button>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        /** Popula os dropdowns de cliente em todas as abas */
+        function populateClientSelects() {
+            const selects = [
+                document.getElementById('res_cliente'),
+                document.getElementById('task_cliente'),
+                document.getElementById('filterClient'),
+                document.getElementById('report_cliente'),
+                document.getElementById('task_manager_filter_client'),
+                document.getElementById('results_filter_cliente') // ADICIONADO: Novo filtro de cliente da Aba 1
+            ];
+
+            selects.forEach(select => {
+                // Checa se o elemento existe antes de tentar manipulá-lo
+                if (!select) return;
+                
+                const selectedValue = select.value;
+                select.innerHTML = select.id.includes('filter') || select.id.includes('report') || select.id.includes('manager_filter_client') || select.id.includes('results_filter') ? 
+                                    '<option value="">Todos os Clientes</option>' : 
+                                    '<option value="">Selecione o Cliente</option>';
+                
+                clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.id;
+                    option.textContent = client.nome;
+                    if (client.id === selectedValue) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        /** Lógica de submissão do formulário de cliente */
+        document.getElementById('clientForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const serviceType = document.getElementById('cli_service_type').value;
+            let newClient = {
+                id: crypto.randomUUID(),
+                serviceType: serviceType, // Salva o tipo de serviço
+                nome: document.getElementById('cli_nome').value,
+                responsavel: document.getElementById('cli_responsavel').value,
+                telefone: document.getElementById('cli_telefone').value,
+                link: document.getElementById('cli_link').value,
+                observacoes: document.getElementById('cli_observacoes').value,
+                color: generateClientColor(clients.length)
+            };
+
+            if (serviceType === 'traffic') {
+                // Coleta dados específicos de Tráfego Pago
+                newClient.platformTraffic = document.getElementById('cli_plataforma_traffic').value;
+                newClient.budgetType = document.getElementById('cli_budget_type_traffic').value;
+                newClient.budgetValue = parseFloat(document.getElementById('cli_budget_value_traffic').value);
+                newClient.conversionGoal = document.getElementById('cli_conversion_goals_traffic').value;
+                // Para compatibilidade com a aba de resultados, o campo "plataforma" é setado a partir do traffic.platformTraffic
+                newClient.plataforma = newClient.platformTraffic; 
+
+            } else if (serviceType === 'social') {
+                // Coleta dados específicos de Social Media
+                newClient.platformSM = document.getElementById('cli_sm_platform').value;
+                newClient.smFee = parseFloat(document.getElementById('cli_sm_fee').value);
+                newClient.smNeeds = document.getElementById('cli_sm_needs').value;
+                // Para compatibilidade com a aba de resultados (embora SM não use o registro de resultados de Ads), setamos um valor
+                newClient.plataforma = newClient.platformSM;
+            }
+
+            clients.push(newClient);
+            saveData();
+            // Chamando as funções de renderização novamente para garantir a atualização IMEDIATA
+            renderClientList(); 
+            populateClientSelects();
+            document.getElementById('clientForm').reset();
+            showMessage(`Cliente ${newClient.nome} (${serviceType === 'traffic' ? 'Tráfego Pago' : 'Social Media'}) cadastrado com sucesso!`);
+            
+            // Reverte para o formulário padrão de Tráfego Pago
+            showClientFormType('traffic'); 
+        });
+
+        /** Deleta um cliente e todos os dados associados */
+        function deleteClient(clientId) {
+            // REMOVIDO 'confirm()' para evitar bloqueio no ambiente. A exclusão é imediata.
+            
+            clients = clients.filter(c => c.id !== clientId);
+            results = results.filter(r => r.clientId !== clientId);
+            tasks = tasks.filter(t => t.clientId !== clientId);
+            
+            saveData();
+            renderClientList();
+            populateClientSelects();
+            renderResultsTable();
+            renderCalendar();
+            renderTaskManagement(); // Atualiza a nova aba também
+            showMessage('Cliente e todos os dados associados excluídos.', true);
+        }
+        
+        // Função para gerar uma cor de cliente pseudo-única
+        function generateClientColor(index) {
+            const colors = ['#6D28D9', '#059669', '#DC2626', '#FBBF24', '#3B82F6', '#EC4899', '#14B8A6'];
+            return colors[index % colors.length];
+        }
+
+
+        // --- ABA 1: RESULTADOS DE CAMPANHAS ---
+
+        /** Renderiza a tabela de resultados */
+        function renderResultsTable() {
+            const body = document.getElementById('resultsTableBody');
+            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value; // NOVO: Filtro de Cliente
+            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value; // NOVO: Filtro de Data Inicial
+            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value; // NOVO: Filtro de Data Final
+            
+            // Filtra apenas resultados de clientes de TRÁFEGO PAGO, pois os campos são de Ads.
+            const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
+            let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
+
+            // 1. Aplica Filtro de Cliente
+            if (resultsFilterClient) {
+                filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
+            }
+
+            // 2. Aplica Filtro de Data
+            if (resultsFilterStartDate) {
+                filteredResults = filteredResults.filter(r => r.data >= resultsFilterStartDate);
+            }
+            if (resultsFilterEndDate) {
+                filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
+            }
+
+            body.innerHTML = '';
+
+            if (filteredResults.length === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('noResults').classList.add('hidden');
+
+            // Ordena por data decrescente
+            const sortedResults = filteredResults.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            sortedResults.forEach(res => {
+                const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
+                const cpa = calculateCPA(res.investimento, res.vendas);
+                const roas = calculateROAS(res.investimento, res.vendas);
+                const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
+                
+                // Lidando com a nova estrutura de Conversão
+                const conversionType = res.conversionType || 'N/D';
+                const conversionCount = res.conversionCount || 0;
+
+                const row = body.insertRow();
+                // A classe "text-xs" foi definida no CSS para o TD
+                row.innerHTML = `
+                    <td>${new Date(res.data).toLocaleDateString('pt-BR')}</td>
+                    <td class="font-medium text-novan-primary">${clientName}</td>
+                    <td>${res.plataforma}</td>
+                    <td>${formatCurrency(res.investimento)}</td>
+                    <td>${res.impressoes.toLocaleString('pt-BR')}</td>
+                    <td>${res.cliques.toLocaleString('pt-BR')}</td>
+                    
+                    <!-- NOVO CPM CÉLULA -->
+                    <td class="text-blue-600 font-bold">${formatCurrency(cpm)}</td>
+                    <!-- FIM NOVO CPM CÉLULA -->
+
+                    <!-- NOVO CAMPO UNIFICADO -->
+                    <td title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
+                        ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
+                    </td>
+                    <!-- FIM NOVO CAMPO -->
+                    
+                    <td>${formatCurrency(res.vendas)}</td>
+                    <td class="text-red-600 font-bold">${formatCurrency(cpa)}</td>
+                    <td class="text-green-600 font-bold">${formatNumber(roas)}</td>
+                    <td>${res.observacoes.substring(0, 20)}...</td>
+                    <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-700 text-xs">X</button></td>
+                `;
+            });
+        }
+        
+        /** Deleta um registro de resultado */
+        function deleteResult(resultId) {
+            // Removido 'confirm()'
+            results = results.filter(r => r.id !== resultId);
+            saveData();
+            renderResultsTable();
+            showMessage('Registro excluído.', true);
+        }
+
+        /** Calcula o Custo por Aquisição (CPA) */
+        function calculateCPA(investimento, vendas) {
+            // CPA baseado em Faturamento/Venda
+            if (vendas === 0 || investimento === 0) return 0;
+            return investimento / vendas;
+        }
+
+        /** Calcula o Retorno sobre o Investimento (ROAS) */
+        function calculateROAS(investimento, vendas) {
+            if (investimento === 0) return 0;
+            return vendas / investimento;
+        }
+        
+        /** Calcula o Custo por Mil Impressões (CPM) */
+        function calculateCPM(investimento, impressoes) {
+            if (impressoes === 0 || investimento === 0) return 0;
+            return (investimento / impressoes) * 1000;
+        }
+
+
+        /** Lógica para cálculo em tempo real do CPA/ROAS/CPM no formulário */
+        function updateMetricsDisplay() {
+            const investimento = parseFloat(document.getElementById('res_investimento').value) || 0;
+            const vendas = parseFloat(document.getElementById('res_vendas').value) || 0;
+            const impressoes = parseInt(document.getElementById('res_impressoes').value) || 0; // Adicionado Impressões
+
+            const cpa = calculateCPA(investimento, vendas);
+            const roas = calculateROAS(investimento, vendas);
+            const cpm = calculateCPM(investimento, impressoes); // NOVO CPM
+
+            document.getElementById('cpa_calc').textContent = formatCurrency(cpa).replace('R$', '').trim();
+            document.getElementById('roas_calc').textContent = formatNumber(roas);
+            document.getElementById('cpm_calc').textContent = formatCurrency(cpm).replace('R$', '').trim(); // NOVO CPM
+        }
+
+        document.getElementById('res_investimento').addEventListener('input', updateMetricsDisplay);
+        document.getElementById('res_vendas').addEventListener('input', updateMetricsDisplay);
+        document.getElementById('res_impressoes').addEventListener('input', updateMetricsDisplay); // NOVO LISTENER
+
+
+        /** Lógica de submissão do formulário de resultados */
+        document.getElementById('campaignForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const investimento = parseFloat(document.getElementById('res_investimento').value);
+            const vendas = parseFloat(document.getElementById('res_vendas').value);
+            const impressoes = parseInt(document.getElementById('res_impressoes').value); // Obtém Impressões
+
+            const newResult = {
+                id: crypto.randomUUID(),
+                data: document.getElementById('res_data').value,
+                clientId: document.getElementById('res_cliente').value,
+                plataforma: document.getElementById('res_plataforma').value,
+                investimento: investimento,
+                impressoes: impressoes, // Salva Impressões
+                alcance: parseInt(document.getElementById('res_alcance').value),
+                cliques: parseInt(document.getElementById('res_cliques').value),
+                
+                // Novos campos unificados de conversão
+                conversionType: document.getElementById('res_conversion_type').value,
+                conversionCount: parseInt(document.getElementById('res_conversion_count').value || 0),
+
+                vendas: vendas,
+                cpa: calculateCPA(investimento, vendas),
+                roas: calculateROAS(investimento, vendas),
+                cpm: calculateCPM(investimento, impressoes), // NOVO CPM SALVO
+                observacoes: document.getElementById('res_observacoes').value,
+            };
+
+            results.push(newResult);
+            saveData();
+            renderResultsTable();
+            document.getElementById('campaignForm').reset();
+            updateMetricsDisplay(); // Limpa os campos de cálculo
+            showMessage(`Resultado de ${newResult.plataforma} em ${new Date(newResult.data).toLocaleDateString('pt-BR')} registrado!`);
+        });
+
+        /** Gera resumo diário */
+        document.getElementById('btnResumoDiario').addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            const dailyResults = results.filter(r => r.data === today);
+
+            if (dailyResults.length === 0) {
+                return showMessage('Nenhum registro encontrado para hoje.', true);
+            }
+
+            let html = '<ul class="space-y-3">';
+            dailyResults.forEach(r => {
+                const clientName = clients.find(c => c.id === r.clientId)?.nome || 'Desconhecido';
+                
+                // Novos campos de conversão unificados
+                const conversionType = r.conversionType || 'N/D';
+                const conversionCount = r.conversionCount || 0;
+
+                html += `
+                    <li class="p-3 border rounded-lg bg-gray-50">
+                        <p class="font-bold text-lg text-novan-primary">${clientName} (${r.plataforma})</p>
+                        <p>Gasto: <span class="font-semibold">${formatCurrency(r.investimento)}</span></p>
+                        <p>Vendas/Faturamento: <span class="font-semibold">${formatCurrency(r.vendas)}</span></p>
+                        
+                        <!-- NOVO DETALHE CPM -->
+                        <p>CPM: <span class="font-bold text-blue-600">${formatCurrency(r.cpm)}</span></p>
+                        <!-- FIM NOVO DETALHE CPM -->
+
+                        <!-- NOVO DETALHE DE CONVERSÃO -->
+                        <p>Conversões (${conversionType}): <span class="font-semibold">${conversionCount.toLocaleString('pt-BR')}</span></p>
+                        <!-- FIM NOVO DETALHE -->
+                        
+                        <p>CPA: <span class="font-bold text-red-600">${formatCurrency(r.cpa)}</span> | ROAS: <span class="font-bold text-green-600">${formatNumber(r.roas)}</span></p>
+                        <p class="text-xs text-gray-500 mt-1">Obs: ${r.observacoes || 'N/A'}</p>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+
+            openSummaryModal('Resumo Diário - ' + new Date().toLocaleDateString('pt-BR'), html);
+        });
+
+        /** Gera resumo quinzenal */
+        document.getElementById('btnResumoQuinzenal').addEventListener('click', () => {
+            const today = new Date();
+            const date15DaysAgo = new Date(today);
+            date15DaysAgo.setDate(today.getDate() - 15);
+
+            const thisPeriod = results.filter(r => new Date(r.data) >= date15DaysAgo && new Date(r.data) <= today);
+            
+            // Período anterior (16 a 30 dias atrás)
+            const date30DaysAgo = new Date(today);
+            date30DaysAgo.setDate(today.getDate() - 30);
+            const lastPeriod = results.filter(r => new Date(r.data) >= date30DaysAgo && new Date(r.data) < date15DaysAgo);
+
+            const summarize = (data) => {
+                return data.reduce((acc, r) => {
+                    const clientId = r.clientId;
+                    if (!acc[clientId]) {
+                        acc[clientId] = { investimento: 0, vendas: 0, totalConversions: 0, impressoes: 0, roasSum: 0, roasCount: 0, cpmSum: 0, cpmCount: 0, count: 0 };
+                    }
+                    acc[clientId].investimento += r.investimento;
+                    acc[clientId].vendas += r.vendas;
+                    acc[clientId].totalConversions += r.conversionCount || 0;
+                    acc[clientId].impressoes += r.impressoes; // Adicionado Impressões
+                    acc[clientId].roasSum += r.roas;
+                    acc[clientId].roasCount += r.roas > 0 ? 1 : 0;
+                    acc[clientId].cpmSum += r.cpm; // Adicionado CPM
+                    acc[clientId].cpmCount += r.cpm > 0 ? 1 : 0; // Adicionado contagem CPM
+                    acc[clientId].count += 1;
+                    return acc;
+                }, {});
+            };
+
+            const summaryThis = summarize(thisPeriod);
+            const summaryLast = summarize(lastPeriod);
+            
+            let html = '<div class="space-y-4">';
+
+            if (Object.keys(summaryThis).length === 0) {
+                 html = '<p>Nenhum dado encontrado nos últimos 15 dias.</p>';
+            } else {
+                Object.keys(summaryThis).forEach(clientId => {
+                    const clientName = clients.find(c => c.id === clientId)?.nome || 'Desconhecido';
+                    const sThis = summaryThis[clientId];
+                    const sLast = summaryLast[clientId] || { investimento: 0, vendas: 0, totalConversions: 0, impressoes: 0, roasSum: 0, roasCount: 0, cpmSum: 0, cpmCount: 0 };
+                    
+                    const roasThis = sThis.roasCount > 0 ? sThis.roasSum / sThis.roasCount : 0;
+                    const roasLast = sLast.roasCount > 0 ? sLast.roasSum / sLast.roasCount : 0;
+                    
+                    const cpmAvgThis = sThis.cpmCount > 0 ? sThis.cpmSum / sThis.cpmCount : 0; // NOVO CPM Médio
+                    const cpmAvgLast = sLast.cpmCount > 0 ? sLast.cpmSum / sLast.cpmCount : 0; // NOVO CPM Médio Anterior
+                    
+                    const percentChange = (current, previous) => previous === 0 ? (current > 0 ? '+∞' : '0%') : ((current - previous) / previous * 100).toFixed(1) + '%';
+                    
+                    html += `
+                        <div class="bg-novan-light p-4 rounded-lg shadow border-l-4 border-novan-primary">
+                            <h4 class="font-bold text-xl mb-2">${clientName}</h4>
+                            <p><strong>Período Atual (15 dias):</strong></p>
+                            <ul class="ml-4 list-disc text-sm">
+                                <li>Gasto: ${formatCurrency(sThis.investimento)} 
+                                    <span class="text-xs ${parseFloat(percentChange(sThis.investimento, sLast.investimento)) > 0 ? 'text-red-500' : 'text-green-500'}">(${percentChange(sThis.investimento, sLast.investimento)})</span>
+                                </li>
+                                <li>Faturamento: ${formatCurrency(sThis.vendas)} 
+                                    <span class="text-xs ${parseFloat(percentChange(sThis.vendas, sLast.vendas)) > 0 ? 'text-green-500' : 'text-red-500'}">(${percentChange(sThis.vendas, sLast.vendas)})</span>
+                                </li>
+                                <li>ROAS Médio: ${formatNumber(roasThis)}X 
+                                    <span class="text-xs ${parseFloat(percentChange(roasThis, roasLast)) > 0 ? 'text-green-500' : 'text-red-500'}">(${percentChange(roasThis, roasLast)})</span>
+                                </li>
+                                <!-- NOVO CPM MÉDIO -->
+                                <li>CPM Médio: ${formatCurrency(cpmAvgThis)} 
+                                    <span class="text-xs ${parseFloat(percentChange(cpmAvgThis, cpmAvgLast)) > 0 ? 'text-red-500' : 'text-green-500'}">(${percentChange(cpmAvgThis, cpmAvgLast)})</span>
+                                </li>
+                                <!-- FIM NOVO CPM MÉDIO -->
+                                <li>Conversões (Total): ${sThis.totalConversions}</li>
+                            </ul>
+                            <p class="text-xs text-gray-500 mt-2">Comparativo com os 15 dias anteriores.</p>
+                        </div>
+                    `;
+                });
+            }
+
+            html += '</div>';
+
+            openSummaryModal('Resumo Quinzenal (Últimos 15 Dias)', html);
+        });
+
+        /** Abre o modal de resumo */
+        function openSummaryModal(title, content) {
+            document.getElementById('summaryTitle').textContent = title;
+            document.getElementById('summaryContent').innerHTML = content;
+            document.getElementById('summaryModal').classList.remove('hidden');
+            document.getElementById('summaryModal').classList.add('flex');
+        }
+
+        /** Fechad o modal de resumo */
+        function closeSummaryModal() {
+            document.getElementById('summaryModal').classList.remove('flex');
+            document.getElementById('summaryModal').classList.add('hidden');
+        }
+
+        // --- ABA 2: CALENDÁRIO DE TAREFAS ---
+
+        /** Renderiza o calendário (Mês Atual) */
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            document.getElementById('currentMonthYear').textContent = currentMonth.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' });
+
+            const today = new Date();
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const startingDay = firstDayOfMonth.getDay(); // 0 (Dom) a 6 (Sáb)
+
+            // Preencher dias vazios no início
+            for (let i = 0; i < startingDay; i++) {
+                grid.innerHTML += '<div class="calendar-day p-2 text-gray-300"></div>';
+            }
+
+            // Renderizar dias do mês
+            for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateString = date.toISOString().split('T')[0];
+                const isToday = date.toDateString() === today.toDateString();
+                
+                const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
+                
+                let tasksHtml = '';
+                dayTasks.forEach(task => {
+                    const client = clients.find(c => c.id === task.clientId);
+                    const clientColor = client?.color || '#334155'; // Cor padrão
+                    const clientName = client?.nome.substring(0, 10) || 'N/D';
+                    
+                    const taskDateTime = new Date(task.date).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                    // Formato do resumo para aparecer no hover (title)
+                    const taskTitle = `CLIENTE: ${clientName}\nDATA/HORA: ${taskDateTime}\nTIPO: ${task.type}\nSTATUS: ${task.status}\nOBS: ${task.observacoes || 'N/A'}`;
+
+
+                    tasksHtml += `
+                        <div class="task-item text-white shadow-sm" style="background-color: ${clientColor};" title="${taskTitle}">
+                            ${clientName} - ${task.type.substring(0, 5)}
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML += `
+                    <div class="calendar-day p-2 text-novan-secondary rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-gray-50'}">
+                        <div class="font-bold mb-1 ${isToday ? 'text-white' : 'text-novan-secondary'}">${day}</div>
+                        ${tasksHtml}
+                    </div>
+                `;
+            }
+        }
+
+        /** Manipuladores de navegação do calendário */
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        });
+
+        /** Lógica de submissão do formulário de tarefas */
+        document.getElementById('taskForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newTask = {
+                id: crypto.randomUUID(),
+                clientId: document.getElementById('task_cliente').value,
+                type: document.getElementById('task_tipo').value,
+                date: document.getElementById('task_data').value, // Formato YYYY-MM-DDTHH:MM
+                status: document.getElementById('task_status').value,
+                observacoes: document.getElementById('task_observacoes').value,
+                completionDate: null, // Novo campo
+            };
+
+            tasks.push(newTask);
+            saveData();
+            renderCalendar();
+            renderTaskNotifications();
+            renderTaskManagement(); // Atualiza a nova aba
+            document.getElementById('taskForm').reset();
+            showMessage('Tarefa agendada com sucesso!');
+        });
+        
+        /** Renderiza as notificações de tarefas próximas (próximos 7 dias) */
+        function renderTaskNotifications() {
+            const notificationBox = document.getElementById('taskNotifications');
+            const list = document.getElementById('notificationList');
+            list.innerHTML = '';
+            
+            const now = new Date();
+            const nextWeek = new Date();
+            nextWeek.setDate(now.getDate() + 7);
+
+            const upcomingTasks = tasks.filter(t => {
+                const taskDate = new Date(t.date);
+                return taskDate >= now && taskDate <= nextWeek && t.status !== 'Concluido';
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (upcomingTasks.length === 0) {
+                notificationBox.classList.add('hidden');
+                return;
+            }
+
+            notificationBox.classList.remove('hidden');
+
+            upcomingTasks.forEach(task => {
+                const clientName = clients.find(c => c.id === task.clientId)?.nome || 'N/D';
+                const taskDate = new Date(task.date);
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="font-semibold">${clientName}</span>: ${task.type} 
+                    em ${taskDate.toLocaleDateString('pt-BR')} às ${taskDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} 
+                    <span class="text-xs text-gray-500">(${task.status})</span>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
+
+        /** Atualiza o status de uma tarefa e salva/renderiza */
+        function updateTaskStatus(taskId, newStatus) {
+            const taskIndex = tasks.findIndex(t => t.id === taskId);
+            if (taskIndex !== -1) {
+                
+                // LÓGICA DE REGISTRO DE DATA DE CONCLUSÃO
+                if (newStatus === 'Concluido') {
+                    tasks[taskIndex].completionDate = new Date().toISOString();
+                } else {
+                    tasks[taskIndex].completionDate = null; // Limpa se for reaberta
+                }
+                
+                tasks[taskIndex].status = newStatus;
+                
+                saveData();
+                renderCalendar(); 
+                renderTaskManagement(); 
+                showMessage(`Status da tarefa atualizado para: ${newStatus}`);
+            }
+        }
+
+        /** Renderiza o painel de gestão de tarefas (Kanban-like) */
+        function renderTaskManagement() {
+            const boardEl = document.getElementById('taskManagementBoard');
+            const noTasksMessageEl = document.getElementById('noTasksMessage');
+            
+            if (!boardEl || !noTasksMessageEl) return;
+
+            boardEl.innerHTML = '';
+            
+            const filterClientId = document.getElementById('task_manager_filter_client').value;
+            const filterStatus = document.getElementById('task_manager_filter_status').value;
+
+            let filteredTasks = tasks.filter(t => {
+                const clientMatch = !filterClientId || t.clientId === filterClientId;
+                const statusMatch = !filterStatus || t.status === filterStatus;
+                return clientMatch && statusMatch;
+            }).sort((a, b) => new Date(a.date) - new Date(b.date)); // Ordena por data
+
+            if (filteredTasks.length === 0) {
+                noTasksMessageEl.classList.remove('hidden');
+                return;
+            }
+            noTasksMessageEl.classList.add('hidden');
+
+
+            const statusGroups = {
+                'Pendente': [],
+                'Em Andamento': [],
+                'Concluido': []
+            };
+            
+            // Reagrupar tarefas
+            filteredTasks.forEach(task => {
+                if (statusGroups[task.status]) {
+                    statusGroups[task.status].push(task);
+                }
+            });
+
+            const allStatuses = ['Pendente', 'Em Andamento', 'Concluido'];
+            const statusesToShow = filterStatus ? [filterStatus] : allStatuses;
+            
+            const statusColors = {
+                'Pendente': { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-500' },
+                'Em Andamento': { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-500' },
+                'Concluido': { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-500' }
+            };
+
+            statusesToShow.forEach(status => {
+                const tasksInGroup = statusGroups[status] || [];
+                const { bg, text, border } = statusColors[status];
+                
+                let taskCardsHtml = tasksInGroup.map(task => {
+                    const client = clients.find(c => c.id === task.clientId);
+                    const clientName = client?.nome || 'Cliente N/D';
+                    const taskDateTime = new Date(task.date).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+                    // Opções de status (inclui o status atual como selecionado)
+                    const statusOptions = allStatuses
+                        .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`)
+                        .join('');
+                    
+                    // Exibir data de conclusão
+                    let completionInfo = '';
+                    if (task.status === 'Concluido' && task.completionDate) {
+                        const completeDate = new Date(task.completionDate).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+                        completionInfo = `<p class="text-xs text-green-600 font-medium mt-1">Concluída em: ${completeDate}</p>`;
+                    }
+
+
+                    return `
+                        <div class="bg-white p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2">
+                            <p class="font-semibold text-sm">${clientName} - ${task.type}</p>
+                            <p class="text-xs text-gray-500">Prazo: ${taskDateTime}</p>
+                            <p class="text-xs italic">${task.observacoes.substring(0, 50)}...</p>
+                            ${completionInfo}
+                            <div class="flex items-center space-x-2 pt-2">
+                                <label class="text-xs font-medium text-gray-600">Mudar Status:</label>
+                                <select onchange="updateTaskStatus('${task.id}', this.value)" class="p-1 border text-xs rounded-lg bg-gray-50 focus:ring-novan-primary">
+                                    ${statusOptions}
+                                </select>
+                                <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-700 text-xs">Excluir</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                const column = document.createElement('div');
+                column.className = `${bg} p-4 rounded-xl shadow-inner border-t-4 ${border}`;
+                column.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4 ${text}">${status} (${tasksInGroup.length})</h3>
+                    <div class="space-y-4 min-h-[50px]">
+                        ${taskCardsHtml || `<p class="text-center text-sm italic ${text}">Nenhuma tarefa neste status.</p>`}
+                    </div>
+                `;
+                boardEl.appendChild(column);
+            });
+        }
+        
+        /** Deleta uma tarefa específica (Adicionado para completar a funcionalidade do Kanban) */
+        function deleteTask(taskId) {
+            // Removido 'confirm()'
+            tasks = tasks.filter(t => t.id !== taskId);
+            saveData();
+            renderCalendar();
+            renderTaskNotifications();
+            renderTaskManagement();
+            showMessage('Tarefa excluída.', true);
+        }
+
+        // --- ABA 4: RELATÓRIOS E INSIGHTS (Chart.js) ---
+
+        /** Inicializa um Chart.js (destrói o anterior se existir) */
+        function initChart(chartId, type, data, options) {
+            const canvas = document.getElementById(chartId);
+            // Destrói a instância anterior para evitar duplicidade
+            const existingChart = Chart.getChart(chartId);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+            return new Chart(canvas, { type, data, options });
+        }
+
+        /** Gera os dados e gráficos do relatório */
+        function generateReport() {
+            const clientId = document.getElementById('report_cliente').value;
+            const startDate = document.getElementById('report_start_date').value;
+            const endDate = document.getElementById('report_end_date').value;
+
+            // Filtra os resultados
+            let filteredResults = results;
+            if (clientId) {
+                filteredResults = filteredResults.filter(r => r.clientId === clientId);
+            }
+            if (startDate) {
+                filteredResults = filteredResults.filter(r => r.data >= startDate);
+            }
+            if (endDate) {
+                filteredResults = filteredResults.filter(r => r.data <= endDate);
+            }
+            
+            if (filteredResults.length === 0) {
+                document.getElementById('noReportData').classList.remove('hidden');
+                document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
+                return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
+            }
+
+            document.getElementById('noReportData').classList.add('hidden');
+            document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'block');
+            
+            // Agrupar e somar os dados por dia (para o eixo X)
+            const groupedData = filteredResults.reduce((acc, r) => {
+                if (!acc[r.data]) {
+                    acc[r.data] = { investimento: 0, faturamento: 0, impressoes: 0, cliques: 0, roasSum: 0, roasCount: 0 };
+                }
+                acc[r.data].investimento += r.investimento;
+                acc[r.data].faturamento += r.vendas;
+                acc[r.data].impressoes += r.impressoes;
+                acc[r.data].cliques += r.cliques;
+                acc[r.data].roasSum += r.roas;
+                acc[r.data].roasCount += r.roas > 0 ? 1 : 0;
+                return acc;
+            }, {});
+
+            const sortedDates = Object.keys(groupedData).sort();
+
+            const reportLabels = sortedDates.map(d => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+            const invData = sortedDates.map(d => groupedData[d].investimento);
+            const fatData = sortedDates.map(d => groupedData[d].faturamento);
+            const imprData = sortedDates.map(d => groupedData[d].impressoes);
+            const cliquesData = sortedDates.map(d => groupedData[d].cliques);
+            const roasData = sortedDates.map(d => groupedData[d].roasCount > 0 ? groupedData[d].roasSum / groupedData[d].roasCount : 0);
+
+
+            // 1. Gráfico de Gasto vs Faturamento
+            invFatChartInstance = initChart('investimentoFaturamentoChart', 'bar', {
+                labels: reportLabels,
+                datasets: [
+                    {
+                        label: 'Gasto (R$)',
+                        data: invData,
+                        backgroundColor: COLORS.investimento,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Faturamento (R$)',
+                        data: fatData,
+                        backgroundColor: COLORS.faturamento,
+                        yAxisID: 'y'
+                    }
+                ]
+            }, {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            });
+
+            // 2. Gráfico de Impressões vs Cliques
+            imprCliquesChartInstance = initChart('impressoesCliquesChart', 'line', {
+                labels: reportLabels,
+                datasets: [
+                    {
+                        label: 'Impressões',
+                        data: imprData,
+                        borderColor: COLORS.impressoes,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Cliques',
+                        data: cliquesData,
+                        borderColor: COLORS.cliques,
+                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            }, {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            });
+
+            // 3. Gráfico de ROAS Médio Diário
+            roasChartInstance = initChart('roasChart', 'line', {
+                labels: reportLabels,
+                datasets: [
+                    {
+                        label: 'ROAS Médio',
+                        data: roasData,
+                        borderColor: COLORS.roas,
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            }, {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            });
+
+            showMessage('Relatório gerado com sucesso!');
+        }
+
+        /** Simula exportação de relatório (PDF/Excel) */
+        function exportReport() {
+            if (results.length === 0) {
+                return showMessage('Nenhum dado de resultado para exportar.', true);
+            }
+            
+            // Simulação de exportação de dados brutos como JSON/CSV (simulando Excel)
+            const csvData = results.map(r => {
+                const clientName = clients.find(c => c.id === r.clientId)?.nome || 'Desconhecido';
+                
+                // Lidando com a nova estrutura de Conversão
+                const conversionType = r.conversionType || 'N/D';
+                const conversionCount = r.conversionCount || 0;
+                const cpm = r.cpm || 0; // NOVO CPM
+
+                return [
+                    r.data, clientName, r.plataforma, r.investimento, r.impressoes, r.alcance, r.cliques, cpm, conversionType, conversionCount, r.vendas, r.cpa, r.roas, r.observacoes
+                ].join(';');
+            }).join('\n');
+            
+            const csvHeader = 'Data;Cliente;Plataforma;Gasto (R$);Impressões;Alcance;Cliques;CPM (R$);Tipo Conversão;Total Conversões;Vendas (R$);CPA (R$);ROAS (X);Observações\n';
+            const fullCsv = csvHeader + csvData;
+            
+            // Download (simulação de planilha Excel/CSV)
+            const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', 'Novan_Relatorio_Trafego.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Simulação de Exportação para PDF (apenas mensagem)
+            showMessage('Exportação de dados para Planilha (CSV) iniciada. Para PDF, utilize a função de impressão do navegador (Ctrl+P) na aba de relatórios!');
+        }
+
+
+        // --- INICIALIZAÇÃO DA APLICAÇÃO PRINCIPAL (Após Login) ---
+
+        function initAppContent() {
+            loadData();
+            // Preenche o campo de responsáveis com Léo e Fabio
+            populateResponsiblesSelect(); 
+            // Define a data atual no campo de resultados
+            document.getElementById('res_data').valueAsDate = new Date();
+            // Inicia na primeira aba
+            switchTab('resultados'); 
+            
+            // Garante que o cálculo CPA/ROAS/CPM esteja zerado na inicialização
+            updateMetricsDisplay();
+        }
+
+    </script>
+</body>
+</html>
