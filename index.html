@@ -649,7 +649,7 @@
         document.getElementById('loginForm').addEventListener('submit', handleLogin);
 
         /** Lida com o Logout */
-        function handleLogout() {
+        window.handleLogout = function() {
             signOut(auth).then(() => {
                 // O onAuthStateChanged lidará com a transição para a tela de login
                 showMessage("Sessão encerrada com sucesso.", true);
@@ -711,6 +711,13 @@
             const num = parseFloat(value);
             return isNaN(num) ? '0.00' : num.toFixed(2);
         }
+        
+        /** Fechad o modal de resumo */
+        window.closeSummaryModal = function() {
+            document.getElementById('summaryModal').classList.remove('flex');
+            document.getElementById('summaryModal').classList.add('hidden');
+        }
+
 
         // --- GESTÃO DE TABS ---
 
@@ -751,7 +758,7 @@
         // --- ABA 3: CADASTRO DE CLIENTES ---
 
         /** Aplica a máscara (00) 00000-0000 ao telefone */
-        function maskPhone(input) {
+        window.maskPhone = function(input) {
             let value = input.value.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
 
             // Limita a 11 dígitos (incluindo o 9 extra de celular)
@@ -783,7 +790,7 @@
         }
         
         /** Alterna a visualização do formulário entre Tráfego Pago e Social Media */
-        function showClientFormType(type) {
+        window.showClientFormType = function(type) {
             const trafficFields = document.getElementById('trafficFields');
             const socialMediaFields = document.getElementById('socialMediaFields');
             const formTitle = document.getElementById('clientFormTitle');
@@ -981,7 +988,7 @@
         });
 
         /** Deleta um cliente e todos os dados associados */
-        function deleteClient(clientId) {
+        window.deleteClient = function(clientId) {
             // REMOVIDO 'confirm()' para evitar bloqueio no ambiente. A exclusão é imediata.
             
             clients = clients.filter(c => c.id !== clientId);
@@ -1007,7 +1014,7 @@
         // --- ABA 1: RESULTADOS DE CAMPANHAS ---
 
         /** Renderiza a tabela de resultados */
-        function renderResultsTable() {
+        window.renderResultsTable = function() {
             const body = document.getElementById('resultsTableBody');
             const resultsFilterClient = document.getElementById('results_filter_cliente')?.value; // NOVO: Filtro de Cliente
             const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value; // NOVO: Filtro de Data Inicial
@@ -1081,7 +1088,7 @@
         }
         
         /** Deleta um registro de resultado */
-        function deleteResult(resultId) {
+        window.deleteResult = function(resultId) {
             // Removido 'confirm()'
             results = results.filter(r => r.id !== resultId);
             saveData();
@@ -1300,11 +1307,6 @@
             document.getElementById('summaryModal').classList.add('flex');
         }
 
-        /** Fechad o modal de resumo */
-        function closeSummaryModal() {
-            document.getElementById('summaryModal').classList.remove('flex');
-            document.getElementById('summaryModal').classList.add('hidden');
-        }
 
         // --- ABA 2: CALENDÁRIO DE TAREFAS ---
 
@@ -1434,7 +1436,7 @@
         // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
-        function updateTaskStatus(taskId, newStatus) {
+        window.updateTaskStatus = function(taskId, newStatus) {
             const taskIndex = tasks.findIndex(t => t.id === taskId);
             if (taskIndex !== -1) {
                 
@@ -1455,7 +1457,7 @@
         }
 
         /** Renderiza o painel de gestão de tarefas (Kanban-like) */
-        function renderTaskManagement() {
+        window.renderTaskManagement = function() {
             const boardEl = document.getElementById('taskManagementBoard');
             const noTasksMessageEl = document.getElementById('noTasksMessage');
             
@@ -1553,7 +1555,7 @@
         }
         
         /** Deleta uma tarefa específica (Adicionado para completar a funcionalidade do Kanban) */
-        function deleteTask(taskId) {
+        window.deleteTask = function(taskId) {
             // Removido 'confirm()'
             tasks = tasks.filter(t => t.id !== taskId);
             saveData();
@@ -1577,7 +1579,7 @@
         }
 
         /** Gera os dados e gráficos do relatório */
-        function generateReport() {
+        window.generateReport = function() {
             const clientId = document.getElementById('report_cliente').value;
             const startDate = document.getElementById('report_start_date').value;
             const endDate = document.getElementById('report_end_date').value;
@@ -1703,7 +1705,7 @@
         }
 
         /** Simula exportação de relatório (PDF/Excel) */
-        function exportReport() {
+        window.exportReport = function() {
             if (results.length === 0) {
                 return showMessage('Nenhum dado de resultado para exportar.', true);
             }
