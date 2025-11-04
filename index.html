@@ -76,6 +76,7 @@
         }
         .calendar-day:hover {
             transform: scale(1.02);
+            cursor: pointer; /* Adiciona cursor de ponteiro para indicar que é clicável */
         }
         .task-item {
             font-size: 0.75rem;
@@ -88,13 +89,74 @@
             white-space: nowrap;
         }
         
+        /* --- ESTILOS DE LOGIN (FUNDO ANIMADO) --- */
+        #login-page {
+            background-color: #0E1B31; /* Azul Marinho Escuro */
+            position: relative;
+            overflow: hidden;
+        }
+        #login-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Padrão de Grid Sutil */
+            background-image: linear-gradient(to right, rgba(109, 40, 217, 0.1) 1px, transparent 1px), 
+                              linear-gradient(to bottom, rgba(109, 40, 217, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+            animation: pulseGlow 15s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.05); }
+        }
+
+        /* PEÇAS DE JOGO ANIMADAS */
+        .futuristic-piece {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #a78bfa 0%, #6D28D9 100%);
+            box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5);
+            z-index: 1;
+            opacity: 0.7;
+            animation: floatPiece 15s ease-in-out infinite alternate, pulsePiece 3s ease-in-out infinite;
+        }
+
+        .piece-1 { top: 10%; left: 10%; transform: scale(0.8); }
+        .piece-2 { bottom: 15%; right: 10%; width: 90px; height: 90px; background: radial-gradient(circle at 70% 70%, #d8b4fe 0%, #6D28D9 100%); animation-delay: 2s; }
+        .piece-3 { top: 50%; left: 5%; transform: scale(0.6); animation-delay: 4s; }
+        .piece-4 { bottom: 5%; left: 40%; width: 40px; height: 40px; animation-delay: 6s; }
+
+        @keyframes floatPiece {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(50px, -50px) rotate(10deg); }
+        }
+
+        @keyframes pulsePiece {
+            0% { box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 25px #c4b5fd, inset 0 0 15px #a78bfa; }
+            100% { box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5); }
+        }
+        /* FIM PEÇAS DE JOGO ANIMADAS */
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen">
     
     <!-- Tela de Login -->
     <div id="login-page" class="flex items-center justify-center min-h-screen w-full bg-novan-secondary">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+        <!-- Peças de Jogo Animadas para Fundo Futurista -->
+        <div class="futuristic-piece piece-1"></div>
+        <div class="futuristic-piece piece-2"></div>
+        <div class="futuristic-piece piece-3"></div>
+        <div class="futuristic-piece piece-4"></div>
+        <!-- Fim Peças de Jogo Animadas -->
+
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md z-10">
             <h1 class="text-4xl font-bold text-center text-novan-primary mb-6">Novan Agency</h1>
             <p class="text-center text-gray-600 mb-8">Acesso restrito. Faça login para continuar.</p>
             
@@ -102,8 +164,22 @@
                 <input type="email" id="login_email" placeholder="Email" required 
                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
                 
-                <input type="password" id="login_password" placeholder="Senha" required 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                <!-- CAMPO DE SENHA COM TOGGLE DE VISIBILIDADE -->
+                <div class="relative">
+                    <input type="password" id="login_password" placeholder="Senha" required 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary pr-10" />
+                    <button type="button" onclick="togglePasswordVisibility()" 
+                        class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-novan-primary transition-colors">
+                        <!-- SVG do Olho Aberto (Padrão) -->
+                        <svg id="togglePasswordIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <!-- Path 1 (Center dot/circle) -->
+                            <path id="togglePasswordPath1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <!-- Path 2 (Eye outline) -->
+                            <path id="togglePasswordPath2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- FIM CAMPO DE SENHA COM TOGGLE DE VISIBILIDADE -->
                 
                 <div class="flex items-center justify-between">
                     <label for="rememberMe" class="flex items-center text-sm text-gray-600">
@@ -195,7 +271,7 @@
                         <input type="number" id="res_alcance" placeholder="Alcance" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
                         <input type="number" id="res_cliques" placeholder="Cliques no Site" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
                         <!-- Vendas / Faturamento movido para a 4ª coluna da Linha 2 -->
-                        <input type="number" step="0.01" id="res_vendas" placeholder="Vendas / Faturamento (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="number" step="0.01" id="res_vendas" placeholder="Vendas (incl. Compras) / Faturamento (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
                         
                         <!-- LINHA 3 (Conversão e Métricas Calculadas) -->
                         <!-- BLOCO DE CONVERSÃO - Agora ocupa 2 colunas para mais visibilidade -->
@@ -213,9 +289,9 @@
                         </div>
                         <!-- Métricas Calculadas (CPA, ROAS, CPM) - Ocupa as 2 colunas restantes -->
                         <div class="col-span-1 md:col-span-2 flex items-center space-x-4">
-                            <div class="text-sm font-medium text-gray-600">CPA: <span id="cpa_calc" class="font-bold text-red-600">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-600">CPA: R$ <span id="cpa_calc" class="font-bold text-red-600">0.00</span></div>
                             <div class="text-sm font-medium text-gray-600">ROAS: <span id="roas_calc" class="font-bold text-green-600">0.00</span></div>
-                            <div class="text-sm font-medium text-gray-600">CPM: <span id="cpm_calc" class="font-bold text-blue-600">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-600">CPM: R$ <span id="cpm_calc" class="font-bold text-blue-600">0.00</span></div>
                         </div>
                         
                         <!-- LINHA 4 (Observações e Botões) -->
@@ -391,6 +467,9 @@
                     <form id="clientForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Campo oculto para armazenar o tipo de serviço ativo -->
                         <input type="hidden" id="cli_service_type" value="traffic">
+                        <!-- Campo oculto para ID de edição -->
+                        <input type="hidden" id="cli_id_edit" value="">
+
 
                         <!-- CAMPOS COMUNS -->
                         <input type="text" id="cli_nome" placeholder="Nome da Empresa" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
@@ -460,8 +539,11 @@
 
                         <textarea id="cli_observacoes" placeholder="Observações gerais e Nicho" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-2"></textarea>
 
-                        <button type="submit" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                        <button type="submit" id="clientSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Cadastrar Cliente
+                        </button>
+                        <button type="button" id="clientCancelButton" onclick="resetClientForm()" class="hidden col-span-1 md:col-span-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Cancelar Edição
                         </button>
                     </form>
                 </div>
@@ -490,7 +572,7 @@
                         <option value="">Todos os Status</option>
                         <option value="Pendente">Pendente</option>
                         <option value="Em Andamento">Em Andamento</option>
-                        <option value="Concluido">Concluído</option>
+                        <option value="Concluido">Concluido</option>
                     </select>
                     <button onclick="renderTaskManagement()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                         Aplicar Filtros
@@ -521,9 +603,14 @@
                         <button onclick="generateReport()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Gerar Relatório
                         </button>
-                        <button onclick="exportReport()" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
-                            Exportar (PDF/Excel)
+                        <!-- BOTÕES DE EXPORTAÇÃO SEPARADOS -->
+                        <button onclick="exportReportAsCSV()" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Exportar Dados (CSV)
                         </button>
+                        <button onclick="exportCombinedReportAsPNG()" class="bg-pink-700 hover:bg-pink-800 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            Exportar Relatório (PNG)
+                        </button>
+                        <!-- FIM BOTÕES DE EXPORTAÇÃO SEPARADOS -->
                     </div>
                 </div>
 
@@ -580,7 +667,9 @@
         let currentMonth = new Date();
         
         let invFatChartInstance, imprCliquesChartInstance, roasChartInstance;
-        
+        let reportSummaryMetrics = null; // Armazena as métricas de resumo
+        let reportDetailedResults = []; // NOVO: Armazena os resultados filtrados para o relatório PNG
+
         // Lista global de responsáveis da agência
         const AGENCY_RESPONSIBLES = ["Léo Begalli", "Fabio Franco", "Outro"];
 
@@ -593,6 +682,10 @@
             cliques: '#EC4899',      // Pink 500
             roas: '#F59E0B'          // Amber 500
         };
+        
+        // Cores do Relatório PNG
+        const NAVY_BLUE = '#0E1B31'; 
+        const LIGHT_TEXT = '#E2E8F0'; // light gray/off-white
 
         // --- FUNÇÕES DE AUTENTICAÇÃO ---
         
@@ -670,6 +763,35 @@
             }
         });
 
+        /** Alterna a visibilidade da senha no campo de login */
+        window.togglePasswordVisibility = function() {
+            const passwordInput = document.getElementById('login_password');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            const path1 = document.getElementById('togglePasswordPath1');
+            const path2 = document.getElementById('togglePasswordPath2');
+            
+            const isPassword = passwordInput.type === 'password';
+
+            if (isPassword) {
+                // Mudar para texto (Olho aberto)
+                passwordInput.type = 'text';
+                // Ícone de Olho Aberto (Ajustar paths se necessário)
+                // Os paths já são do olho aberto, mas se fosse mudar para olho slash
+                path1.setAttribute('d', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z');
+                path2.setAttribute('d', 'M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z');
+                toggleIcon.setAttribute('title', 'Ocultar Senha');
+                
+            } else {
+                // Mudar para senha (Olho fechado/slash)
+                passwordInput.type = 'password';
+                // Ícone de Olho Fechado
+                path1.setAttribute('d', 'M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 1.274-4.057 5.065-7 9.542-7a10.05 10.05 0 011.875.175m-2.031 3.22A3.001 3.001 0 0012 15a3 3 0 003-3h-1.062a4.986 4.986 0 01-1.429-1.429m1.43-1.43a3 3 0 00-4.243 4.243M9.879 9.879l4.242 4.242M9.88 9.88l.585-.585M12 15a3 3 0 01-3-3h1.062a4.986 4.986 0 001.429 1.429m-1.43 1.43a3 3 0 014.243-4.243m-4.243 4.243l4.242-4.242'); // Simplificação para mostrar o olho cortado/slashed
+                path2.setAttribute('d', 'M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 1.274-4.057 5.065-7 9.542-7a10.05 10.05 0 011.875.175'); // Ajusta um path para ser mais consistente com o visual de olho fechado
+                toggleIcon.setAttribute('title', 'Exibir Senha');
+
+            }
+        }
+
 
         // --- FUNÇÕES DE UTILIDADE E ARMAZENAMENTO (localStorage) ---
 
@@ -699,14 +821,34 @@
             }, duration);
         }
 
-        /** Formata um número para moeda BRL */
+        /** Formata um número para moeda BRL (R$ 1.000,00) */
         function formatCurrency(value) {
             // Garante que o valor seja um número válido antes de formatar
             const num = parseFloat(value);
             return isNaN(num) ? 'R$ 0,00' : num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
+        
+        /** * Formata um número para o padrão brasileiro (1.000,32) sem o símbolo R$.
+         * Usado em contextos onde o R$ é redundante ou não desejado (ex: cabeçalho do PNG).
+         */
+        function formatValueBRL(value) {
+            const num = parseFloat(value);
+            if (isNaN(num)) return '0,00';
+            
+            // 1. Usa toLocaleString para obter o formato monetário pt-BR com 2 casas decimais
+            const currencyString = num.toLocaleString('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
 
-        /** Formata um número para 2 casas decimais (ROAS/CPA/CPM) */
+            // 2. Remove o símbolo R$ e espaços adjacentes
+            // A formatação do toLocaleString garante o padrão 1.000,32
+            return currencyString.replace('R$', '').trim();
+        }
+
+        /** Formata um número para 2 casas decimais (ROAS) */
         function formatNumber(value) {
             const num = parseFloat(value);
             return isNaN(num) ? '0.00' : num.toFixed(2);
@@ -716,6 +858,12 @@
         window.closeSummaryModal = function() {
             document.getElementById('summaryModal').classList.remove('flex');
             document.getElementById('summaryModal').classList.add('hidden');
+        }
+
+        /** Utility: Adiciona um offset para garantir que a data YYYY-MM-DD seja lida localmente (Fix Timezone Bug) */
+        function getLocalDayDate(dateString) {
+            // Adiciona um componente de tempo no meio do dia para garantir que o fuso horário local não mova a data para o dia anterior.
+            return new Date(dateString + 'T12:00:00'); 
         }
 
 
@@ -838,6 +986,56 @@
                 document.getElementById('cli_sm_fee').required = true;
                 document.getElementById('cli_sm_needs').required = true;
             }
+
+            // Garante que o formulário está no modo de cadastro ao trocar de tipo
+            if (document.getElementById('cli_id_edit').value === "") {
+                resetClientForm();
+            }
+        }
+        
+        /** Reseta o formulário de cliente para o modo de Cadastro */
+        window.resetClientForm = function() {
+            document.getElementById('clientForm').reset();
+            document.getElementById('cli_id_edit').value = "";
+            document.getElementById('clientSubmitButton').textContent = "Cadastrar Cliente";
+            document.getElementById('clientCancelButton').classList.add('hidden');
+        }
+        
+        /** Carrega os dados do cliente no formulário para edição */
+        window.editClient = function(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) {
+                return showMessage('Cliente não encontrado.', true);
+            }
+            
+            // 1. Alterna o tipo de formulário e define o ID para edição
+            showClientFormType(client.serviceType);
+            document.getElementById('cli_id_edit').value = clientId;
+
+            // 2. Popula campos comuns
+            document.getElementById('cli_nome').value = client.nome;
+            document.getElementById('cli_responsavel').value = client.responsavel;
+            document.getElementById('cli_telefone').value = client.telefone;
+            document.getElementById('cli_link').value = client.link;
+            document.getElementById('cli_observacoes').value = client.observacoes;
+
+            // 3. Popula campos específicos
+            if (client.serviceType === 'traffic') {
+                document.getElementById('cli_plataforma_traffic').value = client.platformTraffic;
+                document.getElementById('cli_budget_type_traffic').value = client.budgetType;
+                document.getElementById('cli_budget_value_traffic').value = client.budgetValue;
+                document.getElementById('cli_conversion_goals_traffic').value = client.conversionGoal;
+            } else if (client.serviceType === 'social') {
+                document.getElementById('cli_sm_platform').value = client.platformSM;
+                document.getElementById('cli_sm_fee').value = client.smFee;
+                document.getElementById('cli_sm_needs').value = client.smNeeds;
+            }
+
+            // 4. Altera botões de submissão
+            document.getElementById('clientSubmitButton').textContent = "Salvar Alterações";
+            document.getElementById('clientCancelButton').classList.remove('hidden');
+            
+            showMessage(`Modo de Edição ativado para ${client.nome}.`, false, true);
         }
 
 
@@ -870,6 +1068,7 @@
                 if (client.serviceType === 'traffic') {
                     // Dados de TRÁFEGO PAGO
                     const budgetLabel = client.budgetType || 'Orçamento';
+                    // USANDO formatCurrency POIS É O DISPLAY COMPLETO
                     const budgetValue = client.budgetValue ? formatCurrency(client.budgetValue) : 'N/A';
                     const goal = client.conversionGoal || 'N/A';
                     mainPlatformDisplay = client.platformTraffic || 'N/A';
@@ -878,8 +1077,18 @@
                         <li><span class="font-medium">${budgetLabel}:</span> ${budgetValue}</li> 
                         <li><span class="font-medium">Meta Principal:</span> ${goal}</li> 
                     `;
+                    
+                    // Adicionar histórico de orçamento para visualização
+                    if (client.budgetHistory && client.budgetHistory.length > 0) {
+                        const latestHistory = client.budgetHistory[client.budgetHistory.length - 1];
+                         detailListHtml += `<li title="Orçamento anterior: ${latestHistory.type} ${formatCurrency(latestHistory.value)} em ${new Date(latestHistory.date).toLocaleDateString('pt-BR')}" class="text-gray-400 text-xs mt-1">
+                            Histórico (Hover)
+                         </li>`;
+                    }
+                    
                 } else if (client.serviceType === 'social') {
                     // Dados de SOCIAL MEDIA
+                    // USANDO formatCurrency POIS É O DISPLAY COMPLETO
                     const feeValue = client.smFee ? formatCurrency(client.smFee) : 'N/A';
                     const smNeeds = client.smNeeds || 'N/A';
                     mainPlatformDisplay = client.platformSM || 'N/A';
@@ -903,7 +1112,10 @@
                         <li><span class="font-medium">Link:</span> <a href="${client.link}" target="_blank" class="text-novan-primary hover:underline">${client.link ? 'Acessar' : 'N/A'}</a></li>
                         <li class="mt-2"><span class="font-medium">Nicho/Obs.:</span> ${client.observacoes || 'N/A'}</li>
                     </ul>
-                    <button onclick="deleteClient('${client.id}')" class="mt-3 text-red-500 hover:text-red-700 text-xs">Excluir</button>
+                    <div class="flex space-x-3 mt-3">
+                        <button onclick="editClient('${client.id}')" class="text-indigo-500 hover:text-indigo-700 text-xs font-semibold">Editar</button>
+                        <button onclick="deleteClient('${client.id}')" class="text-red-500 hover:text-red-700 text-xs">Excluir</button>
+                    </div>
                 `;
                 listEl.appendChild(card);
             });
@@ -941,47 +1153,79 @@
             });
         }
 
-        /** Lógica de submissão do formulário de cliente */
+        /** Lógica de submissão do formulário de cliente (Cadastro ou Edição) */
         document.getElementById('clientForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
+            const clientIdToEdit = document.getElementById('cli_id_edit').value;
+            const isEditing = clientIdToEdit !== "";
+            const clientIndex = clients.findIndex(c => c.id === clientIdToEdit);
+            
             const serviceType = document.getElementById('cli_service_type').value;
-            let newClient = {
+
+            let clientData = isEditing ? clients[clientIndex] : {
                 id: crypto.randomUUID(),
-                serviceType: serviceType, // Salva o tipo de serviço
-                nome: document.getElementById('cli_nome').value,
-                responsavel: document.getElementById('cli_responsavel').value,
-                telefone: document.getElementById('cli_telefone').value,
-                link: document.getElementById('cli_link').value,
-                observacoes: document.getElementById('cli_observacoes').value,
-                color: generateClientColor(clients.length)
+                color: generateClientColor(clients.length),
+                budgetHistory: [] // Inicializa histórico de orçamento
             };
+
+            // CAMPOS COMUNS
+            clientData.serviceType = serviceType;
+            clientData.nome = document.getElementById('cli_nome').value;
+            clientData.responsavel = document.getElementById('cli_responsavel').value;
+            clientData.telefone = document.getElementById('cli_telefone').value;
+            clientData.link = document.getElementById('cli_link').value;
+            clientData.observacoes = document.getElementById('cli_observacoes').value;
+            
+            // Guarda valores antigos para comparação (apenas para Tráfego Pago)
+            const oldBudgetType = clientData.budgetType;
+            const oldBudgetValue = clientData.budgetValue;
+
 
             if (serviceType === 'traffic') {
                 // Coleta dados específicos de Tráfego Pago
-                newClient.platformTraffic = document.getElementById('cli_plataforma_traffic').value;
-                newClient.budgetType = document.getElementById('cli_budget_type_traffic').value;
-                newClient.budgetValue = parseFloat(document.getElementById('cli_budget_value_traffic').value);
-                newClient.conversionGoal = document.getElementById('cli_conversion_goals_traffic').value;
-                // Para compatibilidade com a aba de resultados, o campo "plataforma" é setado a partir do traffic.platformTraffic
-                newClient.plataforma = newClient.platformTraffic; 
+                clientData.platformTraffic = document.getElementById('cli_plataforma_traffic').value;
+                clientData.budgetType = document.getElementById('cli_budget_type_traffic').value;
+                clientData.budgetValue = parseFloat(document.getElementById('cli_budget_value_traffic').value);
+                clientData.conversionGoal = document.getElementById('cli_conversion_goals_traffic').value;
+                clientData.plataforma = clientData.platformTraffic; 
+                
+                // LÓGICA DE HISTÓRICO DE ORÇAMENTO (Apenas se estiver editando E houver mudança)
+                if (isEditing && (oldBudgetType !== clientData.budgetType || oldBudgetValue !== clientData.budgetValue)) {
+                    if (!clientData.budgetHistory) {
+                        clientData.budgetHistory = [];
+                    }
+                    // Adiciona o orçamento *antigo* ao histórico
+                    clientData.budgetHistory.push({
+                        date: new Date().toISOString(),
+                        type: oldBudgetType,
+                        value: oldBudgetValue
+                    });
+                }
+
 
             } else if (serviceType === 'social') {
                 // Coleta dados específicos de Social Media
-                newClient.platformSM = document.getElementById('cli_sm_platform').value;
-                newClient.smFee = parseFloat(document.getElementById('cli_sm_fee').value);
-                newClient.smNeeds = document.getElementById('cli_sm_needs').value;
-                // Para compatibilidade com a aba de resultados (embora SM não use o registro de resultados de Ads), setamos um valor
-                newClient.plataforma = newClient.platformSM;
+                clientData.platformSM = document.getElementById('cli_sm_platform').value;
+                clientData.smFee = parseFloat(document.getElementById('cli_sm_fee').value);
+                clientData.smNeeds = document.getElementById('cli_sm_needs').value;
+                clientData.plataforma = clientData.platformSM;
             }
 
-            clients.push(newClient);
+            if (!isEditing) {
+                clients.push(clientData);
+                showMessage(`Cliente ${clientData.nome} cadastrado com sucesso!`);
+            } else {
+                clients[clientIndex] = clientData;
+                showMessage(`Cliente ${clientData.nome} atualizado com sucesso!`);
+                resetClientForm(); // Volta ao modo de cadastro após salvar
+            }
+
             saveData();
             // Chamando as funções de renderização novamente para garantir a atualização IMEDIATA
             renderClientList(); 
             populateClientSelects();
             document.getElementById('clientForm').reset();
-            showMessage(`Cliente ${newClient.nome} (${serviceType === 'traffic' ? 'Tráfego Pago' : 'Social Media'}) cadastrado com sucesso!`);
             
             // Reverte para o formulário padrão de Tráfego Pago
             showClientFormType('traffic'); 
@@ -993,7 +1237,7 @@
             
             clients = clients.filter(c => c.id !== clientId);
             results = results.filter(r => r.clientId !== clientId);
-            tasks = tasks.filter(t => t.clientId !== clientId);
+            tasks = tasks.filter(t => t.id !== clientId);
             
             saveData();
             renderClientList();
@@ -1050,7 +1294,7 @@
 
             sortedResults.forEach(res => {
                 const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
-                const cpa = calculateCPA(res.investimento, res.vendas);
+                const cpa = calculateCPA(res.investimento, res.conversionCount); // ATUALIZADO: Usando conversionCount
                 const roas = calculateROAS(res.investimento, res.vendas);
                 const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
                 
@@ -1097,10 +1341,10 @@
         }
 
         /** Calcula o Custo por Aquisição (CPA) */
-        function calculateCPA(investimento, vendas) {
-            // CPA baseado em Faturamento/Venda
-            if (vendas === 0 || investimento === 0) return 0;
-            return investimento / vendas;
+        function calculateCPA(gasto, aquisicoes) {
+            // CPA = Gasto / Total de Aquisições (Conversões)
+            if (aquisicoes === 0 || gasto === 0) return 0;
+            return gasto / aquisicoes;
         }
 
         /** Calcula o Retorno sobre o Investimento (ROAS) */
@@ -1121,19 +1365,22 @@
             const investimento = parseFloat(document.getElementById('res_investimento').value) || 0;
             const vendas = parseFloat(document.getElementById('res_vendas').value) || 0;
             const impressoes = parseInt(document.getElementById('res_impressoes').value) || 0; // Adicionado Impressões
+            const conversionCount = parseInt(document.getElementById('res_conversion_count').value) || 0; // NOVO: Total de Conversões
 
-            const cpa = calculateCPA(investimento, vendas);
+            const cpa = calculateCPA(investimento, conversionCount); // ATUALIZADO: Usando conversionCount
             const roas = calculateROAS(investimento, vendas);
             const cpm = calculateCPM(investimento, impressoes); // NOVO CPM
 
-            document.getElementById('cpa_calc').textContent = formatCurrency(cpa).replace('R$', '').trim();
+            // USANDO formatValueBRL para o formato 1.000,32 (sem R$)
+            document.getElementById('cpa_calc').textContent = formatValueBRL(cpa);
             document.getElementById('roas_calc').textContent = formatNumber(roas);
-            document.getElementById('cpm_calc').textContent = formatCurrency(cpm).replace('R$', '').trim(); // NOVO CPM
+            document.getElementById('cpm_calc').textContent = formatValueBRL(cpm);
         }
 
         document.getElementById('res_investimento').addEventListener('input', updateMetricsDisplay);
         document.getElementById('res_vendas').addEventListener('input', updateMetricsDisplay);
-        document.getElementById('res_impressoes').addEventListener('input', updateMetricsDisplay); // NOVO LISTENER
+        document.getElementById('res_impressoes').addEventListener('input', updateMetricsDisplay);
+        document.getElementById('res_conversion_count').addEventListener('input', updateMetricsDisplay); // Adicionado listener para conversões
 
 
         /** Lógica de submissão do formulário de resultados */
@@ -1143,6 +1390,7 @@
             const investimento = parseFloat(document.getElementById('res_investimento').value);
             const vendas = parseFloat(document.getElementById('res_vendas').value);
             const impressoes = parseInt(document.getElementById('res_impressoes').value); // Obtém Impressões
+            const conversionCount = parseInt(document.getElementById('res_conversion_count').value || 0); // Obtém Total de Conversões
 
             const newResult = {
                 id: crypto.randomUUID(),
@@ -1156,10 +1404,10 @@
                 
                 // Novos campos unificados de conversão
                 conversionType: document.getElementById('res_conversion_type').value,
-                conversionCount: parseInt(document.getElementById('res_conversion_count').value || 0),
+                conversionCount: conversionCount,
 
                 vendas: vendas,
-                cpa: calculateCPA(investimento, vendas),
+                cpa: calculateCPA(investimento, conversionCount), // ATUALIZADO: Usando conversionCount
                 roas: calculateROAS(investimento, vendas),
                 cpm: calculateCPM(investimento, impressoes), // NOVO CPM SALVO
                 observacoes: document.getElementById('res_observacoes').value,
@@ -1235,7 +1483,7 @@
                     }
                     acc[clientId].investimento += r.investimento;
                     acc[clientId].vendas += r.vendas;
-                    acc[clientId].totalConversions += r.conversionCount || 0;
+                    acc[clientId].totalConversions += r.conversionCount || 0; // totalConversions is available
                     acc[clientId].impressoes += r.impressoes; // Adicionado Impressões
                     acc[clientId].roasSum += r.roas;
                     acc[clientId].roasCount += r.roas > 0 ? 1 : 0;
@@ -1309,6 +1557,41 @@
 
 
         // --- ABA 2: CALENDÁRIO DE TAREFAS ---
+        
+        /** Exibe um resumo de todas as tarefas para um dia específico ao clicar no dia do calendário. */
+        window.showDaySummary = function(dateString) {
+            const dateObj = getLocalDayDate(dateString); // Usando a nova função para evitar erros de timezone
+            
+            const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
+
+            const title = `Resumo de Tarefas: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+
+            if (dayTasks.length === 0) {
+                const content = `<p class="text-center text-gray-500">Nenhuma tarefa agendada para este dia.</p>`;
+                return openSummaryModal(title, content);
+            }
+
+            let contentHtml = '<div class="space-y-3">';
+            dayTasks.forEach(task => {
+                const client = clients.find(c => c.id === task.clientId);
+                const clientName = client?.nome || 'Cliente N/D';
+                const taskTime = new Date(task.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                
+                const statusColor = task.status === 'Concluido' ? 'text-green-600' : 
+                                    task.status === 'Em Andamento' ? 'text-yellow-600' : 'text-red-600';
+                
+                contentHtml += `
+                    <div class="p-3 border rounded-lg shadow-sm">
+                        <p class="font-bold text-novan-secondary">${clientName} - ${task.type}</p>
+                        <p class="text-sm font-semibold">${taskTime} <span class="${statusColor}">(${task.status})</span></p>
+                        <p class="text-xs text-gray-600 italic mt-1">Obs: ${task.observacoes || 'Sem observações.'}</p>
+                    </div>
+                `;
+            });
+            contentHtml += '</div>';
+
+            openSummaryModal(title, contentHtml);
+        }
 
         /** Renderiza o calendário (Mês Atual) */
         function renderCalendar() {
@@ -1357,7 +1640,7 @@
                 });
 
                 grid.innerHTML += `
-                    <div class="calendar-day p-2 text-novan-secondary rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-gray-50'}">
+                    <div class="calendar-day p-2 text-novan-secondary rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-gray-50'}" onclick="showDaySummary('${dateString}')">
                         <div class="font-bold mb-1 ${isToday ? 'text-white' : 'text-novan-secondary'}">${day}</div>
                         ${tasksHtml}
                     </div>
@@ -1599,6 +1882,8 @@
             if (filteredResults.length === 0) {
                 document.getElementById('noReportData').classList.remove('hidden');
                 document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
+                reportSummaryMetrics = null; // Limpa o resumo
+                reportDetailedResults = []; // Limpa detalhes
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
 
@@ -1608,7 +1893,7 @@
             // Agrupar e somar os dados por dia (para o eixo X)
             const groupedData = filteredResults.reduce((acc, r) => {
                 if (!acc[r.data]) {
-                    acc[r.data] = { investimento: 0, faturamento: 0, impressoes: 0, cliques: 0, roasSum: 0, roasCount: 0 };
+                    acc[r.data] = { investimento: 0, faturamento: 0, impressoes: 0, cliques: 0, roasSum: 0, roasCount: 0, conversionCount: 0 }; // Adicionado conversionCount
                 }
                 acc[r.data].investimento += r.investimento;
                 acc[r.data].faturamento += r.vendas;
@@ -1616,96 +1901,128 @@
                 acc[r.data].cliques += r.cliques;
                 acc[r.data].roasSum += r.roas;
                 acc[r.data].roasCount += r.roas > 0 ? 1 : 0;
+                acc[r.data].conversionCount += r.conversionCount; // Adicionado conversionCount
                 return acc;
             }, {});
 
             const sortedDates = Object.keys(groupedData).sort();
 
-            const reportLabels = sortedDates.map(d => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+            // SALVA OS DETALHES ORDENADOS PARA EXPORTAÇÃO EM TEXTO
+            reportDetailedResults = filteredResults.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            // CORREÇÃO DE DATA: Usando a função getLocalDayDate para evitar o bug de timezone
+            const reportLabels = sortedDates.map(d => getLocalDayDate(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
             const invData = sortedDates.map(d => groupedData[d].investimento);
             const fatData = sortedDates.map(d => groupedData[d].faturamento);
             const imprData = sortedDates.map(d => groupedData[d].impressoes);
             const cliquesData = sortedDates.map(d => groupedData[d].cliques);
             const roasData = sortedDates.map(d => groupedData[d].roasCount > 0 ? groupedData[d].roasSum / groupedData[d].roasCount : 0);
+            
+            // NOVO: Cálculo das Métricas de Resumo
+            const totalGasto = filteredResults.reduce((sum, r) => sum + r.investimento, 0);
+            const totalFaturamento = filteredResults.reduce((sum, r) => sum + r.vendas, 0);
+            const totalConversoes = filteredResults.reduce((sum, r) => sum + (r.conversionCount || 0), 0);
+            const totalImpressoes = filteredResults.reduce((sum, r) => sum + r.impressoes, 0);
+            
+            const avgROAS = calculateROAS(totalGasto, totalFaturamento);
+            const avgCPA = calculateCPA(totalGasto, totalConversoes);
+            const avgCPM = calculateCPM(totalGasto, totalImpressoes);
+            
+            // Determina o nome do cliente para o título do relatório
+            const clientNameForReport = clientId 
+                ? clients.find(c => c.id === clientId)?.nome || 'Cliente Desconhecido'
+                : 'Todos os Clientes'; // Se nenhum cliente for selecionado
+
+            reportSummaryMetrics = {
+                totalGasto: totalGasto,
+                totalFaturamento: totalFaturamento,
+                avgROAS: avgROAS,
+                avgCPA: avgCPA,
+                avgCPM: avgCPM,
+                clientName: clientNameForReport, // ADICIONADO: Nome do cliente para o cabeçalho PNG
+                // Garantindo que a string de período é baseada nos rótulos gerados
+                period: reportLabels.length > 0 ? `${reportLabels[0]} a ${reportLabels[reportLabels.length - 1]}` : 'N/A',
+                // Data de Geração - CORRIGIDO: Usando toLocaleString para incluir data e hora
+                generationDate: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+            };
 
 
-            // 1. Gráfico de Gasto vs Faturamento
-            invFatChartInstance = initChart('investimentoFaturamentoChart', 'bar', {
-                labels: reportLabels,
-                datasets: [
-                    {
-                        label: 'Gasto (R$)',
-                        data: invData,
-                        backgroundColor: COLORS.investimento,
-                        yAxisID: 'y'
+            // Usando setTimeout para garantir que o navegador calculou o tamanho do canvas
+            // antes de o Chart.js tentar desenhar.
+            setTimeout(() => {
+                
+                // Opções para tornar as barras mais finas
+                const barChartOptions = {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
                     },
-                    {
-                        label: 'Faturamento (R$)',
-                        data: fatData,
-                        backgroundColor: COLORS.faturamento,
-                        yAxisID: 'y'
+                    // Opções para reduzir a espessura das barras
+                    datasets: { 
+                        bar: {
+                            categoryPercentage: 0.6, // Espaço entre grupos de barras
+                            barPercentage: 0.8 // Espessura individual das barras
+                        }
                     }
-                ]
-            }, {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            });
+                };
+                
+                // 1. Gráfico de Gasto vs Faturamento (BARRA)
+                invFatChartInstance = initChart('investimentoFaturamentoChart', 'bar', {
+                    labels: reportLabels,
+                    datasets: [
+                        {
+                            label: 'Gasto (R$)',
+                            data: invData,
+                            backgroundColor: COLORS.investimento,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Faturamento (R$)',
+                            data: fatData,
+                            backgroundColor: COLORS.faturamento,
+                            yAxisID: 'y'
+                        }
+                    ]
+                }, barChartOptions);
 
-            // 2. Gráfico de Impressões vs Cliques
-            imprCliquesChartInstance = initChart('impressoesCliquesChart', 'line', {
-                labels: reportLabels,
-                datasets: [
-                    {
-                        label: 'Impressões',
-                        data: imprData,
-                        borderColor: COLORS.impressoes,
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Cliques',
-                        data: cliquesData,
-                        borderColor: COLORS.cliques,
-                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                        fill: false,
-                        tension: 0.3
-                    }
-                ]
-            }, {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            });
+                // 2. Gráfico de Impressões vs Cliques (BARRA)
+                imprCliquesChartInstance = initChart('impressoesCliquesChart', 'bar', { 
+                    labels: reportLabels,
+                    datasets: [
+                        {
+                            label: 'Impressões',
+                            data: imprData,
+                            backgroundColor: COLORS.impressoes, // Blue 500
+                        },
+                        {
+                            label: 'Cliques',
+                            data: cliquesData,
+                            backgroundColor: COLORS.cliques, // Pink 500
+                        }
+                    ]
+                }, barChartOptions);
 
-            // 3. Gráfico de ROAS Médio Diário
-            roasChartInstance = initChart('roasChart', 'line', {
-                labels: reportLabels,
-                datasets: [
-                    {
-                        label: 'ROAS Médio',
-                        data: roasData,
-                        borderColor: COLORS.roas,
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }
-                ]
-            }, {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            });
+                // 3. Gráfico de ROAS Médio Diário (BARRA)
+                roasChartInstance = initChart('roasChart', 'bar', { 
+                    labels: reportLabels,
+                    datasets: [
+                        {
+                            label: 'ROAS Médio',
+                            data: roasData,
+                            backgroundColor: COLORS.roas, // Amber 500
+                        }
+                    ]
+                }, barChartOptions);
 
-            showMessage('Relatório gerado com sucesso!');
+                showMessage('Relatório gerado com sucesso!');
+                
+            }, 50); // Atraso de 50ms
+
+
         }
 
-        /** Simula exportação de relatório (PDF/Excel) */
-        window.exportReport = function() {
+        /** Exporta os dados brutos como CSV */
+        window.exportReportAsCSV = function() { // RENOMEADO
             if (results.length === 0) {
                 return showMessage('Nenhum dado de resultado para exportar.', true);
             }
@@ -1738,6 +2055,184 @@
             
             // Simulação de Exportação para PDF (apenas mensagem)
             showMessage('Exportação de dados para Planilha (CSV) iniciada. Para PDF, utilize a função de impressão do navegador (Ctrl+P) na aba de relatórios!');
+        }
+        
+        /** Wrapper Promise para carregar as imagens do Chart.js */
+        const loadChartImage = (canvas, chartName) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve({ img: img, canvas: canvas });
+                img.onerror = () => reject(new Error(`Falha ao carregar imagem para ${chartName}`));
+                img.src = canvas.toDataURL('image/png');
+            });
+        };
+
+
+        /** Exporta o Relatório Consolidado (TEXTO) como PNG */
+        window.exportCombinedReportAsPNG = async function() { 
+            if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
+                return showMessage('Gere o relatório primeiro antes de exportar o PNG.', true);
+            }
+            
+            const reportData = reportDetailedResults;
+            
+            const headerHeight = 240; 
+            const margin = 20; 
+            const dataRowHeight = 28; // Altura para cada linha de dados
+            const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; // ~35 linhas
+
+            const rowsToShow = reportData.slice(0, maxRows); 
+            const totalDataHeight = rowsToShow.length * dataRowHeight;
+            
+            // Altura total ajustada ao conteúdo (máx 1350)
+            const totalHeight = headerHeight + totalDataHeight + margin * 3; // +3 margens para espaçamento
+            const totalWidth = 1080; 
+
+            const compositeCanvas = document.createElement('canvas');
+            compositeCanvas.width = totalWidth;
+            compositeCanvas.height = totalHeight;
+            const ctx = compositeCanvas.getContext('2d');
+            
+            // Define a fonte base para o canvas
+            ctx.font = 'Poppins';
+            
+            // 1. Fundo (Azul Marinho)
+            ctx.fillStyle = NAVY_BLUE; 
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
+            
+            // --- 2. Desenha o Cabeçalho e Métricas (RESUMO) ---
+            
+            // Título Principal
+            ctx.font = '700 36px Poppins'; 
+            ctx.fillStyle = COLORS.faturamento; 
+            ctx.fillText('RELATÓRIO NOVAN AGENCY', margin, margin + 40); 
+            
+            // Data de Geração 
+            ctx.font = '400 16px Poppins'; 
+            ctx.fillStyle = LIGHT_TEXT;
+            ctx.fillText(`Gerado em: ${reportSummaryMetrics.generationDate}`, margin, margin + 70); 
+
+            // Nome do Cliente
+            ctx.font = '600 24px Poppins'; 
+            ctx.fillStyle = LIGHT_TEXT;
+            const clientDisplay = reportSummaryMetrics.clientName === 'Todos os Clientes' 
+                ? reportSummaryMetrics.clientName 
+                : `CLIENTE: ${reportSummaryMetrics.clientName}`;
+            ctx.fillText(clientDisplay, margin, margin + 110); 
+            
+            // Período 
+            ctx.font = '400 18px Poppins'; 
+            ctx.fillStyle = LIGHT_TEXT;
+            ctx.fillText(`Período Analisado: ${reportSummaryMetrics.period}`, margin, margin + 140); 
+
+            // Bloco de Métricas Chave (Métricas Totais)
+            let metricY = margin + 180; 
+            ctx.font = '700 22px Poppins'; 
+            const metricXSpacing = 300; 
+            
+            // GASTO TOTAL (Usando formatValueBRL para 1.000,32)
+            ctx.fillStyle = COLORS.investimento;
+            ctx.fillText(`GASTO TOTAL: ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
+            
+            // FATURAMENTO TOTAL (Usando formatValueBRL para 1.000,32)
+            ctx.fillStyle = COLORS.faturamento;
+            ctx.fillText(`FATURAMENTO TOTAL: ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
+            
+            metricY += 40; 
+            ctx.font = '700 22px Poppins'; 
+            
+            // ROAS MÉDIO
+            ctx.fillStyle = COLORS.roas;
+            ctx.fillText(`ROAS MÉDIO: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
+            
+            // CPM MÉDIO
+            ctx.fillStyle = COLORS.impressoes;
+            ctx.fillText(`CPM MÉDIO: ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin + metricXSpacing, metricY);
+
+
+            // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
+
+            let currentY = headerHeight + margin; 
+            
+            // Título da Tabela Detalhada
+            ctx.font = '700 18px Poppins';
+            ctx.fillStyle = LIGHT_TEXT;
+            ctx.fillText('DETALHE DE PERFORMANCE DIÁRIA:', margin, currentY);
+            currentY += margin;
+            
+            // Cabeçalho da Tabela
+            ctx.font = '600 15px Poppins'; // Fonte do cabeçalho levemente maior
+            ctx.fillStyle = COLORS.primary; // Roxo para o cabeçalho da tabela
+            const colDataCliente = 20;
+            const colGasto = 260; 
+            const colFaturamento = 400; 
+            const colCPM = 550; 
+            const colROAS = 680; 
+            const colConv = 800; 
+            
+            ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
+            ctx.fillText('GASTO (R$)', colGasto, currentY);
+            ctx.fillText('FATO. (R$)', colFaturamento, currentY);
+            ctx.fillText('CPM (R$)', colCPM, currentY);
+            ctx.fillText('ROAS (X)', colROAS, currentY);
+            ctx.fillText('CONVERSÕES', colConv, currentY);
+            currentY += 8; // Espaçamento extra após o cabeçalho
+
+            // Desenho das Linhas de Dados
+            rowsToShow.forEach(row => {
+                currentY += dataRowHeight - 5; // Ajusta para o próximo Y
+                
+                const cpa = calculateCPA(row.investimento, row.conversionCount); // Recalcula se necessário
+                const roas = calculateROAS(row.investimento, row.vendas);
+                const cpm = calculateCPM(row.investimento, row.impressoes);
+
+                ctx.font = '400 14px Poppins'; // Fonte de dados
+                
+                // Coluna DATA/CLIENTE
+                const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
+                const dateDisplay = new Date(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
+                
+                // Coluna GASTO (formato 1.000,32)
+                ctx.fillStyle = COLORS.investimento; // Vermelho para Gasto
+                ctx.fillText(formatValueBRL(row.investimento), colGasto, currentY);
+                
+                // Coluna FATURAMENTO (formato 1.000,32)
+                ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
+                ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
+                
+                // Coluna CPM (formato 1.000,32)
+                ctx.fillStyle = COLORS.impressoes; // Azul
+                ctx.fillText(formatValueBRL(cpm), colCPM, currentY);
+                
+                // Coluna ROAS (formato 0.00)
+                ctx.fillStyle = COLORS.roas; // Amarelo
+                ctx.fillText(`${formatNumber(roas)}X`, colROAS, currentY);
+                
+                // Coluna CONVERSÃO (tipo e contagem)
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText(`${row.conversionType.substring(0, 5)}. (${row.conversionCount})`, colConv, currentY);
+            });
+
+            if (reportData.length > maxRows) {
+                currentY += dataRowHeight;
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.font = '400 14px Poppins';
+                ctx.fillText(`... e mais ${reportData.length - maxRows} registros. Use o CSV para o detalhe completo.`, margin, currentY);
+            }
+
+            // --- 4. Download ---
+            const dataUrl = compositeCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = `Novan_Relatorio_Feed_${reportSummaryMetrics.period.replace(/\s/g, '_').replace(/\//g, '-')}.png`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage('Exportação do Relatório Consolidado (PNG) iniciada!');
         }
 
 
