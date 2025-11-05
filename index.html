@@ -49,7 +49,7 @@
             transition: all 0.2s;
         }
         .sidebar-item.active {
-            background-color: #5B21B6; /* Roxo mais escuro */
+            background-color: '#5B21B6'; /* Roxo mais escuro */
             border-left: 4px solid #FBBF24; /* Destaque amarelo para contraste */
         }
         /* Estilo para a tabela de resultados: Fontes menores e padding corrigido */
@@ -361,7 +361,7 @@
 
                 <!-- NOVO BLOCO DE FILTROS PARA O HISTÓRICO -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-end">
-                    <h2 class="text-xl font-semibold text-white flex-grow basis-full md:basis-auto">Filtrar Histórico:</h2>
+                    <h2 class="text-xl font-semibold text-white flex-grow basis-full md:basis-auto">Filtrar:</h2>
                     <select id="results_filter_cliente" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow bg-gray-700 text-white">
                         <option value="">Selecione o Cliente</option>
                     </select>
@@ -374,51 +374,30 @@
                 </div>
                 <!-- FIM NOVO BLOCO DE FILTROS -->
 
-                <!-- NOVO BLOCO: KPI Cards de Resumo -->
+                <!-- NOVO BLOCO: KPI Cards de Resumo (AGREGADO) -->
                 <div id="kpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                    <!-- Cards KPI serão injetados aqui -->
+                    <!-- Cards KPI serão injetados aqui (Gasto Total, Faturamento, ROAS Médio, CPA Médio, CPM Médio) -->
                 </div>
                 <!-- FIM NOVO BLOCO: KPI Cards de Resumo -->
 
-                <!-- Histórico de Resultados -->
+                <!-- Container do Resumo Diário (Substituto da Tabela de Histórico) -->
                 <div class="bg-novan-secondary p-6 rounded-xl shadow-lg overflow-x-auto">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Histórico e Evolução das Métricas</h2>
+                    <h2 class="text-xl font-semibold mb-4 text-white">Métricas Agregadas por Filtro</h2>
                     
                     <!-- SPINNER DE CARREGAMENTO PARA FILTRO -->
                     <div id="resultsLoading" class="hidden text-center py-8">
                         <div class="spinner"></div>
-                        <p class="text-gray-400 mt-2">Carregando histórico...</p>
+                        <p class="text-gray-400 mt-2">Carregando métricas...</p>
                     </div>
                     <!-- FIM SPINNER -->
 
-                    <table id="resultsTable" class="w-full text-left text-gray-300">
-                        <thead class="bg-slate-800">
-                            <tr>
-                                <th>Data</th>
-                                <th>Cliente</th>
-                                <th>Plataforma</th>
-                                <!-- Trocado Investimento por Gasto -->
-                                <th class="text-investimento">Gasto (R$)</th>
-                                <th class="text-impressoes">Impr.</th>
-                                <th class="text-cliques">Cliques</th>
-                                <!-- NOVO CPM HEADER -->
-                                <th class="text-cpm">CPM (R$)</th>
-                                <!-- FIM NOVO CPM HEADER -->
-                                <!-- NOVO CAMPO UNIFICADO -->
-                                <th class="text-conversoes">Conversão</th>
-                                <!-- FIM NOVO CAMPO -->
-                                <th class="text-faturamento">Vendas (R$)</th>
-                                <th class="text-cpa">CPA (R$)</th>
-                                <th class="text-roas">ROAS (X)</th>
-                                <th>Obs.</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
-                            <!-- Resultados serão injetados aqui via JS -->
-                        </tbody>
-                    </table>
-                    <p id="noResults" class="text-center text-gray-400 mt-4 hidden">Nenhum resultado registrado ainda.</p>
+                    <!-- NOVO: KPI Cards Detalhados de Resumo -->
+                    <div id="dailySummaryKpis" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                        <!-- Os 8 KPIs diários/agregados serão injetados aqui -->
+                    </div>
+                    <!-- FIM NOVO: KPI Cards Detalhados de Resumo -->
+
+                    <p id="noResults" class="text-center text-gray-400 mt-4 hidden">Nenhuma métrica registrada ou cliente selecionado.</p>
                 </div>
             </section>
 
@@ -1402,7 +1381,7 @@
 
         // --- ABA 1: RESULTADOS DE CAMPANHAS ---
         
-        /** Renderiza os KPI Cards */
+        /** Renderiza os KPI Cards (Agregados) */
         function renderKpiCards(data, summary) {
             const container = document.getElementById('kpiCardsContainer');
             if (!container) return;
@@ -1419,7 +1398,7 @@
                     <p class="text-sm font-medium text-gray-400">Gasto Total</p>
                     <p class="text-2xl font-bold text-red-500 mt-1">${formatCurrency(metrics.totalGasto)}</p>
                 </div>
-                <!-- KPI 2: Faturamento (MODIFICADO DE 'FATURAMENTO TOTAL') -->
+                <!-- KPI 2: Faturamento -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-green-500">
                     <p class="text-sm font-medium text-gray-400">Faturamento</p>
                     <p class="text-2xl font-bold text-green-500 mt-1">${formatCurrency(metrics.totalFaturamento)}</p>
@@ -1443,29 +1422,84 @@
 
             container.innerHTML = kpiCardsHtml;
         }
+        
+        /** Renderiza os KPI Cards de Resumo Detalhado (Substituto da Tabela) */
+        function renderDailySummaryKpis(data) {
+            const container = document.getElementById('dailySummaryKpis');
+            if (!container) return;
 
-        /** Renderiza a tabela de resultados e calcula as métricas de resumo */
+            // Zera o container
+            container.innerHTML = '';
+            
+            // Define o objeto de métricas totais a ser exibido (agregado de todos os resultados filtrados)
+            let totalMetrics = {
+                investimento: 0,
+                vendas: 0,
+                impressoes: 0,
+                cliques: 0,
+                conversionCount: 0,
+            };
+
+            if (data.length > 0) {
+                totalMetrics = data.reduce((acc, r) => ({
+                    investimento: acc.investimento + r.investimento,
+                    vendas: acc.vendas + r.vendas,
+                    impressoes: acc.impressoes + r.impressoes,
+                    cliques: acc.cliques + r.cliques,
+                    conversionCount: acc.conversionCount + (r.conversionCount || 0)
+                }), totalMetrics);
+            }
+            
+            // Calcula as métricas derivadas do total
+            const avgCPA = calculateCPA(totalMetrics.investimento, totalMetrics.conversionCount);
+            const avgROAS = calculateROAS(totalMetrics.investimento, totalMetrics.vendas);
+            const avgCPM = calculateCPM(totalMetrics.investimento, totalMetrics.impressoes);
+            
+            // Array de KPIs Detalhados para Injeção
+            const detailedKpis = [
+                { title: "Gasto (R$)", value: formatCurrency(totalMetrics.investimento), color: 'red-500', icon: 'R$' },
+                { title: "Faturamento (R$)", value: formatCurrency(totalMetrics.vendas), color: 'green-500', icon: 'R$' },
+                { title: "Impressões", value: totalMetrics.impressoes.toLocaleString('pt-BR'), color: 'blue-500', icon: '👁️' },
+                { title: "Cliques", value: totalMetrics.cliques.toLocaleString('pt-BR'), color: 'pink-500', icon: '🖱️' },
+                { title: "Conversão (Total)", value: totalMetrics.conversionCount.toLocaleString('pt-BR'), color: 'novan-primary', icon: '✅' },
+                { title: "CPA Médio (R$)", value: formatCurrency(avgCPA), color: 'yellow-500', icon: 'R$' },
+                { title: "ROAS Médio (X)", value: `${formatNumber(avgROAS)}X`, color: 'red-600', icon: '⬆️' },
+                { title: "CPM Médio (R$)", value: formatCurrency(avgCPM), color: 'indigo-500', icon: 'R$' },
+            ];
+
+            const kpisHtml = detailedKpis.map(kpi => `
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-${kpi.color}">
+                    <p class="text-sm font-medium text-gray-400">${kpi.title}</p>
+                    <p class="text-xl font-bold text-${kpi.color} mt-1">${kpi.value}</p>
+                </div>
+            `).join('');
+
+            container.innerHTML = kpisHtml;
+        }
+
+
+        /** Renderiza os KPIs agregados de todo o período filtrado */
         window.renderResultsTable = function() {
-            const body = document.getElementById('resultsTableBody');
             const resultsFilterClient = document.getElementById('results_filter_cliente')?.value;
             const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
             const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
-            const resultsTable = document.getElementById('resultsTable');
-            const loadingSpinner = document.getElementById('resultsLoading');
             
-            // 1. MOSTRA O SPINNER E ESCONDE A TABELA
-            resultsTable.classList.add('hidden');
+            const resultsTable = document.getElementById('resultsTable');
+            const dailySummaryKpis = document.getElementById('dailySummaryKpis');
+            const loadingSpinner = document.getElementById('resultsLoading');
+            const noResultsEl = document.getElementById('noResults');
+
+            // 1. MOSTRA O SPINNER E ESCONDE AS SEÇÕES
+            dailySummaryKpis.classList.add('hidden');
+            noResultsEl.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
 
             // Validação: Se o filtro de cliente é obrigatório e não foi selecionado, não renderiza
             if (!resultsFilterClient) {
-                // Se não há cliente selecionado, renderiza os cards com zeros e a tabela vazia.
                 renderKpiCards([], {}); 
-                body.innerHTML = '';
-                document.getElementById('noResults').classList.remove('hidden');
-                
-                // Esconde o spinner e mostra apenas a mensagem de não resultados
                 loadingSpinner.classList.add('hidden');
+                noResultsEl.classList.remove('hidden');
+                noResultsEl.textContent = "Selecione um Cliente para visualizar as métricas.";
                 return;
             }
             
@@ -1488,15 +1522,10 @@
                     filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
                 }
 
-                // --- CÁLCULO DAS MÉTRICAS DE RESUMO ---
+                // --- CÁLCULO DAS MÉTRICAS DE RESUMO (Geral) ---
                 let summaryMetrics = {
-                    totalGasto: 0,
-                    totalFaturamento: 0,
-                    totalConversoes: 0,
-                    totalImpressoes: 0,
-                    avgROAS: 0,
-                    avgCPA: 0,
-                    avgCPM: 0
+                    totalGasto: 0, totalFaturamento: 0, totalConversoes: 0, totalImpressoes: 0,
+                    avgROAS: 0, avgCPA: 0, avgCPM: 0
                 };
 
                 if (filteredResults.length > 0) {
@@ -1508,76 +1537,28 @@
                         return acc;
                     }, summaryMetrics);
 
-                    // Cálculos finais de média
                     summaryMetrics.avgCPA = calculateCPA(summaryMetrics.totalGasto, summaryMetrics.totalConversoes);
                     summaryMetrics.avgROAS = calculateROAS(summaryMetrics.totalGasto, summaryMetrics.totalFaturamento);
                     summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
                 }
                 
-                // RENDERIZAÇÃO DOS KPI CARDS (NOVO)
+                // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS (Topo)
                 renderKpiCards(filteredResults, summaryMetrics);
-
-                // --- RENDERIZAÇÃO DA TABELA ---
                 
-                body.innerHTML = '';
-
+                // RENDERIZAÇÃO DOS KPI CARDS DETALHADOS (Substituto da Tabela)
+                renderDailySummaryKpis(filteredResults);
+                
+                // 3. ESCONDE O SPINNER
+                loadingSpinner.classList.add('hidden');
+                
                 if (filteredResults.length === 0) {
-                    document.getElementById('noResults').classList.remove('hidden');
-                    loadingSpinner.classList.add('hidden');
+                    noResultsEl.textContent = "Nenhum resultado encontrado para o cliente e período selecionados.";
+                    noResultsEl.classList.remove('hidden');
                     return;
                 }
-                document.getElementById('noResults').classList.add('hidden');
-
-                // Ordena por data decrescente
-                const sortedResults = filteredResults.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-                sortedResults.forEach((res, index) => {
-                    const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
-                    const cpa = calculateCPA(res.investimento, res.conversionCount); // ATUALIZADO: Usando conversionCount
-                    const roas = calculateROAS(res.investimento, res.vendas);
-                    const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
-                    
-                    // Lidando com a nova estrutura de Conversão
-                    const conversionType = res.conversionType || 'N/D';
-                    const conversionCount = res.conversionCount || 0;
-                    
-                    // COR NAS LINHAS: Alterna a cor de fundo entre as linhas
-                    const rowClass = index % 2 === 0 ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800 hover:bg-slate-600';
-
-
-                    const row = body.insertRow();
-                    row.className = rowClass; // Adiciona a classe da linha
-                    
-                    // A classe "text-xs" foi definida no CSS para o TD
-                    row.innerHTML = `
-                        <td class="text-gray-300">${getLocalDayDate(res.data).toLocaleDateString('pt-BR')}</td>
-                        <td class="font-medium text-novan-primary">${clientName}</td>
-                        <td class="text-gray-300">${res.plataforma}</td>
-                        <td class="text-investimento">${formatCurrency(res.investimento)}</td>
-                        <td class="text-impressoes">${res.impressoes.toLocaleString('pt-BR')}</td>
-                        <td class="text-cliques">${res.cliques.toLocaleString('pt-BR')}</td>
-                        
-                        <!-- NOVO CPM CÉLULA -->
-                        <td class="text-cpm">${formatCurrency(cpm)}</td>
-                        <!-- FIM NOVO CPM CÉLULA -->
-
-                        <!-- NOVO CAMPO UNIFICADO -->
-                        <td class="text-conversoes" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
-                            ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
-                        </td>
-                        <!-- FIM NOVO CAMPO -->
-                        
-                        <td class="text-faturamento">${formatCurrency(res.vendas)}</td>
-                        <td class="text-cpa">${formatCurrency(cpa)}</td>
-                        <td class="text-roas">${formatNumber(roas)}</td>
-                        <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
-                        <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button></td>
-                    `;
-                });
                 
-                // 3. ESCONDE O SPINNER E MOSTRA A TABELA
-                loadingSpinner.classList.add('hidden');
-                resultsTable.classList.remove('hidden');
+                // 4. MOSTRA O NOVO CONTAINER DE KPIS DETALHADOS
+                dailySummaryKpis.classList.remove('hidden');
 
             }, 500); // Atraso de 500ms
         }
@@ -2008,7 +1989,7 @@
             // Define o valor do dropdown de status no modal
             document.getElementById('modalStatusSelect').value = task.status;
             
-            // Atribui a função de edição ao botão (simula a abertura do form de cadastro)
+            // Atribui a função de edição ao botão (simula a abertura da aba de cadastro)
             document.getElementById('modalEditButton').onclick = () => {
                 // Fechamos este modal
                 closeTaskDetailModal();
