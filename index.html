@@ -31,7 +31,7 @@
         /* Estilos globais para a aplicação */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f1f5f9; /* Fundo leve */
+            background-color: #1E293B; /* Fundo Escuro para o conteúdo principal (Slate-800) */
         }
         .tab-content {
             display: none;
@@ -55,38 +55,36 @@
         /* Estilo para a tabela de resultados: Fontes menores e padding corrigido */
         #resultsTable th {
             padding: 8px 6px; /* Aumenta o espaçamento nas células do cabeçalho */
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #334155; /* Borda escura */
             white-space: nowrap;
             font-size: 0.75rem; /* text-xs */
             text-transform: uppercase;
             letter-spacing: 0.05em; /* tracking-wider */
+            color: #F8FAFC; /* Texto claro */
         }
         #resultsTable td {
             padding: 8px 6px; /* Aumenta o espaçamento nas células de dados */
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #334155; /* Borda escura */
             white-space: nowrap;
             font-size: 0.75rem; /* text-xs */
+            color: #E2E8F0; /* Texto claro */
         }
         /* Estilos do calendário */
         .calendar-day {
             min-height: 100px;
-            border: 1px solid #e2e8f0;
-            background-color: #ffffff;
+            border: 1px solid #334155; /* Borda escura */
+            background-color: #1E293B; /* Fundo escuro */
             transition: transform 0.1s;
+            color: #E2E8F0; /* Texto claro */
         }
         .calendar-day:hover {
             transform: scale(1.02);
             cursor: pointer; /* Adiciona cursor de ponteiro para indicar que é clicável */
+            background-color: #334155; /* Darker hover */
         }
-        .task-item {
-            font-size: 0.75rem;
-            padding: 4px 6px;
-            margin-top: 4px;
-            border-radius: 4px;
-            cursor: pointer;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        /* Cor dos dias do mês (o padrão Tailwind é aplicado no HTML, mas garantindo aqui) */
+        .calendar-day div {
+            color: #E2E8F0; 
         }
         
         /* --- ESTILOS DE LOGIN (FUNDO ANIMADO) --- */
@@ -95,6 +93,18 @@
             position: relative;
             overflow: hidden;
         }
+
+        /* NOVO: Estilo para o Canvas Matrix */
+        #matrixCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; 
+            opacity: 0.6;
+        }
+        
         #login-page::before {
             content: '';
             position: absolute;
@@ -108,6 +118,7 @@
             background-size: 50px 50px;
             opacity: 0.5;
             animation: pulseGlow 15s infinite alternate;
+            z-index: 0; /* Manter o grid no fundo */
         }
         @keyframes pulseGlow {
             0% { opacity: 0.3; transform: scale(1); }
@@ -149,6 +160,9 @@
     
     <!-- Tela de Login -->
     <div id="login-page" class="flex items-center justify-center min-h-screen w-full bg-novan-secondary">
+        <!-- NOVO: CANVAS PARA EFEITO CASCATA DE CÓDIGO (Matrix) -->
+        <canvas id="matrixCanvas"></canvas>
+        
         <!-- Peças de Jogo Animadas para Fundo Futurista -->
         <div class="futuristic-piece piece-1"></div>
         <div class="futuristic-piece piece-2"></div>
@@ -217,7 +231,7 @@
                     Calendário de Tarefas
                 </div>
                 <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="clientes">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
                     Cadastro de Clientes
                 </div>
                 
@@ -248,35 +262,35 @@
 
             <!-- Tab 1: Resultados de Campanhas -->
             <section id="resultados" class="tab-content active">
-                <h1 class="text-4xl font-bold text-novan-secondary mb-6">🧾 Resultados de Campanhas</h1>
+                <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
                 
                 <!-- Formulário de Registro Diário -->
-                <div class="bg-novan-light p-6 rounded-xl shadow-lg mb-8">
+                <div class="bg-slate-800 p-6 rounded-xl shadow-lg mb-8">
                     <h2 class="text-xl font-semibold mb-4 text-novan-primary">Registro Diário de Performance</h2>
                     <form id="campaignForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- LINHA 1 -->
-                        <input type="date" id="res_data" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" value="" />
-                        <select id="res_cliente" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                        <input type="date" id="res_data" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" value="" />
+                        <select id="res_cliente" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                             <option value="">Selecione o Cliente</option>
                         </select>
-                        <select id="res_plataforma" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                        <select id="res_plataforma" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                             <option value="Meta">Meta Ads</option>
                             <option value="Google">Google Ads</option>
                             <option value="Outra">Outra</option>
                         </select>
-                        <input type="number" step="0.01" id="res_investimento" placeholder="Gasto (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="number" step="0.01" id="res_investimento" placeholder="Gasto (R$)" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         
                         <!-- LINHA 2 (Métricas Primárias e Vendas) -->
-                        <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
-                        <input type="number" id="res_alcance" placeholder="Alcance" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
-                        <input type="number" id="res_cliques" placeholder="Cliques no Site" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
+                        <input type="number" id="res_alcance" placeholder="Alcance" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
+                        <input type="number" id="res_cliques" placeholder="Cliques no Site" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         <!-- Vendas / Faturamento movido para a 4ª coluna da Linha 2 -->
-                        <input type="number" step="0.01" id="res_vendas" placeholder="Vendas (incl. Compras) / Faturamento (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="number" step="0.01" id="res_vendas" placeholder="Vendas (incl. Compras) / Faturamento (R$)" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         
                         <!-- LINHA 3 (Conversão e Métricas Calculadas) -->
                         <!-- BLOCO DE CONVERSÃO - Agora ocupa 2 colunas para mais visibilidade -->
                         <div class="col-span-1 md:col-span-2 flex items-center space-x-2">
-                            <select id="res_conversion_type" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2">
+                            <select id="res_conversion_type" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2 bg-gray-700 text-white">
                                 <option value="">Tipo Conversão</option>
                                 <option value="Ligue">Ligue</option>
                                 <option value="Mensagem">Mensagem</option>
@@ -285,17 +299,17 @@
                                 <option value="Visualizacao">Visualização</option>
                                 <option value="Outro">Outro</option>
                             </select>
-                            <input type="number" id="res_conversion_count" placeholder="Total de Conversões" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2" />
+                            <input type="number" id="res_conversion_count" placeholder="Total de Conversões" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2 bg-gray-700 text-white" />
                         </div>
                         <!-- Métricas Calculadas (CPA, ROAS, CPM) - Ocupa as 2 colunas restantes -->
                         <div class="col-span-1 md:col-span-2 flex items-center space-x-4">
-                            <div class="text-sm font-medium text-gray-600">CPA: R$ <span id="cpa_calc" class="font-bold text-red-600">0.00</span></div>
-                            <div class="text-sm font-medium text-gray-600">ROAS: <span id="roas_calc" class="font-bold text-green-600">0.00</span></div>
-                            <div class="text-sm font-medium text-gray-600">CPM: R$ <span id="cpm_calc" class="font-bold text-blue-600">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-300">CPA: R$ <span id="cpa_calc" class="font-bold text-red-500">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-300">ROAS: <span id="roas_calc" class="font-bold text-green-500">0.00</span></div>
+                            <div class="text-sm font-medium text-gray-300">CPM: R$ <span id="cpm_calc" class="font-bold text-blue-500">0.00</span></div>
                         </div>
                         
                         <!-- LINHA 4 (Observações e Botões) -->
-                        <textarea id="res_observacoes" placeholder="Observações do dia" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-4"></textarea>
+                        <textarea id="res_observacoes" placeholder="Observações do dia" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-4 bg-gray-700 text-white"></textarea>
 
                         <button type="submit" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Registrar Resultados
@@ -311,33 +325,39 @@
 
                 <!-- Modal para Resumos -->
                 <div id="summaryModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
-                    <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-2xl w-full max-w-lg">
                         <h3 id="summaryTitle" class="text-2xl font-bold mb-4 text-novan-primary"></h3>
-                        <div id="summaryContent" class="mb-4 text-gray-700 max-h-96 overflow-y-auto"></div>
+                        <div id="summaryContent" class="mb-4 text-gray-300 max-h-96 overflow-y-auto"></div>
                         <button onclick="closeSummaryModal()" class="bg-red-500 hover:bg-red-600 text-white font-semibold p-2 rounded-lg w-full">Fechar</button>
                     </div>
                 </div>
 
                 <!-- NOVO BLOCO DE FILTROS PARA O HISTÓRICO -->
-                <div class="bg-novan-light p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-end">
-                    <h2 class="text-xl font-semibold text-novan-secondary flex-grow basis-full md:basis-auto">Filtrar Histórico:</h2>
-                    <select id="results_filter_cliente" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow">
-                        <option value="">Todos os Clientes</option>
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-end">
+                    <h2 class="text-xl font-semibold text-white flex-grow basis-full md:basis-auto">Filtrar Histórico:</h2>
+                    <select id="results_filter_cliente" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow bg-gray-700 text-white">
+                        <option value="">Selecione o Cliente</option>
                     </select>
-                    <input type="date" id="results_filter_start_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
-                    <span class="font-medium text-gray-600">até</span>
-                    <input type="date" id="results_filter_end_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                    <input type="date" id="results_filter_start_date" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
+                    <span class="font-medium text-gray-300">até</span>
+                    <input type="date" id="results_filter_end_date" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                     <button onclick="renderResultsTable()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                         Aplicar Filtros
                     </button>
                 </div>
                 <!-- FIM NOVO BLOCO DE FILTROS -->
 
+                <!-- NOVO BLOCO: KPI Cards de Resumo -->
+                <div id="kpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                    <!-- Cards KPI serão injetados aqui -->
+                </div>
+                <!-- FIM NOVO BLOCO: KPI Cards de Resumo -->
+
                 <!-- Histórico de Resultados -->
-                <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
-                    <h2 class="text-xl font-semibold mb-4 text-novan-secondary">Histórico e Evolução das Métricas</h2>
-                    <table id="resultsTable" class="w-full text-left">
-                        <thead class="bg-gray-100">
+                <div class="bg-novan-secondary p-6 rounded-xl shadow-lg overflow-x-auto">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Histórico e Evolução das Métricas</h2>
+                    <table id="resultsTable" class="w-full text-left text-gray-300">
+                        <thead class="bg-slate-800">
                             <tr>
                                 <th>Data</th>
                                 <th>Cliente</th>
@@ -347,14 +367,14 @@
                                 <th>Impr.</th>
                                 <th>Cliques</th>
                                 <!-- NOVO CPM HEADER -->
-                                <th class="text-blue-600">CPM (R$)</th>
+                                <th class="text-blue-500">CPM (R$)</th>
                                 <!-- FIM NOVO CPM HEADER -->
                                 <!-- NOVO CAMPO UNIFICADO -->
-                                <th class="text-purple-500">Conversão</th>
+                                <th class="text-purple-400">Conversão</th>
                                 <!-- FIM NOVO CAMPO -->
                                 <th>Vendas (R$)</th>
-                                <th class="text-red-600">CPA (R$)</th>
-                                <th class="text-green-600">ROAS (X)</th>
+                                <th class="text-red-500">CPA (R$)</th>
+                                <th class="text-green-500">ROAS (X)</th>
                                 <th>Obs.</th>
                                 <th>Ações</th>
                             </tr>
@@ -363,24 +383,24 @@
                             <!-- Resultados serão injetados aqui via JS -->
                         </tbody>
                     </table>
-                    <p id="noResults" class="text-center text-gray-500 mt-4 hidden">Nenhum resultado registrado ainda.</p>
+                    <p id="noResults" class="text-center text-gray-400 mt-4 hidden">Nenhum resultado registrado ainda.</p>
                 </div>
             </section>
 
             <!-- Tab 2: Calendário de Tarefas -->
             <section id="calendario" class="tab-content">
-                <h1 class="text-4xl font-bold text-novan-secondary mb-6">📅 Calendário de Tarefas</h1>
+                <h1 class="text-4xl font-bold text-white mb-6">📅 Calendário de Tarefas</h1>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     
                     <!-- Card de Cadastro de Tarefas -->
-                    <div class="lg:col-span-1 bg-novan-light p-6 rounded-xl shadow-lg">
+                    <div class="lg:col-span-1 bg-slate-800 p-6 rounded-xl shadow-lg">
                         <h2 class="text-xl font-semibold mb-4 text-novan-primary">Cadastrar Nova Tarefa</h2>
                         <form id="taskForm" class="space-y-3">
-                            <select id="task_cliente" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <select id="task_cliente" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="">Selecione o Cliente</option>
                             </select>
-                            <select id="task_tipo" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <select id="task_tipo" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="">Tipo de Tarefa</option>
                                 <option value="Campanha">Campanha Ads</option>
                                 <option value="Post">Post/Conteúdo</option>
@@ -389,13 +409,13 @@
                                 <option value="Relatorio">Relatório</option>
                                 <option value="Outro">Outro</option>
                             </select>
-                            <input type="datetime-local" id="task_data" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
-                            <select id="task_status" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <input type="datetime-local" id="task_data" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
+                            <select id="task_status" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="Pendente">Pendente</option>
                                 <option value="Em Andamento">Em Andamento</option>
                                 <option value="Concluido">Concluído</option>
                             </select>
-                            <textarea id="task_observacoes" placeholder="Observações" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary"></textarea>
+                            <textarea id="task_observacoes" placeholder="Observações" class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white"></textarea>
                             <button type="submit" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                                 Salvar Tarefa
                             </button>
@@ -403,18 +423,18 @@
                     </div>
 
                     <!-- Card de Visualização do Calendário e Filtros -->
-                    <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg">
+                    <div class="lg:col-span-3 bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <div class="flex flex-wrap items-center justify-between mb-4">
                             <div class="flex space-x-2 mb-4 md:mb-0">
-                                <button id="prevMonth" class="bg-gray-200 hover:bg-gray-300 text-novan-secondary p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&lt;</button>
-                                <h2 id="currentMonthYear" class="text-2xl font-bold text-novan-secondary self-center"></h2>
-                                <button id="nextMonth" class="bg-gray-200 hover:bg-gray-300 text-novan-secondary p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&gt;</button>
+                                <button id="prevMonth" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&lt;</button>
+                                <h2 id="currentMonthYear" class="text-2xl font-bold text-white self-center"></h2>
+                                <button id="nextMonth" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&gt;</button>
                             </div>
                             <div class="flex space-x-2">
-                                <select id="filterClient" class="p-2 border border-gray-300 rounded-lg text-sm">
+                                <select id="filterClient" class="p-2 border border-gray-600 rounded-lg text-sm bg-gray-700 text-white">
                                     <option value="">Filtrar por Cliente</option>
                                 </select>
-                                <select id="filterType" class="p-2 border border-gray-300 rounded-lg text-sm">
+                                <select id="filterType" class="p-2 border border-gray-600 rounded-lg text-sm bg-gray-700 text-white">
                                     <option value="">Filtrar por Tipo</option>
                                     <option value="Campanha">Campanha Ads</option>
                                     <option value="Post">Post/Conteúdo</option>
@@ -429,7 +449,7 @@
                         </div>
 
                         <!-- Grade do Calendário -->
-                        <div class="grid grid-cols-7 text-center font-semibold text-novan-primary border-b-2 pb-2 mb-2">
+                        <div class="grid grid-cols-7 text-center font-semibold text-novan-primary border-b-2 border-gray-600 pb-2 mb-2">
                             <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
                         </div>
                         <div id="calendarGrid" class="grid grid-cols-7 gap-1">
@@ -437,7 +457,7 @@
                         </div>
 
                         <!-- Notificações de Tarefas Próximas -->
-                        <div id="taskNotifications" class="mt-6 p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-lg hidden">
+                        <div id="taskNotifications" class="mt-6 p-3 bg-yellow-900/50 border-l-4 border-yellow-500 text-yellow-300 rounded-lg hidden">
                             <h4 class="font-semibold">⚠️ Alerta de Prazos Próximos:</h4>
                             <ul id="notificationList" class="list-disc list-inside mt-1"></ul>
                         </div>
@@ -448,22 +468,37 @@
 
             <!-- Tab 3: Cadastro de Clientes -->
             <section id="clientes" class="tab-content">
-                <h1 class="text-4xl font-bold text-novan-secondary mb-6">👥 Cadastro de Clientes</h1>
-
-                <!-- Seletor de Tipo de Cliente -->
-                <div class="flex space-x-4 mb-6 justify-center">
-                    <button id="btn_type_traffic" onclick="showClientFormType('traffic')" class="client-type-btn px-6 py-2 rounded-full font-semibold shadow-md transition-all bg-novan-primary text-white">
-                        Novo Cliente - Tráfego Pago
-                    </button>
-                    <button id="btn_type_social" onclick="showClientFormType('social')" class="client-type-btn px-6 py-2 rounded-full font-semibold shadow-md transition-all bg-gray-200 text-novan-secondary hover:bg-novan-light">
-                        Novo Cliente - Social Media
+                <h1 class="text-4xl font-bold text-white mb-6">👥 Cadastro de Clientes</h1>
+                
+                <!-- Botão e Modal para Cadastrar Novo Cliente (NOVO FLUXO) -->
+                <div class="mb-6 flex justify-center">
+                    <button onclick="openClientTypeSelectionModal()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-3 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                        + Cadastrar Novo Cliente
                     </button>
                 </div>
 
+                <!-- Modal de Seleção de Tipo de Cliente -->
+                <div id="clientTypeSelectionModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+                    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-sm text-center">
+                        <h3 class="text-2xl font-bold mb-6 text-white">Qual o tipo de serviço?</h3>
+                        <div class="space-y-4">
+                            <button onclick="selectClientType('traffic')" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-3 rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                                Tráfego Pago
+                            </button>
+                            <button onclick="selectClientType('social')" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold p-3 rounded-lg shadow-md transition-transform transform hover:scale-[1.02]">
+                                Social Media
+                            </button>
+                            <button onclick="closeClientTypeSelectionModal()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold p-2 rounded-lg mt-4">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Formulário de Cadastro -->
-                <div class="bg-novan-light p-6 rounded-xl shadow-lg mb-8 max-w-2xl mx-auto">
-                    <h2 class="text-xl font-semibold mb-4 text-novan-primary" id="clientFormTitle">Formulário de Tráfego Pago</h2>
+                <!-- clientFormContainer está oculto por padrão -->
+                <div id="clientFormContainer" class="bg-slate-800 p-6 rounded-xl shadow-lg mb-8 max-w-2xl mx-auto hidden">
+                    <h2 class="text-xl font-semibold mb-4 text-novan-primary" id="clientFormTitle">Formulário de Cliente</h2>
                     <form id="clientForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Campo oculto para armazenar o tipo de serviço ativo -->
                         <input type="hidden" id="cli_service_type" value="traffic">
@@ -472,18 +507,18 @@
 
 
                         <!-- CAMPOS COMUNS -->
-                        <input type="text" id="cli_nome" placeholder="Nome da Empresa" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
-                        <select id="cli_responsavel" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                        <input type="text" id="cli_nome" placeholder="Nome da Empresa" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
+                        <select id="cli_responsavel" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                             <option value="">Selecione o Responsável da Agência</option>
                         </select>
-                        <input type="tel" id="cli_telefone" placeholder="Telefone / WhatsApp" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" oninput="maskPhone(this)" maxlength="15" />
-                        <input type="url" id="cli_link" placeholder="Link (Site/Cardápio/Perfil)" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="tel" id="cli_telefone" placeholder="Telefone / WhatsApp" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" oninput="maskPhone(this)" maxlength="15" />
+                        <input type="url" id="cli_link" placeholder="Link (Site/Cardápio/Perfil)" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         <!-- FIM CAMPOS COMUNS -->
 
                         <!-- CAMPOS ESPECÍFICOS DE TRÁFEGO PAGO -->
                         <div id="trafficFields" class="contents">
                             <!-- Plataforma Principal -->
-                            <select id="cli_plataforma_traffic" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <select id="cli_plataforma_traffic" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="Meta">Plataforma Principal: Meta Ads</option>
                                 <option value="Google">Plataforma Principal: Google Ads</option>
                                 <option value="Ambos">Plataforma Principal: Ambos</option>
@@ -491,16 +526,16 @@
                             
                             <!-- Tipo e Valor do Orçamento -->
                             <div>
-                                <select id="cli_budget_type_traffic" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                                <select id="cli_budget_type_traffic" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                     <option value="">Selecione o Tipo de Orçamento</option>
                                     <option value="Orçamento Diário">Orçamento Diário</option>
                                     <option value="Orçamento de Campanha">Orçamento de Campanha</option>
                                 </select>
                             </div>
-                            <input type="number" step="0.01" id="cli_budget_value_traffic" placeholder="Valor (R$)" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                            <input type="number" step="0.01" id="cli_budget_value_traffic" placeholder="Valor (R$)" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                             
                             <!-- Meta de Conversão -->
-                            <select id="cli_conversion_goals_traffic" required class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <select id="cli_conversion_goals_traffic" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="">Principal Meta de Conversão</option>
                                 <option value="Ligue">Ligue (Chamadas)</option>
                                 <option value="Mensagem">Mensagem (Leads)</option>
@@ -515,7 +550,7 @@
                         <!-- CAMPOS ESPECÍFICOS DE SOCIAL MEDIA -->
                         <div id="socialMediaFields" class="hidden contents">
                             <!-- Foco de Plataforma SM -->
-                            <select id="cli_sm_platform" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <select id="cli_sm_platform" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="Instagram">Foco Principal: Instagram</option>
                                 <option value="TikTok">Foco Principal: TikTok</option>
                                 <option value="LinkedIn">Foco Principal: LinkedIn</option>
@@ -524,10 +559,10 @@
                             </select>
 
                             <!-- Fee Mensal SM -->
-                            <input type="number" step="0.01" id="cli_sm_fee" placeholder="Fee Mensal (R$)" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                            <input type="number" step="0.01" id="cli_sm_fee" placeholder="Fee Mensal (R$)" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                             
                             <!-- Necessidade de Conteúdo SM -->
-                            <select id="cli_sm_needs" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary">
+                            <select id="cli_sm_needs" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="Conteudo">Foco: Criação de Conteúdo</option>
                                 <option value="Design">Foco: Design/Branding</option>
                                 <option value="Estrategia">Foco: Estratégia/Planejamento</option>
@@ -537,7 +572,7 @@
                         </div>
                         <!-- FIM CAMPOS ESPECÍFICOS DE SOCIAL MEDIA -->
 
-                        <textarea id="cli_observacoes" placeholder="Observações gerais e Nicho" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-2"></textarea>
+                        <textarea id="cli_observacoes" placeholder="Observações gerais e Nicho" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-2 bg-gray-700 text-white"></textarea>
 
                         <button type="submit" id="clientSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Cadastrar Cliente
@@ -549,26 +584,26 @@
                 </div>
 
                 <!-- Lista de Clientes Cadastrados -->
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 class="text-xl font-semibold mb-4 text-novan-secondary">Clientes Ativos</h2>
+                <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Clientes Ativos</h2>
                     <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <!-- Cards de clientes serão injetados aqui via JS -->
                     </div>
                     <!-- O elemento noClients foi movido para fora do clientList para evitar ser apagado pelo innerHTML = '' -->
-                    <p id="noClients" class="text-center text-gray-500 col-span-full hidden mt-4">Nenhum cliente cadastrado ainda.</p>
+                    <p id="noClients" class="text-center text-gray-400 col-span-full hidden mt-4">Nenhum cliente cadastrado ainda.</p>
                 </div>
             </section>
 
             <!-- Tab 5: Gestão de Tarefas (NOVA ABA) -->
             <section id="gestao" class="tab-content">
-                <h1 class="text-4xl font-bold text-novan-secondary mb-6">✅ Gestão de Tarefas e Status</h1>
+                <h1 class="text-4xl font-bold text-white mb-6">✅ Gestão de Tarefas e Status</h1>
                 
-                <div class="bg-novan-light p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-center">
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-center">
                     <h2 class="text-xl font-semibold text-novan-primary">Filtros:</h2>
-                    <select id="task_manager_filter_client" class="p-2 border border-gray-300 rounded-lg">
+                    <select id="task_manager_filter_client" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
                         <option value="">Todos os Clientes</option>
                     </select>
-                    <select id="task_manager_filter_status" class="p-2 border border-gray-300 rounded-lg">
+                    <select id="task_manager_filter_status" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
                         <option value="">Todos os Status</option>
                         <option value="Pendente">Pendente</option>
                         <option value="Em Andamento">Em Andamento</option>
@@ -584,22 +619,22 @@
                     <!-- Colunas de Status serão renderizadas aqui -->
                 </div>
                 
-                <p id="noTasksMessage" class="text-center text-gray-500 mt-8 hidden">Nenhuma tarefa encontrada para os filtros selecionados.</p>
+                <p id="noTasksMessage" class="text-center text-gray-400 mt-8 hidden">Nenhuma tarefa encontrada para os filtros selecionados.</p>
             </section>
 
             <!-- Tab 4: Relatórios e Insights -->
             <section id="relatorios" class="tab-content">
-                <h1 class="text-4xl font-bold text-novan-secondary mb-6">📊 Relatórios e Insights</h1>
+                <h1 class="text-4xl font-bold text-white mb-6">📊 Relatórios e Insights</h1>
                 
-                <div class="bg-novan-light p-6 rounded-xl shadow-lg mb-8">
+                <div class="bg-slate-800 p-6 rounded-xl shadow-lg mb-8">
                     <h2 class="text-xl font-semibold mb-4 text-novan-primary">Filtros de Relatório</h2>
                     <div class="flex flex-wrap gap-4 items-end">
-                        <select id="report_cliente" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow">
+                        <select id="report_cliente" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow bg-gray-700 text-white">
                             <option value="">Todos os Clientes</option>
                         </select>
-                        <input type="date" id="report_start_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
-                        <span class="font-medium text-gray-600">até</span>
-                        <input type="date" id="report_end_date" class="p-2 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary" />
+                        <input type="date" id="report_start_date" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
+                        <span class="font-medium text-gray-300">até</span>
+                        <input type="date" id="report_end_date" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         <button onclick="generateReport()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Gerar Relatório
                         </button>
@@ -616,24 +651,24 @@
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-lg font-semibold mb-4 text-novan-secondary">Gasto vs Faturamento (R$)</h3>
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h3 class="text-lg font-semibold mb-4 text-novan-secondary">Impressões vs Cliques (Volume)</h3>
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-2">
-                        <h3 class="text-lg font-semibold mb-4 text-novan-secondary">ROAS Médio Diário (X)</h3>
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-2">
+                        <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
                     
-                    <p id="noReportData" class="text-center text-gray-500 col-span-full hidden">Selecione filtros e gere o relatório para visualizar os gráficos.</p>
+                    <p id="noReportData" class="text-center text-gray-400 col-span-full hidden">Selecione filtros e gere o relatório para visualizar os gráficos.</p>
                 </div>
 
             </section>
@@ -787,7 +822,7 @@
                 // Ícone de Olho Fechado
                 path1.setAttribute('d', 'M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 1.274-4.057 5.065-7 9.542-7a10.05 10.05 0 011.875.175m-2.031 3.22A3.001 3.001 0 0012 15a3 3 0 003-3h-1.062a4.986 4.986 0 01-1.429-1.429m1.43-1.43a3 3 0 00-4.243 4.243M9.879 9.879l4.242 4.242M9.88 9.88l.585-.585M12 15a3 3 0 01-3-3h1.062a4.986 4.986 0 001.429 1.429m-1.43 1.43a3 3 0 014.243-4.243m-4.243 4.243l4.242-4.242'); // Simplificação para mostrar o olho cortado/slashed
                 path2.setAttribute('d', 'M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 1.274-4.057 5.065-7 9.542-7a10.05 10.05 0 011.875.175'); // Ajusta um path para ser mais consistente com o visual de olho fechado
-                toggleIcon.setAttribute('title', 'Exibir Senha');
+                toggleIcon.setAttribute('title', 'Ocultar Senha');
 
             }
         }
@@ -881,7 +916,8 @@
             if (tabId === 'clientes') {
                 renderClientList();
                 // Garante que o formulário de Tráfego Pago é o padrão ao entrar na aba
-                showClientFormType('traffic'); 
+                // showClientFormType('traffic'); // Removido, pois o modal de seleção é o novo padrão
+                document.getElementById('clientFormContainer').classList.add('hidden'); // Garante que o form comece escondido
             } else if (tabId === 'resultados') {
                 populateClientSelects();
                 renderResultsTable();
@@ -904,6 +940,26 @@
         });
         
         // --- ABA 3: CADASTRO DE CLIENTES ---
+
+        /** Abre o modal de seleção de tipo de cliente */
+        window.openClientTypeSelectionModal = function() {
+            document.getElementById('clientTypeSelectionModal').classList.remove('hidden');
+            document.getElementById('clientTypeSelectionModal').classList.add('flex');
+        }
+
+        /** Fecha o modal de seleção de tipo de cliente */
+        window.closeClientTypeSelectionModal = function() {
+            document.getElementById('clientTypeSelectionModal').classList.add('hidden');
+            document.getElementById('clientTypeSelectionModal').classList.remove('flex');
+        }
+
+        /** Seleciona o tipo de cliente e abre o formulário */
+        window.selectClientType = function(type) {
+            closeClientTypeSelectionModal(); // Fecha o modal
+            resetClientForm(); // Limpa o formulário antes de abrir
+            showClientFormType(type); // Configura os campos
+            document.getElementById('clientFormContainer').classList.remove('hidden'); // Mostra o formulário
+        }
 
         /** Aplica a máscara (00) 00000-0000 ao telefone */
         window.maskPhone = function(input) {
@@ -942,46 +998,39 @@
             const trafficFields = document.getElementById('trafficFields');
             const socialMediaFields = document.getElementById('socialMediaFields');
             const formTitle = document.getElementById('clientFormTitle');
-            const btnTraffic = document.getElementById('btn_type_traffic');
-            const btnSocial = document.getElementById('btn_type_social');
             const cliServiceType = document.getElementById('cli_service_type');
+
+            // Torna campos de tráfego não-obrigatórios e de SM não-obrigatórios por padrão
+            document.getElementById('cli_plataforma_traffic').required = false;
+            document.getElementById('cli_budget_type_traffic').required = false;
+            document.getElementById('cli_budget_value_traffic').required = false;
+            document.getElementById('cli_conversion_goals_traffic').required = false;
+            document.getElementById('cli_sm_platform').required = false;
+            document.getElementById('cli_sm_fee').required = false;
+            document.getElementById('cli_sm_needs').required = false;
+
 
             if (type === 'traffic') {
                 // Configurações para Tráfego Pago
                 trafficFields.classList.remove('hidden');
                 socialMediaFields.classList.add('hidden');
                 formTitle.textContent = 'Formulário de Tráfego Pago';
-                btnTraffic.classList.replace('bg-gray-200', 'bg-novan-primary');
-                btnTraffic.classList.replace('text-novan-secondary', 'text-white');
-                btnSocial.classList.replace('bg-novan-primary', 'bg-gray-200');
-                btnSocial.classList.replace('text-white', 'text-novan-secondary');
                 cliServiceType.value = 'traffic';
 
-                // Torna campos de tráfego obrigatórios e de SM não-obrigatórios
+                // Torna campos de tráfego obrigatórios
                 document.getElementById('cli_plataforma_traffic').required = true;
                 document.getElementById('cli_budget_type_traffic').required = true;
                 document.getElementById('cli_budget_value_traffic').required = true;
                 document.getElementById('cli_conversion_goals_traffic').required = true;
-                document.getElementById('cli_sm_platform').required = false;
-                document.getElementById('cli_sm_fee').required = false;
-                document.getElementById('cli_sm_needs').required = false;
                 
             } else if (type === 'social') {
                 // Configurações para Social Media
                 trafficFields.classList.add('hidden');
                 socialMediaFields.classList.remove('hidden');
                 formTitle.textContent = 'Formulário de Social Media';
-                btnSocial.classList.replace('bg-gray-200', 'bg-novan-primary');
-                btnSocial.classList.replace('text-novan-secondary', 'text-white');
-                btnTraffic.classList.replace('bg-novan-primary', 'bg-gray-200');
-                btnTraffic.classList.replace('text-white', 'text-novan-secondary');
                 cliServiceType.value = 'social';
 
-                // Torna campos de SM obrigatórios e de tráfego não-obrigatórios
-                document.getElementById('cli_plataforma_traffic').required = false;
-                document.getElementById('cli_budget_type_traffic').required = false;
-                document.getElementById('cli_budget_value_traffic').required = false;
-                document.getElementById('cli_conversion_goals_traffic').required = false;
+                // Torna campos de SM obrigatórios
                 document.getElementById('cli_sm_platform').required = true;
                 document.getElementById('cli_sm_fee').required = true;
                 document.getElementById('cli_sm_needs').required = true;
@@ -999,6 +1048,8 @@
             document.getElementById('cli_id_edit').value = "";
             document.getElementById('clientSubmitButton').textContent = "Cadastrar Cliente";
             document.getElementById('clientCancelButton').classList.add('hidden');
+            // Oculta o container do formulário ao resetar
+            document.getElementById('clientFormContainer').classList.add('hidden');
         }
         
         /** Carrega os dados do cliente no formulário para edição */
@@ -1031,9 +1082,10 @@
                 document.getElementById('cli_sm_needs').value = client.smNeeds;
             }
 
-            // 4. Altera botões de submissão
+            // 4. Altera botões de submissão e mostra o container
             document.getElementById('clientSubmitButton').textContent = "Salvar Alterações";
             document.getElementById('clientCancelButton').classList.remove('hidden');
+            document.getElementById('clientFormContainer').classList.remove('hidden');
             
             showMessage(`Modo de Edição ativado para ${client.nome}.`, false, true);
         }
@@ -1060,7 +1112,8 @@
 
             clients.forEach(client => {
                 const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-xl shadow-md border-t-4 border-novan-primary';
+                // Alterado de bg-white para bg-slate-800 e texto para claro
+                card.className = 'bg-slate-800 p-4 rounded-xl shadow-md border-t-4 border-novan-primary text-gray-300'; 
                 
                 let detailListHtml = '';
                 let mainPlatformDisplay = '';
@@ -1100,21 +1153,21 @@
                 }
 
                 card.innerHTML = `
-                    <h4 class="font-bold text-lg text-novan-secondary">${client.nome}</h4>
+                    <h4 class="font-bold text-lg text-white">${client.nome}</h4>
                     <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${client.serviceType === 'traffic' ? 'bg-purple-200 text-novan-primary' : 'bg-pink-200 text-pink-700'}">
                         ${client.serviceType === 'traffic' ? 'TRÁFEGO PAGO' : 'SOCIAL MEDIA'}
                     </span>
-                    <p class="text-sm text-gray-600 my-2">Responsável: <span class="font-semibold">${client.responsavel}</span></p>
-                    <p class="text-sm text-gray-600 mb-2">${client.telefone}</p>
+                    <p class="text-sm my-2">Responsável: <span class="font-semibold">${client.responsavel}</span></p>
+                    <p class="text-sm mb-2">${client.telefone}</p>
                     <ul class="text-xs space-y-1">
                         <li><span class="font-medium">Plataforma:</span> ${mainPlatformDisplay}</li>
                         ${detailListHtml}
-                        <li><span class="font-medium">Link:</span> <a href="${client.link}" target="_blank" class="text-novan-primary hover:underline">${client.link ? 'Acessar' : 'N/A'}</a></li>
+                        <li><span class="font-medium">Link:</span> <a href="${client.link}" target="_blank" class="text-indigo-400 hover:underline">${client.link ? 'Acessar' : 'N/A'}</a></li>
                         <li class="mt-2"><span class="font-medium">Nicho/Obs.:</span> ${client.observacoes || 'N/A'}</li>
                     </ul>
                     <div class="flex space-x-3 mt-3">
-                        <button onclick="editClient('${client.id}')" class="text-indigo-500 hover:text-indigo-700 text-xs font-semibold">Editar</button>
-                        <button onclick="deleteClient('${client.id}')" class="text-red-500 hover:text-red-700 text-xs">Excluir</button>
+                        <button onclick="editClient('${client.id}')" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold">Editar</button>
+                        <button onclick="deleteClient('${client.id}')" class="text-red-500 hover:text-red-400 text-xs">Excluir</button>
                     </div>
                 `;
                 listEl.appendChild(card);
@@ -1137,10 +1190,21 @@
                 if (!select) return;
                 
                 const selectedValue = select.value;
-                select.innerHTML = select.id.includes('filter') || select.id.includes('report') || select.id.includes('manager_filter_client') || select.id.includes('results_filter') ? 
-                                    '<option value="">Todos os Clientes</option>' : 
-                                    '<option value="">Selecione o Cliente</option>';
                 
+                // Define o texto da opção inicial e se deve ser "Todos os Clientes"
+                let initialOptionText = 'Selecione o Cliente';
+                if (select.id.includes('filter') || select.id.includes('report') || select.id.includes('manager_filter_client')) {
+                    initialOptionText = 'Todos os Clientes';
+                }
+
+                // Exceção: O filtro de resultados (results_filter_cliente) deve forçar a seleção de um cliente
+                if (select.id === 'results_filter_cliente') {
+                    initialOptionText = 'Selecione o Cliente'; 
+                }
+
+                // Limpa e adiciona a opção padrão
+                select.innerHTML = `<option value="">${initialOptionText}</option>`;
+
                 clients.forEach(client => {
                     const option = document.createElement('option');
                     option.value = client.id;
@@ -1228,7 +1292,7 @@
             document.getElementById('clientForm').reset();
             
             // Reverte para o formulário padrão de Tráfego Pago
-            showClientFormType('traffic'); 
+            // showClientFormType('traffic'); // Já é tratado pelo resetClientForm
         });
 
         /** Deleta um cliente e todos os dados associados */
@@ -1256,22 +1320,72 @@
 
 
         // --- ABA 1: RESULTADOS DE CAMPANHAS ---
+        
+        /** Renderiza os KPI Cards */
+        function renderKpiCards(data, summary) {
+            const container = document.getElementById('kpiCardsContainer');
+            if (!container) return;
 
-        /** Renderiza a tabela de resultados */
+            // Se não houver dados, exibe zeros
+            const defaultMetrics = { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
+            const metrics = data.length > 0 ? summary : defaultMetrics;
+            
+            // CPA e ROAS já são calculados no summary
+
+            const kpiCardsHtml = `
+                <!-- KPI 1: Gasto Total -->
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-red-500">
+                    <p class="text-sm font-medium text-gray-400">Gasto Total</p>
+                    <p class="text-2xl font-bold text-red-500 mt-1">${formatCurrency(metrics.totalGasto)}</p>
+                </div>
+                <!-- KPI 2: Faturamento (MODIFICADO DE 'FATURAMENTO TOTAL') -->
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-green-500">
+                    <p class="text-sm font-medium text-gray-400">Faturamento</p>
+                    <p class="text-2xl font-bold text-green-500 mt-1">${formatCurrency(metrics.totalFaturamento)}</p>
+                </div>
+                <!-- KPI 3: ROAS Médio -->
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-yellow-500">
+                    <p class="text-sm font-medium text-gray-400">ROAS Médio (X)</p>
+                    <p class="text-2xl font-bold text-yellow-500 mt-1">${formatNumber(metrics.avgROAS)}X</p>
+                </div>
+                <!-- KPI 4: CPA Médio -->
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-indigo-500">
+                    <p class="text-sm font-medium text-gray-400">CPA Médio (R$)</p>
+                    <p class="text-2xl font-bold text-indigo-500 mt-1">${formatCurrency(metrics.avgCPA)}</p>
+                </div>
+                <!-- KPI 5: CPM Médio -->
+                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-blue-500">
+                    <p class="text-sm font-medium text-gray-400">CPM Médio (R$)</p>
+                    <p class="text-2xl font-bold text-blue-500 mt-1">${formatCurrency(metrics.avgCPM)}</p>
+                </div>
+            `;
+
+            container.innerHTML = kpiCardsHtml;
+        }
+
+        /** Renderiza a tabela de resultados e calcula as métricas de resumo */
         window.renderResultsTable = function() {
             const body = document.getElementById('resultsTableBody');
-            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value; // NOVO: Filtro de Cliente
-            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value; // NOVO: Filtro de Data Inicial
-            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value; // NOVO: Filtro de Data Final
+            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value;
+            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
+            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
             
-            // Filtra apenas resultados de clientes de TRÁFEGO PAGO, pois os campos são de Ads.
+            // Validação: Se o filtro de cliente é obrigatório e não foi selecionado, não renderiza
+            if (!resultsFilterClient) {
+                // Se não há cliente selecionado, renderiza os cards com zeros e a tabela vazia.
+                renderKpiCards([], {}); 
+                body.innerHTML = '';
+                document.getElementById('noResults').classList.remove('hidden');
+                return;
+            }
+
+            // Filtra apenas resultados de clientes de TRÁFEGO PAGO
             const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
             let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
 
-            // 1. Aplica Filtro de Cliente
-            if (resultsFilterClient) {
-                filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
-            }
+            // 1. Aplica Filtro de Cliente (JÁ SABEMOS QUE resultsFilterClient TEM VALOR)
+            filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
+            
 
             // 2. Aplica Filtro de Data
             if (resultsFilterStartDate) {
@@ -1281,6 +1395,37 @@
                 filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
             }
 
+            // --- CÁLCULO DAS MÉTRICAS DE RESUMO ---
+            let summaryMetrics = {
+                totalGasto: 0,
+                totalFaturamento: 0,
+                totalConversoes: 0,
+                totalImpressoes: 0,
+                avgROAS: 0,
+                avgCPA: 0,
+                avgCPM: 0
+            };
+
+            if (filteredResults.length > 0) {
+                summaryMetrics = filteredResults.reduce((acc, r) => {
+                    acc.totalGasto += r.investimento;
+                    acc.totalFaturamento += r.vendas;
+                    acc.totalConversoes += r.conversionCount || 0;
+                    acc.totalImpressoes += r.impressoes;
+                    return acc;
+                }, summaryMetrics);
+
+                // Cálculos finais de média
+                summaryMetrics.avgCPA = calculateCPA(summaryMetrics.totalGasto, summaryMetrics.totalConversoes);
+                summaryMetrics.avgROAS = calculateROAS(summaryMetrics.totalGasto, summaryMetrics.totalFaturamento);
+                summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
+            }
+            
+            // RENDERIZAÇÃO DOS KPI CARDS (NOVO)
+            renderKpiCards(filteredResults, summaryMetrics);
+
+            // --- RENDERIZAÇÃO DA TABELA ---
+            
             body.innerHTML = '';
 
             if (filteredResults.length === 0) {
@@ -1305,28 +1450,28 @@
                 const row = body.insertRow();
                 // A classe "text-xs" foi definida no CSS para o TD
                 row.innerHTML = `
-                    <td>${new Date(res.data).toLocaleDateString('pt-BR')}</td>
+                    <td class="text-gray-300">${new Date(res.data).toLocaleDateString('pt-BR')}</td>
                     <td class="font-medium text-novan-primary">${clientName}</td>
-                    <td>${res.plataforma}</td>
-                    <td>${formatCurrency(res.investimento)}</td>
-                    <td>${res.impressoes.toLocaleString('pt-BR')}</td>
-                    <td>${res.cliques.toLocaleString('pt-BR')}</td>
+                    <td class="text-gray-300">${res.plataforma}</td>
+                    <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
+                    <td class="text-gray-300">${res.impressoes.toLocaleString('pt-BR')}</td>
+                    <td class="text-gray-300">${res.cliques.toLocaleString('pt-BR')}</td>
                     
                     <!-- NOVO CPM CÉLULA -->
-                    <td class="text-blue-600 font-bold">${formatCurrency(cpm)}</td>
+                    <td class="text-blue-500 font-bold">${formatCurrency(cpm)}</td>
                     <!-- FIM NOVO CPM CÉLULA -->
 
                     <!-- NOVO CAMPO UNIFICADO -->
-                    <td title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
+                    <td class="text-gray-300" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
                         ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
                     </td>
                     <!-- FIM NOVO CAMPO -->
                     
-                    <td>${formatCurrency(res.vendas)}</td>
-                    <td class="text-red-600 font-bold">${formatCurrency(cpa)}</td>
-                    <td class="text-green-600 font-bold">${formatNumber(roas)}</td>
-                    <td>${res.observacoes.substring(0, 20)}...</td>
-                    <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-700 text-xs">X</button></td>
+                    <td class="text-gray-300">${formatCurrency(res.vendas)}</td>
+                    <td class="text-red-500 font-bold">${formatCurrency(cpa)}</td>
+                    <td class="text-green-500 font-bold">${formatNumber(roas)}</td>
+                    <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
+                    <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button></td>
                 `;
             });
         }
@@ -1439,21 +1584,21 @@
                 const conversionCount = r.conversionCount || 0;
 
                 html += `
-                    <li class="p-3 border rounded-lg bg-gray-50">
+                    <li class="p-3 border rounded-lg bg-gray-700">
                         <p class="font-bold text-lg text-novan-primary">${clientName} (${r.plataforma})</p>
                         <p>Gasto: <span class="font-semibold">${formatCurrency(r.investimento)}</span></p>
                         <p>Vendas/Faturamento: <span class="font-semibold">${formatCurrency(r.vendas)}</span></p>
                         
                         <!-- NOVO DETALHE CPM -->
-                        <p>CPM: <span class="font-bold text-blue-600">${formatCurrency(r.cpm)}</span></p>
+                        <p>CPM: <span class="font-bold text-blue-500">${formatCurrency(r.cpm)}</span></p>
                         <!-- FIM NOVO DETALHE CPM -->
 
                         <!-- NOVO DETALHE DE CONVERSÃO -->
                         <p>Conversões (${conversionType}): <span class="font-semibold">${conversionCount.toLocaleString('pt-BR')}</span></p>
                         <!-- FIM NOVO DETALHE -->
                         
-                        <p>CPA: <span class="font-bold text-red-600">${formatCurrency(r.cpa)}</span> | ROAS: <span class="font-bold text-green-600">${formatNumber(r.roas)}</span></p>
-                        <p class="text-xs text-gray-500 mt-1">Obs: ${r.observacoes || 'N/A'}</p>
+                        <p>CPA: <span class="font-bold text-red-500">${formatCurrency(r.cpa)}</span> | ROAS: <span class="font-bold text-green-500">${formatNumber(r.roas)}</span></p>
+                        <p class="text-xs text-gray-400 mt-1">Obs: ${r.observacoes || 'N/A'}</p>
                     </li>
                 `;
             });
@@ -1516,8 +1661,8 @@
                     const percentChange = (current, previous) => previous === 0 ? (current > 0 ? '+∞' : '0%') : ((current - previous) / previous * 100).toFixed(1) + '%';
                     
                     html += `
-                        <div class="bg-novan-light p-4 rounded-lg shadow border-l-4 border-novan-primary">
-                            <h4 class="font-bold text-xl mb-2">${clientName}</h4>
+                        <div class="bg-gray-700 p-4 rounded-lg shadow border-l-4 border-novan-primary">
+                            <h4 class="font-bold text-xl mb-2 text-white">${clientName}</h4>
                             <p><strong>Período Atual (15 dias):</strong></p>
                             <ul class="ml-4 list-disc text-sm">
                                 <li>Gasto: ${formatCurrency(sThis.investimento)} 
@@ -1536,7 +1681,7 @@
                                 <!-- FIM NOVO CPM MÉDIO -->
                                 <li>Conversões (Total): ${sThis.totalConversions}</li>
                             </ul>
-                            <p class="text-xs text-gray-500 mt-2">Comparativo com os 15 dias anteriores.</p>
+                            <p class="text-xs text-gray-400 mt-2">Comparativo com os 15 dias anteriores.</p>
                         </div>
                     `;
                 });
@@ -1567,7 +1712,7 @@
             const title = `Resumo de Tarefas: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
 
             if (dayTasks.length === 0) {
-                const content = `<p class="text-center text-gray-500">Nenhuma tarefa agendada para este dia.</p>`;
+                const content = `<p class="text-center text-gray-400">Nenhuma tarefa agendada para este dia.</p>`;
                 return openSummaryModal(title, content);
             }
 
@@ -1577,14 +1722,14 @@
                 const clientName = client?.nome || 'Cliente N/D';
                 const taskTime = new Date(task.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                 
-                const statusColor = task.status === 'Concluido' ? 'text-green-600' : 
-                                    task.status === 'Em Andamento' ? 'text-yellow-600' : 'text-red-600';
+                const statusColor = task.status === 'Concluido' ? 'text-green-500' : 
+                                    task.status === 'Em Andamento' ? 'text-yellow-500' : 'text-red-500';
                 
                 contentHtml += `
-                    <div class="p-3 border rounded-lg shadow-sm">
-                        <p class="font-bold text-novan-secondary">${clientName} - ${task.type}</p>
+                    <div class="p-3 border rounded-lg shadow-sm bg-gray-700">
+                        <p class="font-bold text-white">${clientName} - ${task.type}</p>
                         <p class="text-sm font-semibold">${taskTime} <span class="${statusColor}">(${task.status})</span></p>
-                        <p class="text-xs text-gray-600 italic mt-1">Obs: ${task.observacoes || 'Sem observações.'}</p>
+                        <p class="text-xs text-gray-400 italic mt-1">Obs: ${task.observacoes || 'Sem observações.'}</p>
                     </div>
                 `;
             });
@@ -1610,7 +1755,7 @@
 
             // Preencher dias vazios no início
             for (let i = 0; i < startingDay; i++) {
-                grid.innerHTML += '<div class="calendar-day p-2 text-gray-300"></div>';
+                grid.innerHTML += '<div class="calendar-day p-2 text-gray-600"></div>'; // Mantido cinza escuro para os dias fora do mês
             }
 
             // Renderizar dias do mês
@@ -1640,8 +1785,8 @@
                 });
 
                 grid.innerHTML += `
-                    <div class="calendar-day p-2 text-novan-secondary rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-gray-50'}" onclick="showDaySummary('${dateString}')">
-                        <div class="font-bold mb-1 ${isToday ? 'text-white' : 'text-novan-secondary'}">${day}</div>
+                    <div class="calendar-day p-2 rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-slate-700'}" onclick="showDaySummary('${dateString}')">
+                        <div class="font-bold mb-1 ${isToday ? 'text-white' : 'text-gray-300'}">${day}</div>
                         ${tasksHtml}
                     </div>
                 `;
@@ -1710,7 +1855,7 @@
                 li.innerHTML = `
                     <span class="font-semibold">${clientName}</span>: ${task.type} 
                     em ${taskDate.toLocaleDateString('pt-BR')} às ${taskDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} 
-                    <span class="text-xs text-gray-500">(${task.status})</span>
+                    <span class="text-xs text-gray-400">(${task.status})</span>
                 `;
                 list.appendChild(li);
             });
@@ -1781,9 +1926,9 @@
             const statusesToShow = filterStatus ? [filterStatus] : allStatuses;
             
             const statusColors = {
-                'Pendente': { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-500' },
-                'Em Andamento': { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-500' },
-                'Concluido': { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-500' }
+                'Pendente': { bg: 'bg-red-900/50', text: 'text-red-300', border: 'border-red-500' }, // Darker background
+                'Em Andamento': { bg: 'bg-yellow-900/50', text: 'text-yellow-300', border: 'border-yellow-500' }, // Darker background
+                'Concluido': { bg: 'bg-green-900/50', text: 'text-green-300', border: 'border-green-500' } // Darker background
             };
 
             statusesToShow.forEach(status => {
@@ -1804,22 +1949,22 @@
                     let completionInfo = '';
                     if (task.status === 'Concluido' && task.completionDate) {
                         const completeDate = new Date(task.completionDate).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-                        completionInfo = `<p class="text-xs text-green-600 font-medium mt-1">Concluída em: ${completeDate}</p>`;
+                        completionInfo = `<p class="text-xs text-green-500 font-medium mt-1">Concluída em: ${completeDate}</p>`;
                     }
 
 
                     return `
-                        <div class="bg-white p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2">
-                            <p class="font-semibold text-sm">${clientName} - ${task.type}</p>
-                            <p class="text-xs text-gray-500">Prazo: ${taskDateTime}</p>
-                            <p class="text-xs italic">${task.observacoes.substring(0, 50)}...</p>
+                        <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300">
+                            <p class="font-semibold text-sm text-white">${clientName} - ${task.type}</p>
+                            <p class="text-xs text-gray-400">Prazo: ${taskDateTime}</p>
+                            <p class="text-xs italic text-gray-400">${task.observacoes.substring(0, 50)}...</p>
                             ${completionInfo}
                             <div class="flex items-center space-x-2 pt-2">
-                                <label class="text-xs font-medium text-gray-600">Mudar Status:</label>
-                                <select onchange="updateTaskStatus('${task.id}', this.value)" class="p-1 border text-xs rounded-lg bg-gray-50 focus:ring-novan-primary">
+                                <label class="text-xs font-medium text-gray-400">Mudar Status:</label>
+                                <select onchange="updateTaskStatus('${task.id}', this.value)" class="p-1 border text-xs rounded-lg bg-gray-600 text-white focus:ring-novan-primary">
                                     ${statusOptions}
                                 </select>
-                                <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-700 text-xs">Excluir</button>
+                                <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-400 text-xs">Excluir</button>
                             </div>
                         </div>
                     `;
@@ -1949,13 +2094,26 @@
 
             // Usando setTimeout para garantir que o navegador calculou o tamanho do canvas
             // antes de o Chart.js tentar desenhar.
+            // ... (restante da lógica do gráfico)
+            
             setTimeout(() => {
                 
                 // Opções para tornar as barras mais finas
                 const barChartOptions = {
                     responsive: true,
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: '#334155' }, // Cor da grade escura
+                            ticks: { color: '#E2E8F0' } // Cor dos rótulos
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#E2E8F0' } // Cor dos rótulos
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E2E8F0' } } // Cor da legenda
                     },
                     // Opções para reduzir a espessura das barras
                     datasets: { 
@@ -2132,11 +2290,11 @@
             
             // GASTO TOTAL (Usando formatValueBRL para 1.000,32)
             ctx.fillStyle = COLORS.investimento;
-            ctx.fillText(`GASTO TOTAL: ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
+            ctx.fillText(`GASTO TOTAL: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
             
-            // FATURAMENTO TOTAL (Usando formatValueBRL para 1.000,32)
+            // FATURAMENTO (MODIFICADO)
             ctx.fillStyle = COLORS.faturamento;
-            ctx.fillText(`FATURAMENTO TOTAL: ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
+            ctx.fillText(`FATURAMENTO: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
             
             metricY += 40; 
             ctx.font = '700 22px Poppins'; 
@@ -2147,7 +2305,7 @@
             
             // CPM MÉDIO
             ctx.fillStyle = COLORS.impressoes;
-            ctx.fillText(`CPM MÉDIO: ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin + metricXSpacing, metricY);
+            ctx.fillText(`CPM MÉDIO: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin + metricXSpacing, metricY);
 
 
             // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
@@ -2234,6 +2392,69 @@
             
             showMessage('Exportação do Relatório Consolidado (PNG) iniciada!');
         }
+
+
+        // --- FUNÇÃO PARA ANIMAÇÃO CODE RAIN (MATRIX) ---
+        
+        /** Inicializa o Efeito Code Rain (Matrix) */
+        function initMatrixEffect() {
+            const canvas = document.getElementById('matrixCanvas');
+            // Verifica se o elemento foi encontrado antes de prosseguir
+            if (!canvas) return; 
+            
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            const fontSize = 16;
+            const columns = Math.floor(width / fontSize);
+            
+            const drops = [];
+            for(let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+            
+            // Caracteres para o efeito binário/digital
+            const characters = '01'; 
+            
+            const draw = () => {
+                // Fundo com opacidade baixa para o efeito de rastro
+                ctx.fillStyle = 'rgba(14, 27, 49, 0.05)'; // Azul Marinho com opacidade
+                ctx.fillRect(0, 0, width, height);
+                
+                ctx.font = `${fontSize}px monospace`;
+                ctx.fillStyle = '#6D28D9'; // Cor Roxo Principal
+                
+                for(let i = 0; i < drops.length; i++) {
+                    const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+                    
+                    ctx.fillText(text, x, y);
+                    
+                    // Re-inicia a gota se sair da tela (com chance de 97.5% de resetar)
+                    if(y * fontSize > height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Move a gota para baixo
+                    drops[i]++;
+                }
+                requestAnimationFrame(draw);
+            };
+
+            const handleResize = () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            };
+
+            window.addEventListener('resize', handleResize);
+            // Inicia o loop de animação
+            requestAnimationFrame(draw);
+        }
+        
+        // Chamada da animação após o DOM carregar
+        document.addEventListener('DOMContentLoaded', initMatrixEffect);
+        // --- FIM DA FUNÇÃO PARA ANIMAÇÃO CODE RAIN (MATRIX) ---
 
 
         // --- INICIALIZAÇÃO DA APLICAÇÃO PRINCIPAL (Após Login) ---
