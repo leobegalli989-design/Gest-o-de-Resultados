@@ -180,6 +180,22 @@
         .text-cliques { color: #EC4899; font-weight: 600; }      /* Pink 500 (CLIQUES) */
         .text-conversoes { color: #6D28D9; font-weight: 600; }    /* Novan Primary (Purple) (CONVERSÕES) */
         
+        /* Estilo para as tarefas no calendário */
+        .task-item {
+            padding: 2px 4px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+            border-left: 4px solid; /* Usado para a cor do cliente */
+        }
+        /* --- ESTILOS DE STATUS DE CALENDÁRIO --- */
+        .bg-status-Pendente { background-color: #DC2626; } /* Vermelho */
+        .bg-status-Em_Andamento { background-color: #F59E0B; } /* Âmbar/Amarelo */
+        .bg-status-Concluido { background-color: #10B981; } /* Verde */
 
     </style>
 </head>
@@ -258,7 +274,7 @@
                     Calendário de Tarefas
                 </div>
                 <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="clientes">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
                     Cadastro de Clientes
                 </div>
                 
@@ -361,9 +377,9 @@
 
                 <!-- NOVO BLOCO DE FILTROS PARA O HISTÓRICO -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-end">
-                    <h2 class="text-xl font-semibold text-white flex-grow basis-full md:basis-auto">Filtrar:</h2>
-                    <select id="results_filter_cliente" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow bg-gray-700 text-white">
-                        <option value="">Selecione o Cliente</option>
+                    <h2 class="text-xl font-semibold text-white flex-grow basis-full md:basis-auto">Filtrar Histórico:</h2>
+                    <select id="results_filter_cliente" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary flex-grow bg-gray-700 text-white">
+                        <option value="">Todos os Clientes</option>
                     </select>
                     <input type="date" id="results_filter_start_date" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                     <span class="font-medium text-gray-300">até</span>
@@ -375,30 +391,68 @@
                 <!-- FIM NOVO BLOCO DE FILTROS -->
 
                 <!-- NOVO BLOCO: KPI Cards de Resumo (AGREGADO) -->
+                <!-- Movido para ANTES da tabela de histórico, conforme solicitado -->
+                <h2 class="text-xl font-semibold mb-4 text-white mt-8">Resumo Agregado (Filtro Aplicado)</h2>
                 <div id="kpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                    <!-- Cards KPI serão injetados aqui (Gasto Total, Faturamento, ROAS Médio, CPA Médio, CPM Médio) -->
+                    <!-- Cards KPI serão injetados aqui -->
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-red-500">
+                        <p class="text-sm font-medium text-gray-400">Gasto Total</p>
+                        <p class="text-2xl font-bold text-red-500 mt-1">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-green-500">
+                        <p class="text-sm font-medium text-gray-400">Faturamento</p>
+                        <p class="text-2xl font-bold text-green-500 mt-1">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-yellow-500">
+                        <p class="text-sm font-medium text-gray-400">ROAS Médio (X)</p>
+                        <p class="text-2xl font-bold text-yellow-500 mt-1">0.00X</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-indigo-500">
+                        <p class="text-sm font-medium text-gray-400">CPA Médio (R$)</p>
+                        <p class="text-2xl font-bold text-indigo-500 mt-1">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-blue-500">
+                        <p class="text-sm font-medium text-gray-400">CPM Médio (R$)</p>
+                        <p class="text-2xl font-bold text-blue-500 mt-1">R$ 0,00</p>
+                    </div>
                 </div>
                 <!-- FIM NOVO BLOCO: KPI Cards de Resumo -->
 
-                <!-- Container do Resumo Diário (Substituto da Tabela de Histórico) -->
+                <!-- Histórico de Resultados -->
                 <div class="bg-novan-secondary p-6 rounded-xl shadow-lg overflow-x-auto">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Métricas Agregadas por Filtro</h2>
-                    
-                    <!-- SPINNER DE CARREGAMENTO PARA FILTRO -->
-                    <div id="resultsLoading" class="hidden text-center py-8">
-                        <div class="spinner"></div>
-                        <p class="text-gray-400 mt-2">Carregando métricas...</p>
-                    </div>
-                    <!-- FIM SPINNER -->
-
-                    <!-- NOVO: KPI Cards Detalhados de Resumo -->
-                    <div id="dailySummaryKpis" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                        <!-- Os 8 KPIs diários/agregados serão injetados aqui -->
-                    </div>
-                    <!-- FIM NOVO: KPI Cards Detalhados de Resumo -->
-
-                    <p id="noResults" class="text-center text-gray-400 mt-4 hidden">Nenhuma métrica registrada ou cliente selecionado.</p>
+                    <h2 class="text-xl font-semibold mb-4 text-white">Histórico e Evolução das Métricas</h2>
+                    <table id="resultsTable" class="w-full text-left text-gray-300">
+                        <thead class="bg-slate-800">
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Plataforma</th>
+                                <!-- Trocado Investimento por Gasto -->
+                                <th>Gasto (R$)</th>
+                                <th>Impr.</th>
+                                <th>Cliques</th>
+                                <!-- NOVO CPM HEADER -->
+                                <th class="text-blue-500">CPM (R$)</th>
+                                <!-- FIM NOVO CPM HEADER -->
+                                <!-- NOVO CAMPO UNIFICADO -->
+                                <th class="text-purple-400">Conversão</th>
+                                <!-- FIM NOVO CAMPO -->
+                                <th>Vendas (R$)</th>
+                                <th class="text-red-500">CPA (R$)</th>
+                                <th class="text-green-500">ROAS (X)</th>
+                                <th>Obs.</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Resultados serão injetados aqui via JS -->
+                        </tbody>
+                    </table>
+                    <p id="noResults" class="text-center text-gray-400 mt-4 hidden">Nenhum resultado registrado ainda.</p>
                 </div>
+
+                <!-- BLOCO ANTIGO DOS KPIs (REMOVIDO DESTA POSIÇÃO) -->
+
             </section>
 
             <!-- Tab 2: Calendário de Tarefas -->
@@ -483,9 +537,9 @@
             <!-- Tab 3: Cadastro de Clientes -->
             <section id="clientes" class="tab-content">
                 <h1 class="text-4xl font-bold text-white mb-6">👥 Cadastro de Clientes</h1>
-                
-                <!-- Botão e Modal para Cadastrar Novo Cliente (NOVO FLUXO) -->
-                <div class="mb-6 flex justify-center">
+
+                <!-- Botão centralizado para Novo Cadastro -->
+                <div class="mb-8 flex justify-center">
                     <button onclick="openClientTypeSelectionModal()" class="bg-novan-primary hover:bg-violet-700 text-white font-semibold p-3 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                         + Cadastrar Novo Cliente
                     </button>
@@ -674,7 +728,7 @@
 
                 </div>
 
-                <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div id="chartsContainer" class="grid grid-cols-1 lg:col-span-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
                     <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
@@ -892,7 +946,7 @@
                 // Ícone de Olho Fechado
                 path1.setAttribute('d', 'M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 1.274-4.057 5.065-7 9.542-7a10.05 10.05 0 011.875.175m-2.031 3.22A3.001 3.001 0 0012 15a3 3 0 003-3h-1.062a4.986 4.986 0 01-1.429-1.429m1.43-1.43a3 3 0 00-4.243 4.243M9.879 9.879l4.242 4.242M9.88 9.88l.585-.585M12 15a3 3 0 01-3-3h1.062a4.986 4.986 0 001.429 1.429m-1.43 1.43a3 3 0 014.243-4.243m-4.243 4.243l4.242-4.242'); // Simplificação para mostrar o olho cortado/slashed
                 path2.setAttribute('d', 'M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 1.274-4.057 5.065-7 9.542-7a10.05 10.05 0 011.875.175'); // Ajusta um path para ser mais consistente com o visual de olho fechado
-                toggleIcon.setAttribute('title', 'Ocultar Senha');
+                toggleIcon.setAttribute('title', 'Exibir Senha');
 
             }
         }
@@ -959,7 +1013,7 @@
             return isNaN(num) ? '0.00' : num.toFixed(2);
         }
         
-        /** Fechad o modal de resumo (usado no Resumo Diário/Quinzenal e Calendário) */
+        /** Fecha o modal de resumo */
         window.closeSummaryModal = function() {
             document.getElementById('summaryModal').classList.remove('flex');
             document.getElementById('summaryModal').classList.add('hidden');
@@ -968,10 +1022,258 @@
         /** Utility: Adiciona um offset para garantir que a data YYYY-MM-DD seja lida localmente (Fix Timezone Bug) */
         function getLocalDayDate(dateString) {
             // Adiciona um componente de tempo no meio do dia para garantir que o fuso horário local não mova a data para o dia anterior.
-            // Isso é um fix comum para inputs type="date" no JS.
             return new Date(dateString + 'T12:00:00'); 
         }
 
+
+        // --- FUNÇÕES GEMINI API ---
+        
+        /** Função utilitária para chamar a API Gemini */
+        async function callGeminiApi(systemPrompt, userQuery) {
+            const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+            const API_KEY = ""; // Será preenchida pelo Canvas
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            let attempts = 0;
+            const maxRetries = 3;
+
+            while (attempts < maxRetries) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429) {
+                        // Too Many Requests - Implementa Backoff Exponencial
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou (429). Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!text) {
+                        console.error("Resposta Gemini vazia ou inesperada:", result);
+                        return "Erro: O LLM não retornou uma análise válida.";
+                    }
+
+                    return text;
+
+                } catch (error) {
+                    console.error("Erro na chamada da API Gemini:", error);
+                    // Tenta novamente apenas para erros de rede/timeout, não para erros 4xx/5xx diretos
+                    if (attempts < maxRetries - 1) {
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou. Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                    } else {
+                        return "Erro: Falha na comunicação com o LLM após várias tentativas.";
+                    }
+                }
+            }
+            return "Erro: Falha na comunicação com o LLM após o limite de retentativas.";
+        }
+
+        /** Gera Análise de Performance usando o LLM */
+        window.generatePerformanceAnalysis = async function() {
+            // CORRIGIDO: Usa a data do input (res_data) em vez de apenas 'hoje'
+            const selectedDate = document.getElementById('res_data').value;
+            if (!selectedDate) {
+                return showMessage('Selecione uma data para a análise.', true);
+            }
+            
+            const dailyResults = results.filter(r => r.data === selectedDate);
+
+            if (dailyResults.length === 0) {
+                return showMessage('Nenhum registro encontrado para esta data para gerar a análise.', true);
+            }
+            
+            // Agregação dos dados para o LLM
+            let summary = dailyResults.reduce((acc, r) => {
+                acc.gasto += r.investimento;
+                acc.vendas += r.vendas;
+                acc.conversoes += r.conversionCount || 0;
+                acc.impressoes += r.impressoes;
+                
+                // Adiciona observações e detalhes
+                const clientName = clients.find(c => c.id === r.clientId)?.nome || 'Desconhecido';
+                acc.detalhes.push({
+                    cliente: clientName,
+                    plataforma: r.plataforma,
+                    investimento: r.investimento,
+                    vendas: r.vendas,
+                    cpa: calculateCPA(r.investimento, r.conversionCount),
+                    roas: calculateROAS(r.investimento, r.vendas),
+                    conversoes: r.conversionCount,
+                    obs: r.observacoes
+                });
+                return acc;
+            }, { gasto: 0, vendas: 0, conversoes: 0, impressoes: 0, detalhes: [] });
+
+            const totalCPA = calculateCPA(summary.gasto, summary.conversoes);
+            const totalROAS = calculateROAS(summary.gasto, summary.vendas);
+
+            // Constrói o prompt
+            const systemPrompt = `Você é um Analista de Tráfego Sênior da Novan Agency. Sua tarefa é fornecer uma análise concisa, clara e orientada a ações sobre o desempenho das campanhas diárias. Seu público é o gerente da agência.
+            Formate a sua resposta em dois parágrafos:
+            1. Resumo da Performance: Foco nas métricas globais (GASTO, ROAS, CPA) e a tendência geral.
+            2. Ações Recomendadas: Foco nas próximas 2-3 ações mais importantes ou anomalias encontradas nos detalhes.
+            Não use formatação Markdown (como ** ou cabeçalhos).`;
+
+            // CORRIGIDO: Usa a data selecionada (selectedDate) e o T12:00:00 para evitar timezone shift
+            const userQuery = `Analise a performance diária de (${new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR')}) baseada nos seguintes dados agregados:
+            - Gasto Total: ${formatCurrency(summary.gasto)}
+            - Faturamento/Vendas Total: ${formatCurrency(summary.vendas)}
+            - CPA Agregado: ${formatCurrency(totalCPA)}
+            - ROAS Agregado: ${formatNumber(totalROAS)}X
+            - Detalhes por Cliente (onde buscar anomalias): ${JSON.stringify(summary.detalhes.map(d => ({
+                cliente: d.cliente,
+                gasto: d.investimento,
+                roas: formatNumber(d.roas),
+                obs: d.obs.substring(0, 50)
+            })))}`;
+
+            // 1. Mostrar o modal de carregamento
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a gerar a análise...</p>`;
+            openSummaryModal('✨ Gerando Análise de Desempenho', loadingHtml);
+
+            // 2. Chamar a API
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            // 3. Formatar e exibir o resultado
+            // Usando white-space: pre-wrap para respeitar quebras de linha do LLM.
+            const finalHtml = `<div class="whitespace-pre-wrap text-base leading-relaxed">${analysisText}</div>`;
+            openSummaryModal('✨ Análise de Desempenho Diário', finalHtml);
+        }
+        
+        /** NOVO: Gera Sugestão de Tarefa (Calendário) usando o LLM */
+        window.generateTaskSuggestion = async function() {
+            const clientId = document.getElementById('task_cliente').value;
+            const taskType = document.getElementById('task_tipo').value;
+            const obsTextarea = document.getElementById('task_observacoes');
+            const genButton = document.getElementById('btnGerarObsTarefa');
+
+            if (!clientId || !taskType) {
+                return showMessage('Selecione um Cliente e um Tipo de Tarefa primeiro.', true);
+            }
+
+            const clientName = clients.find(c => c.id === clientId)?.nome || 'Cliente Desconhecido';
+            
+            genButton.disabled = true;
+            obsTextarea.placeholder = "Gerando sugestão com a Gemini... ⏳";
+            
+            const systemPrompt = `Você é um assistente de gestão de projetos numa agência de marketing digital. Crie uma lista de verificação (checklist) ou uma descrição detalhada para a tarefa solicitada. Responda em português (Portugal). Seja conciso e prático. Use quebras de linha (\\n) para formatar a checklist.`;
+            const userQuery = `Gere uma checklist de 3-5 passos para a tarefa: "${taskType}" para o cliente: "${clientName}".`;
+
+            try {
+                const suggestion = await callGeminiApi(systemPrompt, userQuery);
+                obsTextarea.value = suggestion;
+            } catch (error) {
+                console.error("Erro ao gerar sugestão de tarefa:", error);
+                obsTextarea.placeholder = "Erro ao gerar. Tente novamente.";
+                showMessage('Falha ao comunicar com a API Gemini.', true);
+            } finally {
+                genButton.disabled = false;
+                if(obsTextarea.value === "") { // Só redefine se a API falhar em preencher
+                    obsTextarea.placeholder = "Observações";
+                }
+            }
+        }
+        
+        /** NOVO: Gera Insight de Relatório (Aba Relatórios) usando o LLM */
+        window.generateReportInsight = async function() {
+            if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
+                return showMessage('Gere o relatório primeiro (botão roxo) antes de pedir o insight.', true);
+            }
+            
+            // 1. Mostrar o modal de carregamento
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a analisar o relatório...</p>`;
+            openSummaryModal('✨ Gerando Insights do Relatório', loadingHtml);
+
+            // 2. Preparar dados para o LLM
+            // Para evitar limites de token, vamos sumarizar os dados detalhados (groupedData)
+            const groupedData = reportDetailedResults.reduce((acc, r) => {
+                if (!acc[r.data]) {
+                    acc[r.data] = { investimento: 0, faturamento: 0, cpm: 0, roas: 0, count: 0 };
+                }
+                acc[r.data].investimento += r.investimento;
+                acc[r.data].faturamento += r.vendas;
+                acc[r.data].cpm += r.cpm;
+                acc[r.data].roas += r.roas;
+                acc[r.data].count += 1;
+                return acc;
+            }, {});
+
+            const dailySummaryForLLM = Object.entries(groupedData).map(([date, metrics]) => ({
+                data: date,
+                gasto: metrics.investimento,
+                faturamento: metrics.faturamento,
+                roas_medio: (metrics.roas / (metrics.count || 1)) // Evita divisão por zero
+            }));
+            
+            // Limita a 50 pontos de dados para o prompt
+            const sampledData = dailySummaryForLLM.length > 50 
+                ? dailySummaryForLLM.slice(-50) // Pega os últimos 50 dias
+                : dailySummaryForLLM;
+
+            const systemPrompt = `Você é um Analista de Dados Sênior da Novan Agency, especializado em tráfego pago. Analise o relatório de performance fornecido. Responda em português (Portugal).
+            O seu formato de resposta deve ser:
+            
+            ### Análise de Performance
+            (Um parágrafo conciso sobre as métricas principais: Gasto, Faturamento, ROAS e CPA.)
+
+            ### Tendências e Observações
+            (Um parágrafo sobre as tendências vistas nos dados diários, como growth do ROAS ou picos de gasto.)
+
+            ### Recomendações Acionáveis
+            (Uma lista de 2-3 bullet points sobre o que fazer a seguir, focado em otimização.)`;
+            
+            // Correção: Garantir que o período é uma string antes de usar 'replace'
+            const periodString = reportSummaryMetrics.period ? reportSummaryMetrics.period.toString() : 'N/A';
+
+            const userQuery = `Cliente: ${reportSummaryMetrics.clientName}
+            Período: ${periodString}
+            
+            Métricas Agregadas (Totais/Médias do Período):
+            - Gasto Total: ${formatCurrency(reportSummaryMetrics.totalGasto)}
+            - Faturamento Total: ${formatCurrency(reportSummaryMetrics.totalFaturamento)}
+            - ROAS Médio: ${formatNumber(reportSummaryMetrics.avgROAS)}X
+            - CPA Médio: ${formatCurrency(reportSummaryMetrics.avgCPA)}
+            - CPM Médio: ${formatCurrency(reportSummaryMetrics.avgCPM)}
+
+            Dados Diários (Amostra para análise de tendência):
+            ${JSON.stringify(sampledData)}
+            `;
+            
+            // 3. Chamar a API
+            let analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            // 4. Formatar o Markdown para HTML (simples)
+            // (Usando regex para formatar a saída do LLM em HTML simples para o modal)
+            analysisText = analysisText
+                .replace(/### (.*?)\n/g, '<h4 class="text-lg font-bold text-novan-primary mt-4 mb-2">$1</h4>')
+                .replace(/\* (.*?)\n/g, '<li class="ml-4 list-disc">$1</li>') // Bullet points
+                .replace(/\n\n/g, '<br><br>') // Parágrafos
+                .replace(/\n/g, '<br>'); // Novas linhas
+
+            const finalHtml = `<div class="text-left">${analysisText}</div>`;
+            openSummaryModal('✨ Insights do Relatório', finalHtml);
+        }
 
         // --- GESTÃO DE TABS ---
 
@@ -986,12 +1288,11 @@
             // Ações específicas ao trocar de aba
             if (tabId === 'clientes') {
                 renderClientList();
-                // Garante que o formulário de Tráfego Pago é o padrão ao entrar na aba
-                // showClientFormType('traffic'); // Removido, pois o modal de seleção é o novo padrão
-                document.getElementById('clientFormContainer').classList.add('hidden'); // Garante que o form comece escondido
+                // Garante que o formulário está oculto por padrão (modo de cadastro inicial)
+                document.getElementById('clientFormContainer').classList.add('hidden');
             } else if (tabId === 'resultados') {
                 populateClientSelects();
-                renderResultsTable();
+                renderResultsTable(); 
             } else if (tabId === 'calendario') {
                 populateClientSelects();
                 renderCalendar();
@@ -1363,7 +1664,7 @@
             document.getElementById('clientForm').reset();
             
             // Reverte para o formulário padrão de Tráfego Pago
-            // showClientFormType('traffic'); // Já é tratado pelo resetClientForm
+            showClientFormType('traffic'); 
         });
 
         /** Deleta um cliente e todos os dados associados */
@@ -1391,7 +1692,7 @@
 
 
         // --- ABA 1: RESULTADOS DE CAMPANHAS ---
-        
+
         /** Renderiza os KPI Cards (Agregados) */
         function renderKpiCards(data, summary) {
             const container = document.getElementById('kpiCardsContainer');
@@ -1433,154 +1734,103 @@
 
             container.innerHTML = kpiCardsHtml;
         }
-        
-        /** Renderiza os KPI Cards de Resumo Detalhado (Substituto da Tabela) */
-        function renderDailySummaryKpis(data) {
-            const container = document.getElementById('dailySummaryKpis');
-            if (!container) return;
 
-            // Zera o container
-            container.innerHTML = '';
+        /** Renderiza a tabela de resultados */
+        window.renderResultsTable = function() {
+            const body = document.getElementById('resultsTableBody');
+            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value; // NOVO: Filtro de Cliente
+            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value; // NOVO: Filtro de Data Inicial
+            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value; // NOVO: Filtro de Data Final
             
-            // Define o objeto de métricas totais a ser exibido (agregado de todos os resultados filtrados)
-            let totalMetrics = {
-                investimento: 0,
-                vendas: 0,
-                impressoes: 0,
-                cliques: 0,
-                conversionCount: 0,
+            // Filtra apenas resultados de clientes de TRÁFEGO PAGO, pois os campos são de Ads.
+            const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
+            let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
+
+            // 1. Aplica Filtro de Cliente
+            if (resultsFilterClient) {
+                filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
+            }
+
+            // 2. Aplica Filtro de Data
+            if (resultsFilterStartDate) {
+                filteredResults = filteredResults.filter(r => r.data >= resultsFilterStartDate);
+            }
+            if (resultsFilterEndDate) {
+                filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
+            }
+
+            // --- NOVO: CÁLCULO DAS MÉTRICAS DE RESUMO (Geral) ---
+            let summaryMetrics = {
+                totalGasto: 0, totalFaturamento: 0, totalConversoes: 0, totalImpressoes: 0,
+                avgROAS: 0, avgCPA: 0, avgCPM: 0
             };
 
-            if (data.length > 0) {
-                totalMetrics = data.reduce((acc, r) => ({
-                    investimento: acc.investimento + r.investimento,
-                    vendas: acc.vendas + r.vendas,
-                    impressoes: acc.impressoes + r.impressoes,
-                    cliques: acc.cliques + r.cliques,
-                    conversionCount: acc.conversionCount + (r.conversionCount || 0)
-                }), totalMetrics);
+            if (filteredResults.length > 0) {
+                summaryMetrics = filteredResults.reduce((acc, r) => {
+                    acc.totalGasto += r.investimento;
+                    acc.totalFaturamento += r.vendas;
+                    acc.totalConversoes += r.conversionCount || 0;
+                    acc.totalImpressoes += r.impressoes;
+                    return acc;
+                }, summaryMetrics);
+
+                summaryMetrics.avgCPA = calculateCPA(summaryMetrics.totalGasto, summaryMetrics.totalConversoes);
+                summaryMetrics.avgROAS = calculateROAS(summaryMetrics.totalGasto, summaryMetrics.totalFaturamento);
+                summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
             }
             
-            // Calcula as métricas derivadas do total
-            const avgCPA = calculateCPA(totalMetrics.investimento, totalMetrics.conversionCount);
-            const avgROAS = calculateROAS(totalMetrics.investimento, totalMetrics.vendas);
-            const avgCPM = calculateCPM(totalMetrics.investimento, totalMetrics.impressoes);
-            
-            // Array de KPIs Detalhados para Injeção
-            // As cores foram ajustadas para o estilo Novan (roxo, vermelho, verde, etc.)
-            const detailedKpis = [
-                // Gasto (R$)
-                { title: "Gasto (R$)", value: formatCurrency(totalMetrics.investimento), color: 'red-500', icon: 'R$', valueClass: 'text-investimento' },
-                // Faturamento (R$)
-                { title: "Vendas (R$)", value: formatCurrency(totalMetrics.vendas), color: 'green-500', icon: 'R$', valueClass: 'text-faturamento' },
-                // Impressões
-                { title: "Impressões", value: totalMetrics.impressoes.toLocaleString('pt-BR'), color: 'blue-500', icon: '👁️', valueClass: 'text-impressoes' },
-                // Cliques
-                { title: "Cliques", value: totalMetrics.cliques.toLocaleString('pt-BR'), color: 'pink-500', icon: '🖱️', valueClass: 'text-cliques' },
-                // Conversão
-                { title: "Conversão (Total)", value: totalMetrics.conversionCount.toLocaleString('pt-BR'), color: 'novan-primary', icon: '✅', valueClass: 'text-conversoes' },
-                // CPA Médio
-                { title: "CPA Médio (R$)", value: formatCurrency(avgCPA), color: 'yellow-500', icon: 'R$', valueClass: 'text-cpa' },
-                // ROAS Médio
-                { title: "ROAS Médio (X)", value: `${formatNumber(avgROAS)}X`, color: 'red-600', icon: '⬆️', valueClass: 'text-roas' },
-                // CPM Médio
-                { title: "CPM Médio (R$)", value: formatCurrency(avgCPM), color: 'indigo-500', icon: 'R$', valueClass: 'text-cpm' },
-            ];
+            // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS (Topo)
+            renderKpiCards(filteredResults, summaryMetrics);
+            // --- FIM DO NOVO CÁLCULO ---
 
-            const kpisHtml = detailedKpis.map(kpi => `
-                <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-${kpi.color}">
-                    <p class="text-sm font-medium text-gray-400">${kpi.title}</p>
-                    <p class="text-xl font-bold mt-1 ${kpi.valueClass}">${kpi.value}</p>
-                </div>
-            `).join('');
+            body.innerHTML = '';
 
-            container.innerHTML = kpisHtml;
-        }
-
-
-        /** Renderiza os KPIs agregados de todo o período filtrado */
-        window.renderResultsTable = function() {
-            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value;
-            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
-            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
-            
-            const resultsTable = document.getElementById('resultsTable');
-            const dailySummaryKpis = document.getElementById('dailySummaryKpis');
-            const loadingSpinner = document.getElementById('resultsLoading');
-            const noResultsEl = document.getElementById('noResults');
-
-            // 1. MOSTRA O SPINNER E ESCONDE AS SEÇÕES
-            dailySummaryKpis.classList.add('hidden');
-            noResultsEl.classList.add('hidden');
-            loadingSpinner.classList.remove('hidden');
-
-            // Validação: Se o filtro de cliente é obrigatório e não foi selecionado, não renderiza
-            if (!resultsFilterClient) {
-                renderKpiCards([], {}); 
-                loadingSpinner.classList.add('hidden');
-                noResultsEl.classList.remove('hidden');
-                noResultsEl.textContent = "Selecione um Cliente para visualizar as métricas.";
+            if (filteredResults.length === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
                 return;
             }
-            
-            // Simula um atraso de carregamento de 500ms
-            setTimeout(() => {
-                
-                // Filtra apenas resultados de clientes de TRÁFEGO PAGO
-                const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
-                let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
+            document.getElementById('noResults').classList.add('hidden');
 
-                // 1. Aplica Filtro de Cliente (JÁ SABEMOS QUE resultsFilterClient TEM VALOR)
-                filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
-                
+            // Ordena por data decrescente
+            const sortedResults = filteredResults.sort((a, b) => new Date(b.data) - new Date(a.data));
 
-                // 2. Aplica Filtro de Data
-                if (resultsFilterStartDate) {
-                    filteredResults = filteredResults.filter(r => r.data >= resultsFilterStartDate);
-                }
-                if (resultsFilterEndDate) {
-                    filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
-                }
+            sortedResults.forEach(res => {
+                const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
+                const cpa = calculateCPA(res.investimento, res.conversionCount); // ATUALIZADO: Usando conversionCount
+                const roas = calculateROAS(res.investimento, res.vendas);
+                const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
+                
+                // Lidando com a nova estrutura de Conversão
+                const conversionType = res.conversionType || 'N/D';
+                const conversionCount = res.conversionCount || 0;
 
-                // --- CÁLCULO DAS MÉTRICAS DE RESUMO (Geral) ---
-                let summaryMetrics = {
-                    totalGasto: 0, totalFaturamento: 0, totalConversoes: 0, totalImpressoes: 0,
-                    avgROAS: 0, avgCPA: 0, avgCPM: 0
-                };
+                const row = body.insertRow();
+                // A classe "text-xs" foi definida no CSS para o TD
+                row.innerHTML = `
+                    <td class="text-gray-300">${new Date(res.data).toLocaleDateString('pt-BR')}</td>
+                    <td class="font-medium text-novan-primary">${clientName}</td>
+                    <td class="text-gray-300">${res.plataforma}</td>
+                    <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
+                    <td class="text-gray-300">${res.impressoes.toLocaleString('pt-BR')}</td>
+                    <td class="text-gray-300">${res.cliques.toLocaleString('pt-BR')}</td>
+                    
+                    <!-- NOVO CPM CÉLULA -->
+                    <td class="text-blue-500 font-bold">${formatCurrency(cpm)}</td>
+                    <!-- FIM NOVO CPM CÉLULA -->
 
-                if (filteredResults.length > 0) {
-                    summaryMetrics = filteredResults.reduce((acc, r) => {
-                        acc.totalGasto += r.investimento;
-                        acc.totalFaturamento += r.vendas;
-                        acc.totalConversoes += r.conversionCount || 0;
-                        acc.totalImpressoes += r.impressoes;
-                        return acc;
-                    }, summaryMetrics);
-
-                    summaryMetrics.avgCPA = calculateCPA(summaryMetrics.totalGasto, summaryMetrics.totalConversoes);
-                    summaryMetrics.avgROAS = calculateROAS(summaryMetrics.totalGasto, summaryMetrics.totalFaturamento);
-                    summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
-                }
-                
-                // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS (Topo)
-                renderKpiCards(filteredResults, summaryMetrics);
-                
-                // RENDERIZAÇÃO DOS KPI CARDS DETALHADOS (Substituto da Tabela)
-                renderDailySummaryKpis(filteredResults);
-                
-                // 3. ESCONDE O SPINNER
-                loadingSpinner.classList.add('hidden');
-                
-                if (filteredResults.length === 0) {
-                    noResultsEl.textContent = "Nenhum resultado encontrado para o cliente e período selecionados.";
-                    noResultsEl.classList.remove('hidden');
-                    return;
-                }
-                
-                // 4. MOSTRA O NOVO CONTAINER DE KPIS DETALHADOS
-                dailySummaryKpis.classList.remove('hidden');
-
-            }, 500); // Atraso de 500ms
+                    <!-- NOVO CAMPO UNIFICADO -->
+                    <td class="text-gray-300" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
+                        ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
+                    </td>
+                    <!-- FIM NOVO CAMPO -->
+                    
+                    <td class="text-gray-300">${formatCurrency(res.vendas)}</td>
+                    <td class="text-red-500 font-bold">${formatCurrency(cpa)}</td>
+                    <td class="text-green-500 font-bold">${formatNumber(roas)}</td>
+                    <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
+                    <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button></td>
+                `;
+            });
         }
         
         /** Deleta um registro de resultado */
@@ -1814,7 +2064,6 @@
         window.showDaySummary = function(dateString) {
             const dateObj = getLocalDayDate(dateString); // Usando a nova função para evitar erros de timezone
             
-            // Filtra as tarefas para o dia clicado
             const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
 
             const title = `Resumo de Tarefas: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
@@ -1830,7 +2079,6 @@
                 const clientName = client?.nome || 'Cliente N/D';
                 const taskTime = new Date(task.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                 
-                // Define a cor de acordo com o status
                 const statusColor = task.status === 'Concluido' ? 'text-green-500' : 
                                     task.status === 'Em Andamento' ? 'text-yellow-500' : 'text-red-500';
                 
@@ -1873,29 +2121,37 @@
                 const dateString = date.toISOString().split('T')[0];
                 const isToday = date.toDateString() === today.toDateString();
                 
-                // OTIMIZAÇÃO: Filtra tasks apenas para o dia em questão
                 const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
                 
                 let tasksHtml = '';
                 dayTasks.forEach(task => {
                     const client = clients.find(c => c.id === task.clientId);
-                    const clientName = client?.nome || 'N/D'; // Nome completo
-                    
-                    // Define a cor de acordo com o status
-                    let statusColorClass = 'bg-gray-700/50'; // Cor de fundo padrão
-                    if (task.status === 'Concluido') statusColorClass = 'bg-green-700/70';
-                    else if (task.status === 'Em Andamento') statusColorClass = 'bg-yellow-700/70';
-                    else if (task.status === 'Pendente') statusColorClass = 'bg-red-700/70';
+                    const clientColor = client?.color || '#334155'; // Cor padrão
 
-                    // A tarefa agora só mostra o nome do cliente e usa a cor baseada no status
+                    // Corrigido: Usando a classe de status para o background
+                    let statusClass = '';
+                    if (task.status === 'Pendente') {
+                        statusClass = 'bg-status-Pendente'; // Define o background como vermelho
+                    } else if (task.status === 'Em Andamento') {
+                        statusClass = 'bg-status-Em_Andamento'; // Define o background como amarelo/âmbar
+                    } else if (task.status === 'Concluido') {
+                        statusClass = 'bg-status-Concluido'; // Define o background como verde
+                    }
+                    
+                    const clientName = client?.nome.substring(0, 10) || 'N/D';
+                    
+                    const taskDateTime = new Date(task.date).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                    const taskTitle = `CLIENTE: ${clientName}\nDATA/HORA: ${taskDateTime}\nTIPO: ${task.type}\nSTATUS: ${task.status}\nOBS: ${task.observacoes || 'N/A'}`;
+
                     tasksHtml += `
-                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusColorClass}" title="${clientName} - ${task.type} (${task.status})">
-                            ${clientName}
+                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusClass} border-l-4" 
+                             style="border-left-color: ${clientColor};"
+                             title="${taskTitle}">
+                            ${clientName} - ${task.type.substring(0, 5)}
                         </div>
                     `;
                 });
 
-                // A CLIQUE JÁ ESTAVA IMPLEMENTADA AQUI
                 grid.innerHTML += `
                     <div class="calendar-day p-2 rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-slate-700'}" onclick="showDaySummary('${dateString}')">
                         <div class="font-bold mb-1 ${isToday ? 'text-white' : 'text-gray-300'}">${day}</div>
@@ -1948,7 +2204,6 @@
             const nextWeek = new Date();
             nextWeek.setDate(now.getDate() + 7);
 
-            // OTIMIZAÇÃO: Filtra tarefas em uma única passagem
             const upcomingTasks = tasks.filter(t => {
                 const taskDate = new Date(t.date);
                 return taskDate >= now && taskDate <= nextWeek && t.status !== 'Concluido';
@@ -1975,14 +2230,8 @@
         }
 
         // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
-        
-        // Função para fechar o modal de detalhes da tarefa
-        window.closeTaskDetailModal = function() {
-            document.getElementById('taskDetailModal').classList.add('hidden');
-            document.getElementById('taskDetailModal').classList.remove('flex');
-        }
 
-        // Função para abrir o modal de detalhes
+        /** Abre o modal de detalhes da tarefa */
         window.openTaskDetailModal = function(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (!task) return showMessage('Tarefa não encontrada.', true);
@@ -2017,11 +2266,10 @@
             // Atribui a função de edição ao botão (simula a abertura da aba de cadastro)
             document.getElementById('modalEditButton').onclick = () => {
                 // Fechamos este modal
-                closeTaskDetailModal();
+                window.closeTaskDetailModal();
                 // Alternamos para a aba de cadastro
                 switchTab('calendario'); 
-                // Preenchemos o form da aba 'calendario' com os dados da tarefa para edição
-                // (Isso requer uma função de preenchimento no form de cadastro de tarefas, que pode ser adicionada se necessário)
+                // A edição no formulário de cadastro (calendario) deve ser implementada separadamente
                 showMessage('Implementar edição direta no formulário de cadastro de tarefas.', false, true);
             };
 
@@ -2030,12 +2278,10 @@
             document.getElementById('taskDetailModal').classList.add('flex');
         }
 
-        // Função para aplicar a mudança de status a partir do modal
-        window.applyStatusChange = function() {
-            const taskId = document.getElementById('modalTaskId').value;
-            const newStatus = document.getElementById('modalStatusSelect').value;
-            updateTaskStatus(taskId, newStatus);
-            closeTaskDetailModal();
+        // Função para fechar o modal de detalhes da tarefa
+        window.closeTaskDetailModal = function() {
+            document.getElementById('taskDetailModal').classList.add('hidden');
+            document.getElementById('taskDetailModal').classList.remove('flex');
         }
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
@@ -2057,6 +2303,14 @@
                 renderTaskManagement(); 
                 showMessage(`Status da tarefa atualizado para: ${newStatus}`);
             }
+        }
+        
+        // Função para aplicar a mudança de status a partir do modal
+        window.applyStatusChange = function() {
+            const taskId = document.getElementById('modalTaskId').value;
+            const newStatus = document.getElementById('modalStatusSelect').value;
+            updateTaskStatus(taskId, newStatus);
+            closeTaskDetailModal();
         }
 
         /** Renderiza o painel de gestão de tarefas (Kanban-like) */
@@ -2116,12 +2370,18 @@
                     const clientName = client?.nome || 'Cliente N/D';
                     const taskDateTime = new Date(task.date).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
+                    // Opções de status (inclui o status atual como selecionado)
+                    const statusOptions = allStatuses
+                        .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`)
+                        .join('');
+                    
                     // Exibir data de conclusão
                     let completionInfo = '';
                     if (task.status === 'Concluido' && task.completionDate) {
                         const completeDate = new Date(task.completionDate).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
                         completionInfo = `<p class="text-xs text-green-500 font-medium mt-1">Concluída em: ${completeDate}</p>`;
                     }
+
 
                     return `
                         <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300 cursor-pointer hover:bg-gray-600 transition" 
@@ -2155,7 +2415,6 @@
             tasks = tasks.filter(t => t.id !== taskId);
             saveData();
             renderCalendar();
-            renderTaskNotifications();
             renderTaskManagement();
             showMessage('Tarefa excluída.', true);
         }
@@ -2297,8 +2556,6 @@
 
             // Usando setTimeout para garantir que o navegador calculou o tamanho do canvas
             // antes de o Chart.js tentar desenhar.
-            // ... (restante da lógica do gráfico)
-            
             setTimeout(() => {
                 
                 // Opções para tornar as barras mais finas
@@ -2363,49 +2620,17 @@
                     ]
                 }, barChartOptions);
 
-                // NOVO: Opções para Gráfico de Linha (ROAS)
-                const lineChartOptions = {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#334155' },
-                            ticks: { color: '#E2E8F0' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#E2E8F0' }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#E2E8F0' } }
-                    },
-                    elements: {
-                        line: {
-                            tension: 0.4, // Suaviza a linha
-                            borderWidth: 3,
-                        },
-                        point: {
-                            radius: 5,
-                            hoverRadius: 7,
-                            backgroundColor: COLORS.roas,
-                        }
-                    }
-                };
-
-                // 3. Gráfico de ROAS Médio Diário (LINHA)
-                roasChartInstance = initChart('roasChart', 'line', { 
+                // 3. Gráfico de ROAS Médio Diário (BARRA)
+                roasChartInstance = initChart('roasChart', 'bar', { 
                     labels: reportLabels,
                     datasets: [
                         {
                             label: 'ROAS Médio',
                             data: roasData,
-                            borderColor: COLORS.roas, // Cor da linha (Âmbar/Amarelo)
-                            backgroundColor: 'rgba(245, 158, 11, 0.2)', // Fundo sutil
-                            fill: true,
+                            backgroundColor: COLORS.roas, // Amber 500
                         }
                     ]
-                }, lineChartOptions);
+                }, barChartOptions);
 
                 showMessage('Relatório gerado com sucesso!');
                 
@@ -2565,7 +2790,7 @@
             
             ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
             ctx.fillText('GASTO (R$)', colGasto, currentY);
-            ctx.fillText('FATURAMENTO (R$)', colFaturamento, currentY);
+            ctx.fillText('FATO. (R$)', colFaturamento, currentY);
             ctx.fillText('CPM (R$)', colCPM, currentY);
             ctx.fillText('ROAS (X)', colROAS, currentY);
             ctx.fillText('CONVERSÕES', colConv, currentY);
@@ -2583,7 +2808,7 @@
                 
                 // Coluna DATA/CLIENTE
                 const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
-                const dateDisplay = getLocalDayDate(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); // FIX APLICADO AQUI
+                const dateDisplay = getLocalDayDate(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
                 ctx.fillStyle = LIGHT_TEXT;
                 ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
                 
@@ -2593,7 +2818,7 @@
                 
                 // Coluna FATURAMENTO (formato 1.000,32)
                 ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
-                ctx.fillText(formatValueBRL(row.faturamento), colFaturamento, currentY);
+                ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
                 
                 // Coluna CPM (formato 1.000,32)
                 ctx.fillStyle = COLORS.impressoes; // Azul
