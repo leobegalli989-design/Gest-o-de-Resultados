@@ -168,6 +168,19 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Estilos para diferenciação de cor nas células da tabela */
+        .text-investimento { color: #EF4444; font-weight: 600; } /* Red 500 (GASTO) */
+        .text-faturamento { color: #10B981; font-weight: 600; }  /* Green 500 (FATURAMENTO/VENDAS) */
+        .text-cpa { color: #F59E0B; font-weight: 600; }          /* Amber 500 (CPA) */
+        .text-roas { color: #DC2626; font-weight: 600; }          /* Red 600 (ROAS - mantendo a cor forte de retorno) */
+        .text-cpm { color: #3B82F6; font-weight: 600; }           /* Blue 500 (CPM) */
+        
+        .text-impressoes { color: #3B82F6; font-weight: 600; }   /* Blue 500 (IMPRESSÕES - mesma cor do CPM para consistência) */
+        .text-cliques { color: #EC4899; font-weight: 600; }      /* Pink 500 (CLIQUES) */
+        .text-conversoes { color: #6D28D9; font-weight: 600; }    /* Novan Primary (Purple) (CONVERSÕES) */
+        
+
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen">
@@ -385,18 +398,18 @@
                                 <th>Cliente</th>
                                 <th>Plataforma</th>
                                 <!-- Trocado Investimento por Gasto -->
-                                <th>Gasto (R$)</th>
-                                <th>Impr.</th>
-                                <th>Cliques</th>
+                                <th class="text-investimento">Gasto (R$)</th>
+                                <th class="text-impressoes">Impr.</th>
+                                <th class="text-cliques">Cliques</th>
                                 <!-- NOVO CPM HEADER -->
-                                <th class="text-blue-500">CPM (R$)</th>
+                                <th class="text-cpm">CPM (R$)</th>
                                 <!-- FIM NOVO CPM HEADER -->
                                 <!-- NOVO CAMPO UNIFICADO -->
-                                <th class="text-purple-400">Conversão</th>
+                                <th class="text-conversoes">Conversão</th>
                                 <!-- FIM NOVO CAMPO -->
-                                <th>Vendas (R$)</th>
-                                <th class="text-red-500">CPA (R$)</th>
-                                <th class="text-green-500">ROAS (X)</th>
+                                <th class="text-faturamento">Vendas (R$)</th>
+                                <th class="text-cpa">CPA (R$)</th>
+                                <th class="text-roas">ROAS (X)</th>
                                 <th>Obs.</th>
                                 <th>Ações</th>
                             </tr>
@@ -965,6 +978,7 @@
         /** Utility: Adiciona um offset para garantir que a data YYYY-MM-DD seja lida localmente (Fix Timezone Bug) */
         function getLocalDayDate(dateString) {
             // Adiciona um componente de tempo no meio do dia para garantir que o fuso horário local não mova a data para o dia anterior.
+            // Isso é um fix comum para inputs type="date" no JS.
             return new Date(dateString + 'T12:00:00'); 
         }
 
@@ -1536,27 +1550,26 @@
                     
                     // A classe "text-xs" foi definida no CSS para o TD
                     row.innerHTML = `
-                        <!-- FIX: Usando getLocalDayDate para corrigir o fuso horário na exibição -->
                         <td class="text-gray-300">${getLocalDayDate(res.data).toLocaleDateString('pt-BR')}</td>
                         <td class="font-medium text-novan-primary">${clientName}</td>
                         <td class="text-gray-300">${res.plataforma}</td>
-                        <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
-                        <td class="text-gray-300">${res.impressoes.toLocaleString('pt-BR')}</td>
-                        <td class="text-gray-300">${res.cliques.toLocaleString('pt-BR')}</td>
+                        <td class="text-investimento">${formatCurrency(res.investimento)}</td>
+                        <td class="text-impressoes">${res.impressoes.toLocaleString('pt-BR')}</td>
+                        <td class="text-cliques">${res.cliques.toLocaleString('pt-BR')}</td>
                         
                         <!-- NOVO CPM CÉLULA -->
-                        <td class="text-blue-500 font-bold">${formatCurrency(cpm)}</td>
+                        <td class="text-cpm">${formatCurrency(cpm)}</td>
                         <!-- FIM NOVO CPM CÉLULA -->
 
                         <!-- NOVO CAMPO UNIFICADO -->
-                        <td class="text-gray-300" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
+                        <td class="text-conversoes" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
                             ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
                         </td>
                         <!-- FIM NOVO CAMPO -->
                         
-                        <td class="text-gray-300">${formatCurrency(res.vendas)}</td>
-                        <td class="text-red-500 font-bold">${formatCurrency(cpa)}</td>
-                        <td class="text-green-500 font-bold">${formatNumber(roas)}</td>
+                        <td class="text-faturamento">${formatCurrency(res.vendas)}</td>
+                        <td class="text-cpa">${formatCurrency(cpa)}</td>
+                        <td class="text-roas">${formatNumber(roas)}</td>
                         <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
                         <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button></td>
                     `;
@@ -1859,6 +1872,7 @@
                 const dateString = date.toISOString().split('T')[0];
                 const isToday = date.toDateString() === today.toDateString();
                 
+                // OTIMIZAÇÃO: Filtra tasks apenas para o dia em questão
                 const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
                 
                 let tasksHtml = '';
@@ -1928,6 +1942,7 @@
             const nextWeek = new Date();
             nextWeek.setDate(now.getDate() + 7);
 
+            // OTIMIZAÇÃO: Filtra tarefas em uma única passagem
             const upcomingTasks = tasks.filter(t => {
                 const taskDate = new Date(t.date);
                 return taskDate >= now && taskDate <= nextWeek && t.status !== 'Concluido';
@@ -2050,6 +2065,7 @@
             const filterClientId = document.getElementById('task_manager_filter_client').value;
             const filterStatus = document.getElementById('task_manager_filter_status').value;
 
+            // OTIMIZAÇÃO: Filtra tarefas em uma única passagem
             let filteredTasks = tasks.filter(t => {
                 const clientMatch = !filterClientId || t.clientId === filterClientId;
                 const statusMatch = !filterStatus || t.status === filterStatus;
@@ -2094,11 +2110,6 @@
                     const clientName = client?.nome || 'Cliente N/D';
                     const taskDateTime = new Date(task.date).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
-                    // Opções de status (inclui o status atual como selecionado)
-                    const statusOptions = allStatuses
-                        .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`)
-                        .join('');
-                    
                     // Exibir data de conclusão
                     let completionInfo = '';
                     if (task.status === 'Concluido' && task.completionDate) {
