@@ -154,6 +154,20 @@
             100% { box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5); }
         }
         /* FIM PEÇAS DE JOGO ANIMADAS */
+        
+        /* ANIMAÇÃO DE CARREGAMENTO (SPINNER) */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #6D28D9;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen">
@@ -356,6 +370,14 @@
                 <!-- Histórico de Resultados -->
                 <div class="bg-novan-secondary p-6 rounded-xl shadow-lg overflow-x-auto">
                     <h2 class="text-xl font-semibold mb-4 text-white">Histórico e Evolução das Métricas</h2>
+                    
+                    <!-- SPINNER DE CARREGAMENTO PARA FILTRO -->
+                    <div id="resultsLoading" class="hidden text-center py-8">
+                        <div class="spinner"></div>
+                        <p class="text-gray-400 mt-2">Carregando histórico...</p>
+                    </div>
+                    <!-- FIM SPINNER -->
+
                     <table id="resultsTable" class="w-full text-left text-gray-300">
                         <thead class="bg-slate-800">
                             <tr>
@@ -676,6 +698,51 @@
     </div>
     <!-- Fim Dashboard Principal -->
 
+    <!-- Modal de Detalhes e Gestão de Tarefa (NOVO) -->
+    <div id="taskDetailModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
+                <h3 class="text-2xl font-bold text-white" id="modalTaskTitle">Detalhes da Tarefa</h3>
+                <button onclick="closeTaskDetailModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="text-gray-300 space-y-3">
+                <p><strong>Cliente:</strong> <span id="modalClientName" class="font-semibold text-novan-primary"></span></p>
+                <p><strong>Tipo:</strong> <span id="modalTaskType"></span></p>
+                <p><strong>Prazo:</strong> <span id="modalTaskDate"></span></p>
+                <p><strong>Status Atual:</strong> <span id="modalTaskStatus" class="font-semibold"></span></p>
+                
+                <div class="bg-gray-700 p-3 rounded-lg mt-4">
+                    <p class="font-bold text-white mb-1">Observações:</p>
+                    <p id="modalTaskObs" class="text-sm italic whitespace-pre-wrap"></p>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-gray-700 pt-4 space-y-4">
+                <div class="flex items-center space-x-3">
+                    <label class="text-sm font-medium text-gray-300">Mudar Status:</label>
+                    <select id="modalStatusSelect" class="p-2 border text-sm rounded-lg bg-gray-700 text-white focus:ring-novan-primary">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluido">Concluído</option>
+                    </select>
+                    <button onclick="applyStatusChange()" class="bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-lg text-sm">Aplicar</button>
+                </div>
+
+                <div class="flex justify-between space-x-2">
+                    <!-- Botão de Edição (apenas abre a aba de cadastro, o modal atual é fechado) -->
+                    <button id="modalEditButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-2 rounded-lg flex-grow">Editar Tarefa</button>
+                    <button id="modalDeleteButton" onclick="deleteTask(document.getElementById('modalTaskId').value); closeTaskDetailModal()" class="bg-red-600 hover:bg-red-700 text-white font-semibold p-2 rounded-lg">Excluir</button>
+                </div>
+            </div>
+            <!-- Campo oculto para armazenar o ID da tarefa -->
+            <input type="hidden" id="modalTaskId" value="">
+        </div>
+    </div>
+    <!-- Fim Modal de Detalhes da Tarefa -->
+
     <script type="module">
         // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
@@ -889,7 +956,7 @@
             return isNaN(num) ? '0.00' : num.toFixed(2);
         }
         
-        /** Fechad o modal de resumo */
+        /** Fechad o modal de resumo (usado no Resumo Diário/Quinzenal e Calendário) */
         window.closeSummaryModal = function() {
             document.getElementById('summaryModal').classList.remove('flex');
             document.getElementById('summaryModal').classList.add('hidden');
@@ -1369,111 +1436,136 @@
             const resultsFilterClient = document.getElementById('results_filter_cliente')?.value;
             const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
             const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
+            const resultsTable = document.getElementById('resultsTable');
+            const loadingSpinner = document.getElementById('resultsLoading');
             
+            // 1. MOSTRA O SPINNER E ESCONDE A TABELA
+            resultsTable.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+
             // Validação: Se o filtro de cliente é obrigatório e não foi selecionado, não renderiza
             if (!resultsFilterClient) {
                 // Se não há cliente selecionado, renderiza os cards com zeros e a tabela vazia.
                 renderKpiCards([], {}); 
                 body.innerHTML = '';
                 document.getElementById('noResults').classList.remove('hidden');
-                return;
-            }
-
-            // Filtra apenas resultados de clientes de TRÁFEGO PAGO
-            const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
-            let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
-
-            // 1. Aplica Filtro de Cliente (JÁ SABEMOS QUE resultsFilterClient TEM VALOR)
-            filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
-            
-
-            // 2. Aplica Filtro de Data
-            if (resultsFilterStartDate) {
-                filteredResults = filteredResults.filter(r => r.data >= resultsFilterStartDate);
-            }
-            if (resultsFilterEndDate) {
-                filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
-            }
-
-            // --- CÁLCULO DAS MÉTRICAS DE RESUMO ---
-            let summaryMetrics = {
-                totalGasto: 0,
-                totalFaturamento: 0,
-                totalConversoes: 0,
-                totalImpressoes: 0,
-                avgROAS: 0,
-                avgCPA: 0,
-                avgCPM: 0
-            };
-
-            if (filteredResults.length > 0) {
-                summaryMetrics = filteredResults.reduce((acc, r) => {
-                    acc.totalGasto += r.investimento;
-                    acc.totalFaturamento += r.vendas;
-                    acc.totalConversoes += r.conversionCount || 0;
-                    acc.totalImpressoes += r.impressoes;
-                    return acc;
-                }, summaryMetrics);
-
-                // Cálculos finais de média
-                summaryMetrics.avgCPA = calculateCPA(summaryMetrics.totalGasto, summaryMetrics.totalConversoes);
-                summaryMetrics.avgROAS = calculateROAS(summaryMetrics.totalGasto, summaryMetrics.totalFaturamento);
-                summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
-            }
-            
-            // RENDERIZAÇÃO DOS KPI CARDS (NOVO)
-            renderKpiCards(filteredResults, summaryMetrics);
-
-            // --- RENDERIZAÇÃO DA TABELA ---
-            
-            body.innerHTML = '';
-
-            if (filteredResults.length === 0) {
-                document.getElementById('noResults').classList.remove('hidden');
-                return;
-            }
-            document.getElementById('noResults').classList.add('hidden');
-
-            // Ordena por data decrescente
-            const sortedResults = filteredResults.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-            sortedResults.forEach(res => {
-                const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
-                const cpa = calculateCPA(res.investimento, res.conversionCount); // ATUALIZADO: Usando conversionCount
-                const roas = calculateROAS(res.investimento, res.vendas);
-                const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
                 
-                // Lidando com a nova estrutura de Conversão
-                const conversionType = res.conversionType || 'N/D';
-                const conversionCount = res.conversionCount || 0;
+                // Esconde o spinner e mostra apenas a mensagem de não resultados
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+            
+            // Simula um atraso de carregamento de 500ms
+            setTimeout(() => {
+                
+                // Filtra apenas resultados de clientes de TRÁFEGO PAGO
+                const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
+                let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
 
-                const row = body.insertRow();
-                // A classe "text-xs" foi definida no CSS para o TD
-                row.innerHTML = `
-                    <td class="text-gray-300">${new Date(res.data).toLocaleDateString('pt-BR')}</td>
-                    <td class="font-medium text-novan-primary">${clientName}</td>
-                    <td class="text-gray-300">${res.plataforma}</td>
-                    <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
-                    <td class="text-gray-300">${res.impressoes.toLocaleString('pt-BR')}</td>
-                    <td class="text-gray-300">${res.cliques.toLocaleString('pt-BR')}</td>
-                    
-                    <!-- NOVO CPM CÉLULA -->
-                    <td class="text-blue-500 font-bold">${formatCurrency(cpm)}</td>
-                    <!-- FIM NOVO CPM CÉLULA -->
+                // 1. Aplica Filtro de Cliente (JÁ SABEMOS QUE resultsFilterClient TEM VALOR)
+                filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
+                
 
-                    <!-- NOVO CAMPO UNIFICADO -->
-                    <td class="text-gray-300" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
-                        ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
-                    </td>
-                    <!-- FIM NOVO CAMPO -->
+                // 2. Aplica Filtro de Data
+                if (resultsFilterStartDate) {
+                    filteredResults = filteredResults.filter(r => r.data >= resultsFilterStartDate);
+                }
+                if (resultsFilterEndDate) {
+                    filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
+                }
+
+                // --- CÁLCULO DAS MÉTRICAS DE RESUMO ---
+                let summaryMetrics = {
+                    totalGasto: 0,
+                    totalFaturamento: 0,
+                    totalConversoes: 0,
+                    totalImpressoes: 0,
+                    avgROAS: 0,
+                    avgCPA: 0,
+                    avgCPM: 0
+                };
+
+                if (filteredResults.length > 0) {
+                    summaryMetrics = filteredResults.reduce((acc, r) => {
+                        acc.totalGasto += r.investimento;
+                        acc.totalFaturamento += r.vendas;
+                        acc.totalConversoes += r.conversionCount || 0;
+                        acc.totalImpressoes += r.impressoes;
+                        return acc;
+                    }, summaryMetrics);
+
+                    // Cálculos finais de média
+                    summaryMetrics.avgCPA = calculateCPA(summaryMetrics.totalGasto, summaryMetrics.totalConversoes);
+                    summaryMetrics.avgROAS = calculateROAS(summaryMetrics.totalGasto, summaryMetrics.totalFaturamento);
+                    summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
+                }
+                
+                // RENDERIZAÇÃO DOS KPI CARDS (NOVO)
+                renderKpiCards(filteredResults, summaryMetrics);
+
+                // --- RENDERIZAÇÃO DA TABELA ---
+                
+                body.innerHTML = '';
+
+                if (filteredResults.length === 0) {
+                    document.getElementById('noResults').classList.remove('hidden');
+                    loadingSpinner.classList.add('hidden');
+                    return;
+                }
+                document.getElementById('noResults').classList.add('hidden');
+
+                // Ordena por data decrescente
+                const sortedResults = filteredResults.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+                sortedResults.forEach((res, index) => {
+                    const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
+                    const cpa = calculateCPA(res.investimento, res.conversionCount); // ATUALIZADO: Usando conversionCount
+                    const roas = calculateROAS(res.investimento, res.vendas);
+                    const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
                     
-                    <td class="text-gray-300">${formatCurrency(res.vendas)}</td>
-                    <td class="text-red-500 font-bold">${formatCurrency(cpa)}</td>
-                    <td class="text-green-500 font-bold">${formatNumber(roas)}</td>
-                    <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
-                    <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button></td>
-                `;
-            });
+                    // Lidando com a nova estrutura de Conversão
+                    const conversionType = res.conversionType || 'N/D';
+                    const conversionCount = res.conversionCount || 0;
+                    
+                    // COR NAS LINHAS: Alterna a cor de fundo entre as linhas
+                    const rowClass = index % 2 === 0 ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-800 hover:bg-slate-600';
+
+
+                    const row = body.insertRow();
+                    row.className = rowClass; // Adiciona a classe da linha
+                    
+                    // A classe "text-xs" foi definida no CSS para o TD
+                    row.innerHTML = `
+                        <td class="text-gray-300">${new Date(res.data).toLocaleDateString('pt-BR')}</td>
+                        <td class="font-medium text-novan-primary">${clientName}</td>
+                        <td class="text-gray-300">${res.plataforma}</td>
+                        <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
+                        <td class="text-gray-300">${res.impressoes.toLocaleString('pt-BR')}</td>
+                        <td class="text-gray-300">${res.cliques.toLocaleString('pt-BR')}</td>
+                        
+                        <!-- NOVO CPM CÉLULA -->
+                        <td class="text-blue-500 font-bold">${formatCurrency(cpm)}</td>
+                        <!-- FIM NOVO CPM CÉLULA -->
+
+                        <!-- NOVO CAMPO UNIFICADO -->
+                        <td class="text-gray-300" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
+                            ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
+                        </td>
+                        <!-- FIM NOVO CAMPO -->
+                        
+                        <td class="text-gray-300">${formatCurrency(res.vendas)}</td>
+                        <td class="text-red-500 font-bold">${formatCurrency(cpa)}</td>
+                        <td class="text-green-500 font-bold">${formatNumber(roas)}</td>
+                        <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
+                        <td><button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button></td>
+                    `;
+                });
+                
+                // 3. ESCONDE O SPINNER E MOSTRA A TABELA
+                loadingSpinner.classList.add('hidden');
+                resultsTable.classList.remove('hidden');
+
+            }, 500); // Atraso de 500ms
         }
         
         /** Deleta um registro de resultado */
@@ -1707,6 +1799,7 @@
         window.showDaySummary = function(dateString) {
             const dateObj = getLocalDayDate(dateString); // Usando a nova função para evitar erros de timezone
             
+            // Filtra as tarefas para o dia clicado
             const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
 
             const title = `Resumo de Tarefas: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
@@ -1722,6 +1815,7 @@
                 const clientName = client?.nome || 'Cliente N/D';
                 const taskTime = new Date(task.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                 
+                // Define a cor de acordo com o status
                 const statusColor = task.status === 'Concluido' ? 'text-green-500' : 
                                     task.status === 'Em Andamento' ? 'text-yellow-500' : 'text-red-500';
                 
@@ -1770,20 +1864,17 @@
                 dayTasks.forEach(task => {
                     const client = clients.find(c => c.id === task.clientId);
                     const clientColor = client?.color || '#334155'; // Cor padrão
-                    const clientName = client?.nome.substring(0, 10) || 'N/D';
+                    const clientName = client?.nome || 'N/D'; // Nome completo
                     
-                    const taskDateTime = new Date(task.date).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-                    // Formato do resumo para aparecer no hover (title)
-                    const taskTitle = `CLIENTE: ${clientName}\nDATA/HORA: ${taskDateTime}\nTIPO: ${task.type}\nSTATUS: ${task.status}\nOBS: ${task.observacoes || 'N/A'}`;
-
-
+                    // Removida a data/hora e o tipo da tarefa para mostrar apenas o nome do cliente
                     tasksHtml += `
-                        <div class="task-item text-white shadow-sm" style="background-color: ${clientColor};" title="${taskTitle}">
-                            ${clientName} - ${task.type.substring(0, 5)}
+                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate" style="background-color: ${clientColor};" title="${clientName} - ${task.type}">
+                            ${clientName}
                         </div>
                     `;
                 });
 
+                // A CLIQUE JÁ ESTAVA IMPLEMENTADA AQUI
                 grid.innerHTML += `
                     <div class="calendar-day p-2 rounded-lg ${isToday ? 'bg-novan-primary text-white shadow-lg' : 'hover:bg-slate-700'}" onclick="showDaySummary('${dateString}')">
                         <div class="font-bold mb-1 ${isToday ? 'text-white' : 'text-gray-300'}">${day}</div>
@@ -1862,6 +1953,68 @@
         }
 
         // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
+        
+        // Função para fechar o modal de detalhes da tarefa
+        window.closeTaskDetailModal = function() {
+            document.getElementById('taskDetailModal').classList.add('hidden');
+            document.getElementById('taskDetailModal').classList.remove('flex');
+        }
+
+        // Função para abrir o modal de detalhes
+        window.openTaskDetailModal = function(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return showMessage('Tarefa não encontrada.', true);
+
+            const client = clients.find(c => c.id === task.clientId);
+            const clientName = client?.nome || 'Cliente N/D';
+            
+            const taskDateTime = new Date(task.date).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+            
+            // Define a cor de acordo com o status
+            let statusColorClass = 'text-gray-400';
+            if (task.status === 'Concluido') statusColorClass = 'text-green-500';
+            else if (task.status === 'Em Andamento') statusColorClass = 'text-yellow-500';
+            else if (task.status === 'Pendente') statusColorClass = 'text-red-500';
+            
+            // Preenche o modal
+            document.getElementById('modalTaskId').value = taskId;
+            document.getElementById('modalTaskTitle').textContent = `${clientName} - ${task.type}`;
+            document.getElementById('modalClientName').textContent = clientName;
+            document.getElementById('modalTaskType').textContent = task.type;
+            document.getElementById('modalTaskDate').textContent = taskDateTime;
+            
+            const statusEl = document.getElementById('modalTaskStatus');
+            statusEl.textContent = task.status;
+            statusEl.className = `font-semibold ${statusColorClass}`;
+            
+            document.getElementById('modalTaskObs').textContent = task.observacoes || 'Nenhuma observação detalhada.';
+            
+            // Define o valor do dropdown de status no modal
+            document.getElementById('modalStatusSelect').value = task.status;
+            
+            // Atribui a função de edição ao botão (simula a abertura do form de cadastro)
+            document.getElementById('modalEditButton').onclick = () => {
+                // Fechamos este modal
+                closeTaskDetailModal();
+                // Alternamos para a aba de cadastro
+                switchTab('calendario'); 
+                // Preenchemos o form da aba 'calendario' com os dados da tarefa para edição
+                // (Isso requer uma função de preenchimento no form de cadastro de tarefas, que pode ser adicionada se necessário)
+                showMessage('Implementar edição direta no formulário de cadastro de tarefas.', false, true);
+            };
+
+            // Exibe o modal
+            document.getElementById('taskDetailModal').classList.remove('hidden');
+            document.getElementById('taskDetailModal').classList.add('flex');
+        }
+
+        // Função para aplicar a mudança de status a partir do modal
+        window.applyStatusChange = function() {
+            const taskId = document.getElementById('modalTaskId').value;
+            const newStatus = document.getElementById('modalStatusSelect').value;
+            updateTaskStatus(taskId, newStatus);
+            closeTaskDetailModal();
+        }
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
         window.updateTaskStatus = function(taskId, newStatus) {
@@ -1952,19 +2105,15 @@
                         completionInfo = `<p class="text-xs text-green-500 font-medium mt-1">Concluída em: ${completeDate}</p>`;
                     }
 
-
                     return `
-                        <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300">
+                        <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300 cursor-pointer hover:bg-gray-600 transition" 
+                             onclick="openTaskDetailModal('${task.id}')">
                             <p class="font-semibold text-sm text-white">${clientName} - ${task.type}</p>
                             <p class="text-xs text-gray-400">Prazo: ${taskDateTime}</p>
                             <p class="text-xs italic text-gray-400">${task.observacoes.substring(0, 50)}...</p>
                             ${completionInfo}
-                            <div class="flex items-center space-x-2 pt-2">
-                                <label class="text-xs font-medium text-gray-400">Mudar Status:</label>
-                                <select onchange="updateTaskStatus('${task.id}', this.value)" class="p-1 border text-xs rounded-lg bg-gray-600 text-white focus:ring-novan-primary">
-                                    ${statusOptions}
-                                </select>
-                                <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-400 text-xs">Excluir</button>
+                            <div class="flex justify-end pt-2">
+                                <button onclick="event.stopPropagation(); deleteTask('${task.id}');" class="text-red-500 hover:text-red-400 text-xs font-semibold">Excluir</button>
                             </div>
                         </div>
                     `;
@@ -2358,7 +2507,7 @@
                 
                 // Coluna FATURAMENTO (formato 1.000,32)
                 ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
-                ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
+                ctx.fillText(formatValueBRL(row.faturamento), colFaturamento, currentY);
                 
                 // Coluna CPM (formato 1.000,32)
                 ctx.fillStyle = COLORS.impressoes; // Azul
