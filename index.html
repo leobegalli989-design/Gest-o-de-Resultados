@@ -621,7 +621,7 @@
                 <h1 class="text-4xl font-bold text-white mb-6">✅ Gestão de Tarefas e Status</h1>
                 
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-center">
-                    <h2 class="text-xl font-semibold text-novan-primary">Filtros:</h2>
+                    <h2 class="text-xl font-semibold text-novan-primary">Filtrar:</h2>
                     <select id="task_manager_filter_client" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
                         <option value="">Todos os Clientes</option>
                     </select>
@@ -1022,10 +1022,10 @@
 
         /** Seleciona o tipo de cliente e abre o formulário */
         window.selectClientType = function(type) {
-            closeClientTypeSelectionModal(); // Fecha o modal
-            resetClientForm(); // Limpa o formulário antes de abrir
-            showClientFormType(type); // Configura os campos
-            document.getElementById('clientFormContainer').classList.remove('hidden'); // Mostra o formulário
+            closeClientTypeSelectionModal(); // Fechamos o modal
+            resetClientForm(); // Limpamos o formulário antes de abrir
+            showClientFormType(type); // Configuramos os campos
+            document.getElementById('clientFormContainer').classList.remove('hidden'); // Mostramos o formulário
         }
 
         /** Aplica a máscara (00) 00000-0000 ao telefone */
@@ -1536,7 +1536,8 @@
                     
                     // A classe "text-xs" foi definida no CSS para o TD
                     row.innerHTML = `
-                        <td class="text-gray-300">${new Date(res.data).toLocaleDateString('pt-BR')}</td>
+                        <!-- FIX: Usando getLocalDayDate para corrigir o fuso horário na exibição -->
+                        <td class="text-gray-300">${getLocalDayDate(res.data).toLocaleDateString('pt-BR')}</td>
                         <td class="font-medium text-novan-primary">${clientName}</td>
                         <td class="text-gray-300">${res.plataforma}</td>
                         <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
@@ -2479,7 +2480,7 @@
             
             ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
             ctx.fillText('GASTO (R$)', colGasto, currentY);
-            ctx.fillText('FATO. (R$)', colFaturamento, currentY);
+            ctx.fillText('FATURAMENTO (R$)', colFaturamento, currentY);
             ctx.fillText('CPM (R$)', colCPM, currentY);
             ctx.fillText('ROAS (X)', colROAS, currentY);
             ctx.fillText('CONVERSÕES', colConv, currentY);
@@ -2497,7 +2498,7 @@
                 
                 // Coluna DATA/CLIENTE
                 const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
-                const dateDisplay = new Date(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                const dateDisplay = getLocalDayDate(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); // FIX APLICADO AQUI
                 ctx.fillStyle = LIGHT_TEXT;
                 ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
                 
@@ -2612,8 +2613,15 @@
             loadData();
             // Preenche o campo de responsáveis com Léo e Fabio
             populateResponsiblesSelect(); 
-            // Define a data atual no campo de resultados
-            document.getElementById('res_data').valueAsDate = new Date();
+            
+            // CORREÇÃO: Define a data atual no campo de resultados, ajustando o fuso horário
+            const today = new Date();
+            const offset = today.getTimezoneOffset() * 60000; // Offset em milissegundos
+            const localTime = new Date(today.getTime() - offset); // Hora local ajustada para o offset
+            
+            // Formata para YYYY-MM-DD
+            document.getElementById('res_data').value = localTime.toISOString().split('T')[0];
+            
             // Inicia na primeira aba
             switchTab('resultados'); 
             
