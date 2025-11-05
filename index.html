@@ -1007,7 +1007,7 @@
             document.getElementById('clientTypeSelectionModal').classList.add('flex');
         }
 
-        /** Fecha o modal de seleção de tipo de cliente */
+        /** Fechad o modal de seleção de tipo de cliente */
         window.closeClientTypeSelectionModal = function() {
             document.getElementById('clientTypeSelectionModal').classList.add('hidden');
             document.getElementById('clientTypeSelectionModal').classList.remove('flex');
@@ -1456,21 +1456,30 @@
             const avgCPM = calculateCPM(totalMetrics.investimento, totalMetrics.impressoes);
             
             // Array de KPIs Detalhados para Injeção
+            // As cores foram ajustadas para o estilo Novan (roxo, vermelho, verde, etc.)
             const detailedKpis = [
-                { title: "Gasto (R$)", value: formatCurrency(totalMetrics.investimento), color: 'red-500', icon: 'R$' },
-                { title: "Faturamento (R$)", value: formatCurrency(totalMetrics.vendas), color: 'green-500', icon: 'R$' },
-                { title: "Impressões", value: totalMetrics.impressoes.toLocaleString('pt-BR'), color: 'blue-500', icon: '👁️' },
-                { title: "Cliques", value: totalMetrics.cliques.toLocaleString('pt-BR'), color: 'pink-500', icon: '🖱️' },
-                { title: "Conversão (Total)", value: totalMetrics.conversionCount.toLocaleString('pt-BR'), color: 'novan-primary', icon: '✅' },
-                { title: "CPA Médio (R$)", value: formatCurrency(avgCPA), color: 'yellow-500', icon: 'R$' },
-                { title: "ROAS Médio (X)", value: `${formatNumber(avgROAS)}X`, color: 'red-600', icon: '⬆️' },
-                { title: "CPM Médio (R$)", value: formatCurrency(avgCPM), color: 'indigo-500', icon: 'R$' },
+                // Gasto (R$)
+                { title: "Gasto (R$)", value: formatCurrency(totalMetrics.investimento), color: 'red-500', icon: 'R$', valueClass: 'text-investimento' },
+                // Faturamento (R$)
+                { title: "Vendas (R$)", value: formatCurrency(totalMetrics.vendas), color: 'green-500', icon: 'R$', valueClass: 'text-faturamento' },
+                // Impressões
+                { title: "Impressões", value: totalMetrics.impressoes.toLocaleString('pt-BR'), color: 'blue-500', icon: '👁️', valueClass: 'text-impressoes' },
+                // Cliques
+                { title: "Cliques", value: totalMetrics.cliques.toLocaleString('pt-BR'), color: 'pink-500', icon: '🖱️', valueClass: 'text-cliques' },
+                // Conversão
+                { title: "Conversão (Total)", value: totalMetrics.conversionCount.toLocaleString('pt-BR'), color: 'novan-primary', icon: '✅', valueClass: 'text-conversoes' },
+                // CPA Médio
+                { title: "CPA Médio (R$)", value: formatCurrency(avgCPA), color: 'yellow-500', icon: 'R$', valueClass: 'text-cpa' },
+                // ROAS Médio
+                { title: "ROAS Médio (X)", value: `${formatNumber(avgROAS)}X`, color: 'red-600', icon: '⬆️', valueClass: 'text-roas' },
+                // CPM Médio
+                { title: "CPM Médio (R$)", value: formatCurrency(avgCPM), color: 'indigo-500', icon: 'R$', valueClass: 'text-cpm' },
             ];
 
             const kpisHtml = detailedKpis.map(kpi => `
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-${kpi.color}">
                     <p class="text-sm font-medium text-gray-400">${kpi.title}</p>
-                    <p class="text-xl font-bold text-${kpi.color} mt-1">${kpi.value}</p>
+                    <p class="text-xl font-bold mt-1 ${kpi.valueClass}">${kpi.value}</p>
                 </div>
             `).join('');
 
@@ -1859,12 +1868,17 @@
                 let tasksHtml = '';
                 dayTasks.forEach(task => {
                     const client = clients.find(c => c.id === task.clientId);
-                    const clientColor = client?.color || '#334155'; // Cor padrão
                     const clientName = client?.nome || 'N/D'; // Nome completo
                     
-                    // Removida a data/hora e o tipo da tarefa para mostrar apenas o nome do cliente
+                    // Define a cor de acordo com o status
+                    let statusColorClass = 'bg-gray-700/50'; // Cor de fundo padrão
+                    if (task.status === 'Concluido') statusColorClass = 'bg-green-700/70';
+                    else if (task.status === 'Em Andamento') statusColorClass = 'bg-yellow-700/70';
+                    else if (task.status === 'Pendente') statusColorClass = 'bg-red-700/70';
+
+                    // A tarefa agora só mostra o nome do cliente e usa a cor baseada no status
                     tasksHtml += `
-                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate" style="background-color: ${clientColor};" title="${clientName} - ${task.type}">
+                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusColorClass}" title="${clientName} - ${task.type} (${task.status})">
                             ${clientName}
                         </div>
                     `;
@@ -2302,17 +2316,49 @@
                     ]
                 }, barChartOptions);
 
-                // 3. Gráfico de ROAS Médio Diário (BARRA)
-                roasChartInstance = initChart('roasChart', 'bar', { 
+                // NOVO: Opções para Gráfico de Linha (ROAS)
+                const lineChartOptions = {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#E2E8F0' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#E2E8F0' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E2E8F0' } }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4, // Suaviza a linha
+                            borderWidth: 3,
+                        },
+                        point: {
+                            radius: 5,
+                            hoverRadius: 7,
+                            backgroundColor: COLORS.roas,
+                        }
+                    }
+                };
+
+                // 3. Gráfico de ROAS Médio Diário (LINHA)
+                roasChartInstance = initChart('roasChart', 'line', { 
                     labels: reportLabels,
                     datasets: [
                         {
                             label: 'ROAS Médio',
                             data: roasData,
-                            backgroundColor: COLORS.roas, // Amber 500
+                            borderColor: COLORS.roas, // Cor da linha (Âmbar/Amarelo)
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)', // Fundo sutil
+                            fill: true,
                         }
                     ]
-                }, barChartOptions);
+                }, lineChartOptions);
 
                 showMessage('Relatório gerado com sucesso!');
                 
