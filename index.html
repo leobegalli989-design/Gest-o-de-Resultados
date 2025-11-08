@@ -705,17 +705,6 @@
                         </button>
                         <!-- FIM BOTÕES DE EXPORTAÇÃO SEPARADOS -->
                     </div>
-                    
-                    <!-- NOVO: Botões de Filtro Rápido -->
-                    <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-700">
-                        <span class="text-sm font-medium text-gray-300 self-center mr-2">Filtros Rápidos:</span>
-                        <button onclick="filterReportByPreset('today')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Hoje (1 dia)</button>
-                        <button onclick="filterReportByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 7 dias</button>
-                        <button onclick="filterReportByPreset('15days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 15 dias</button>
-                        <button onclick="filterReportByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
-                    </div>
-                    <!-- FIM: Botões de Filtro Rápido -->
-
                 </div>
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -732,7 +721,7 @@
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-1 chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
@@ -2401,6 +2390,7 @@
                 // Opções para tornar as barras mais finas
                 const barChartOptions = {
                     responsive: true,
+                    maintainAspectRatio: false, // Permite que o contêiner de 300px controle a altura
                     scales: {
                         y: { 
                             beginAtZero: true,
@@ -2424,28 +2414,10 @@
                     }
                 };
                 
-                // 1. Gráfico de Gasto vs Faturamento (BARRA)
-                invFatChartInstance = initChart('investimentoFaturamentoChart', 'bar', {
-                    labels: reportLabels,
-                    datasets: [
-                        {
-                            label: 'Gasto (R$)',
-                            data: invData,
-                            backgroundColor: COLORS.investimento,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Faturamento (R$)',
-                            data: fatData,
-                            backgroundColor: COLORS.faturamento,
-                            yAxisID: 'y'
-                        }
-                    ]
-                }, barChartOptions);
-
                 // NOVO: Opções para Gráfico de Linha (ROAS)
                 const lineChartOptions = {
                     responsive: true,
+                    maintainAspectRatio: false, // Permite que o contêiner de 300px controle a altura
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -2472,6 +2444,25 @@
                         }
                     }
                 };
+
+                // 1. Gráfico de Gasto vs Faturamento (BARRA)
+                invFatChartInstance = initChart('investimentoFaturamentoChart', 'bar', {
+                    labels: reportLabels,
+                    datasets: [
+                        {
+                            label: 'Gasto (R$)',
+                            data: invData,
+                            backgroundColor: COLORS.investimento,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Faturamento (R$)',
+                            data: fatData,
+                            backgroundColor: COLORS.faturamento,
+                            yAxisID: 'y'
+                        }
+                    ]
+                }, barChartOptions);
 
                 // 2. Gráfico de Impressões vs Cliques (BARRA)
                 imprCliquesChartInstance = initChart('impressoesCliquesChart', 'bar', { 
@@ -2566,16 +2557,17 @@
             
             const reportData = reportDetailedResults;
             
-            const headerHeight = 240; 
+            // Ajuste a altura do cabeçalho para acomodar mais KPIs
+            const headerHeight = 280; 
             const margin = 20; 
-            const dataRowHeight = 28; // Altura para cada linha de dados
-            const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; // ~35 linhas
+            const dataRowHeight = 28; 
+            const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; 
 
             const rowsToShow = reportData.slice(0, maxRows); 
             const totalDataHeight = rowsToShow.length * dataRowHeight;
             
             // Altura total ajustada ao conteúdo (máx 1350)
-            const totalHeight = headerHeight + totalDataHeight + margin * 3; // +3 margens para espaçamento
+            const totalHeight = headerHeight + totalDataHeight + margin * 3; 
             const totalWidth = 1080; 
 
             const compositeCanvas = document.createElement('canvas');
@@ -2615,29 +2607,39 @@
             ctx.fillStyle = LIGHT_TEXT;
             ctx.fillText(`Período Analisado: ${reportSummaryMetrics.period}`, margin, margin + 140); 
 
-            // Bloco de Métricas Chave (Métricas Totais)
+            // BLOCO DE KPIS DE DESTAQUE (3 LINHAS)
+            
             let metricY = margin + 180; 
             ctx.font = '700 22px Poppins'; 
-            const metricXSpacing = 300; 
-            
-            // GASTO TOTAL (Usando formatValueBRL para 1.000,32)
+            const metricXSpacing = 350; // Aumentado o espaçamento X
+            const metricYSpacing = 40; // Espaçamento Y
+
+            // LINHA 1: GASTO e FATURAMENTO
             ctx.fillStyle = COLORS.investimento;
-            ctx.fillText(`GASTO TOTAL: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
+            ctx.fillText(`GASTO: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
             
-            // FATURAMENTO TOTAL (Usando formatValueBRL para 1.000,32)
             ctx.fillStyle = COLORS.faturamento;
-            ctx.fillText(`FATURAMENTO TOTAL: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
+            ctx.fillText(`FATURAMENTO: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
             
-            metricY += 40; 
+            metricY += metricYSpacing; 
             ctx.font = '700 22px Poppins'; 
             
-            // ROAS MÉDIO
+            // LINHA 2: ROAS e CPA
             ctx.fillStyle = COLORS.roas;
-            ctx.fillText(`ROAS MÉDIO: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
+            ctx.fillText(`ROAS: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
             
-            // CPM MÉDIO
+            ctx.fillStyle = COLORS.cpa; // Usando cor diferente para CPA
+            ctx.fillText(`CPA: R$ ${formatValueBRL(reportSummaryMetrics.avgCPA)}`, margin + metricXSpacing, metricY);
+
+            metricY += metricYSpacing; 
+            ctx.font = '700 22px Poppins'; 
+
+            // LINHA 3: CPM e CONVERSÕES (total)
             ctx.fillStyle = COLORS.impressoes;
-            ctx.fillText(`CPM MÉDIO: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin + metricXSpacing, metricY);
+            ctx.fillText(`CPM: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin, metricY);
+            
+            ctx.fillStyle = COLORS.primary; // Roxo para conversões
+            ctx.fillText(`CONVERSÕES: ${reportSummaryMetrics.totalConversoes.toLocaleString('pt-BR')}`, margin + metricXSpacing, metricY);
 
 
             // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
