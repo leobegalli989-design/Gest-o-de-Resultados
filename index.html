@@ -192,10 +192,16 @@
             font-weight: 500;
             border-left: 4px solid; /* Usado para a cor do cliente */
         }
-        /* --- ESTILOS DE STATUS DE CALENDÁRIO --- */
+        /* --- ESTILOS DE STATUS DE CALENDÁRIO E KANBAN --- */
         .bg-status-Pendente { background-color: #DC2626; } /* Vermelho */
         .bg-status-Em_Andamento { background-color: #F59E0B; } /* Âmbar/Amarelo */
         .bg-status-Concluido { background-color: #10B981; } /* Verde */
+        
+        /* Estilo para diminuir a altura do canvas nos relatórios */
+        .chart-container {
+            height: 300px; /* Altura padrão para todos os gráficos */
+            width: 100%;
+        }
 
     </style>
 </head>
@@ -714,19 +720,19 @@
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-1">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-1 chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
@@ -2315,7 +2321,7 @@
             
             if (filteredResults.length === 0) {
                 document.getElementById('noReportData').classList.remove('hidden');
-                document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
+                document.getElementById('chartsContainer').querySelectorAll('.chart-container').forEach(c => c.style.display = 'none'); // Oculta o contêiner do gráfico
                 reportSummaryMetrics = null; // Limpa o resumo
                 reportDetailedResults = []; // Limpa detalhes
                 // Limpa e zera os KPIs do Relatório
@@ -2324,7 +2330,7 @@
             }
 
             document.getElementById('noReportData').classList.add('hidden');
-            document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'block');
+            document.getElementById('chartsContainer').querySelectorAll('.chart-container').forEach(c => c.style.display = 'block');
             
             // Agrupar e somar os dados por dia (para o eixo X)
             const groupedData = filteredResults.reduce((acc, r) => {
