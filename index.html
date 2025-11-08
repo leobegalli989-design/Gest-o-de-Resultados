@@ -486,7 +486,7 @@
                             <select id="task_status" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="Pendente">Pendente</option>
                                 <option value="Em Andamento">Em Andamento</option>
-                                <option value="Concluido">Concluido</option>
+                                <option value="Concluido">Concluído</option>
                             </select>
                             <textarea id="task_observacoes" placeholder="Observações" class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white"></textarea>
                             <button type="submit" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
@@ -760,51 +760,6 @@
         </main>
     </div>
     <!-- Fim Dashboard Principal -->
-
-    <!-- Modal de Detalhes e Gestão de Tarefa (NOVO) -->
-    <div id="taskDetailModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
-                <h3 class="text-2xl font-bold text-white" id="modalTaskTitle">Detalhes da Tarefa</h3>
-                <button onclick="closeTaskDetailModal()" class="text-gray-400 hover:text-red-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            
-            <div class="text-gray-300 space-y-3">
-                <p><strong>Cliente:</strong> <span id="modalClientName" class="font-semibold text-novan-primary"></span></p>
-                <p><strong>Tipo:</strong> <span id="modalTaskType"></span></p>
-                <p><strong>Prazo:</strong> <span id="modalTaskDate"></span></p>
-                <p><strong>Status Atual:</strong> <span id="modalTaskStatus" class="font-semibold"></span></p>
-                
-                <div class="bg-gray-700 p-3 rounded-lg mt-4">
-                    <p class="font-bold text-white mb-1">Observações:</p>
-                    <p id="modalTaskObs" class="text-sm italic whitespace-pre-wrap"></p>
-                </div>
-            </div>
-
-            <div class="mt-6 border-t border-gray-700 pt-4 space-y-4">
-                <div class="flex items-center space-x-3">
-                    <label class="text-sm font-medium text-gray-300">Mudar Status:</label>
-                    <select id="modalStatusSelect" class="p-2 border text-sm rounded-lg bg-gray-700 text-white focus:ring-novan-primary">
-                        <option value="Pendente">Pendente</option>
-                        <option value="Em Andamento">Em Andamento</option>
-                        <option value="Concluido">Concluído</option>
-                    </select>
-                    <button onclick="applyStatusChange()" class="bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-lg text-sm">Aplicar</button>
-                </div>
-
-                <div class="flex justify-between space-x-2">
-                    <!-- Botão de Edição (apenas abre a aba de cadastro, o modal atual é fechado) -->
-                    <button id="modalEditButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-2 rounded-lg flex-grow">Editar Tarefa</button>
-                    <button id="modalDeleteButton" onclick="deleteTask(document.getElementById('modalTaskId').value); closeTaskDetailModal()" class="bg-red-600 hover:bg-red-700 text-white font-semibold p-2 rounded-lg">Excluir</button>
-                </div>
-            </div>
-            <!-- Campo oculto para armazenar o ID da tarefa -->
-            <input type="hidden" id="modalTaskId" value="">
-        </div>
-    </div>
-    <!-- Fim Modal de Detalhes da Tarefa -->
 
     <script type="module">
         // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
@@ -2319,7 +2274,7 @@
             
             if (filteredResults.length === 0) {
                 document.getElementById('noReportData').classList.remove('hidden');
-                document.getElementById('chartsContainer').querySelectorAll('.chart-container').forEach(c => c.style.display = 'none'); // Oculta o contêiner do gráfico
+                document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
                 reportSummaryMetrics = null; // Limpa o resumo
                 reportDetailedResults = []; // Limpa detalhes
                 // Limpa e zera os KPIs do Relatório
@@ -2328,7 +2283,7 @@
             }
 
             document.getElementById('noReportData').classList.add('hidden');
-            document.getElementById('chartsContainer').querySelectorAll('.chart-container').forEach(c => c.style.display = 'block');
+            document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'block');
             
             // Agrupar e somar os dados por dia (para o eixo X)
             const groupedData = filteredResults.reduce((acc, r) => {
@@ -2489,19 +2444,17 @@
                     ]
                 }, barChartOptions);
 
-                // 3. Gráfico de ROAS Médio Diário (LINHA) - CORRIGIDO PARA LINHA
-                roasChartInstance = initChart('roasChart', 'line', { 
+                // 3. Gráfico de ROAS Médio Diário (BARRA) - CORRIGIDO PARA BARRA
+                roasChartInstance = initChart('roasChart', 'bar', { 
                     labels: reportLabels,
                     datasets: [
                         {
                             label: 'ROAS Médio',
                             data: roasData,
-                            borderColor: COLORS.roas, // Cor da linha (Âmbar/Amarelo)
-                            backgroundColor: 'rgba(245, 158, 11, 0.2)', // Fundo sutil
-                            fill: true,
+                            backgroundColor: COLORS.roas, // Cor da barra (Âmbar/Amarelo)
                         }
                     ]
-                }, lineChartOptions);
+                }, barChartOptions);
                 
                 showMessage('Relatório gerado com sucesso!');
                 
