@@ -2242,6 +2242,15 @@
             if (existingChart) {
                 existingChart.destroy();
             }
+            // Adiciona um container div temporário para forçar o tamanho do canvas
+            // O Chart.js precisa de um contêiner com altura/largura definida para o maintainAspectRatio=false funcionar
+            const container = canvas.closest('.chart-container');
+            if(container) {
+                // Adiciona o container para manter a proporção no layout
+                canvas.style.width = '100%';
+                canvas.style.height = '100%'; 
+            }
+
             return new Chart(canvas, { type, data, options });
         }
 
@@ -2370,10 +2379,9 @@
                 avgROAS: avgROAS,
                 avgCPA: avgCPA,
                 avgCPM: avgCPM,
-                clientName: clientNameForReport, // ADICIONADO: Nome do cliente para o cabeçalho PNG
-                // Garantindo que a string de período é baseada nos rótulos gerados
+                totalConversoes: totalConversoes, // Adicionado para PNG
+                clientName: clientNameForReport, 
                 period: reportLabels.length > 0 ? `${reportLabels[0]} a ${reportLabels[reportLabels.length - 1]}` : 'N/A',
-                // Data de Geração - CORRIGIDO: Usando toLocaleString para incluir data e hora
                 generationDate: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
             };
             
@@ -2551,180 +2559,189 @@
 
         /** Exporta o Relatório Consolidado (TEXTO) como PNG */
         window.exportCombinedReportAsPNG = async function() { 
-            if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
-                return showMessage('Gere o relatório primeiro antes de exportar o PNG.', true);
+            try {
+                if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
+                    return showMessage('Gere o relatório primeiro antes de exportar o PNG.', 5000, true);
+                }
+                
+                const reportData = reportDetailedResults;
+                
+                // Ajuste a altura do cabeçalho para acomodar mais KPIs
+                const headerHeight = 280; 
+                const margin = 20; 
+                const dataRowHeight = 28; 
+                const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; 
+
+                const rowsToShow = reportData.slice(0, maxRows); 
+                const totalDataHeight = rowsToShow.length * dataRowHeight;
+                
+                // Altura total ajustada ao conteúdo (máx 1350)
+                const totalHeight = headerHeight + totalDataHeight + margin * 3; 
+                const totalWidth = 1080; 
+
+                const compositeCanvas = document.createElement('canvas');
+                compositeCanvas.width = totalWidth;
+                compositeCanvas.height = totalHeight;
+                const ctx = compositeCanvas.getContext('2d');
+                
+                // Define a fonte base para o canvas com fallback
+                ctx.font = 'Poppins, sans-serif'; 
+                
+                // 1. Fundo (Azul Marinho)
+                ctx.fillStyle = NAVY_BLUE; 
+                ctx.fillRect(0, 0, totalWidth, totalHeight);
+                
+                // --- 2. Desenha o Cabeçalho e Métricas (RESUMO) ---
+                
+                // Título Principal
+                ctx.font = '700 36px Poppins, sans-serif'; 
+                ctx.fillStyle = COLORS.faturamento; 
+                ctx.fillText('RELATÓRIO NOVAN AGENCY', margin, margin + 40); 
+                
+                // Data de Geração 
+                ctx.font = '400 16px Poppins, sans-serif'; 
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText(`Gerado em: ${reportSummaryMetrics.generationDate}`, margin, margin + 70); 
+
+                // Nome do Cliente
+                ctx.font = '600 24px Poppins, sans-serif'; 
+                ctx.fillStyle = LIGHT_TEXT;
+                const clientDisplay = reportSummaryMetrics.clientName === 'Todos os Clientes' 
+                    ? reportSummaryMetrics.clientName 
+                    : `CLIENTE: ${reportSummaryMetrics.clientName}`;
+                ctx.fillText(clientDisplay, margin, margin + 110); 
+                
+                // Período 
+                ctx.font = '400 18px Poppins, sans-serif'; 
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText(`Período Analisado: ${reportSummaryMetrics.period}`, margin, margin + 140); 
+
+                // BLOCO DE KPIS DE DESTAQUE (3 LINHAS)
+                
+                let metricY = margin + 180; 
+                ctx.font = '700 22px Poppins, sans-serif'; 
+                const metricXSpacing = 350; // Aumentado o espaçamento X
+                const metricYSpacing = 40; // Espaçamento Y
+
+                // LINHA 1: GASTO e FATURAMENTO
+                ctx.fillStyle = COLORS.investimento;
+                ctx.fillText(`GASTO: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
+                
+                ctx.fillStyle = COLORS.faturamento;
+                ctx.fillText(`FATURAMENTO: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
+                
+                metricY += metricYSpacing; 
+                ctx.font = '700 22px Poppins, sans-serif'; 
+                
+                // LINHA 2: ROAS e CPA
+                ctx.fillStyle = COLORS.roas;
+                ctx.fillText(`ROAS: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
+                
+                ctx.fillStyle = COLORS.cpa; // Usando cor diferente para CPA
+                ctx.fillText(`CPA: R$ ${formatValueBRL(reportSummaryMetrics.avgCPA)}`, margin + metricXSpacing, metricY);
+
+                metricY += metricYSpacing; 
+                ctx.font = '700 22px Poppins, sans-serif'; 
+
+                // LINHA 3: CPM e CONVERSÕES (total)
+                ctx.fillStyle = COLORS.impressoes;
+                ctx.fillText(`CPM: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin, metricY);
+                
+                ctx.fillStyle = COLORS.primary; // Roxo para conversões
+                ctx.fillText(`CONVERSÕES: ${reportSummaryMetrics.totalConversoes.toLocaleString('pt-BR')}`, margin + metricXSpacing, metricY);
+
+
+                // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
+
+                let currentY = headerHeight + margin; 
+                
+                // Título da Tabela Detalhada
+                ctx.font = '700 18px Poppins, sans-serif';
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText('DETALHE DE PERFORMANCE DIÁRIA:', margin, currentY);
+                currentY += margin;
+                
+                // Cabeçalho da Tabela
+                ctx.font = '600 15px Poppins, sans-serif'; // Fonte do cabeçalho levemente maior
+                ctx.fillStyle = COLORS.primary; // Roxo para o cabeçalho da tabela
+                const colDataCliente = 20;
+                const colGasto = 260; 
+                const colFaturamento = 400; 
+                const colCPM = 550; 
+                const colROAS = 680; 
+                const colConv = 800; 
+                
+                ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
+                ctx.fillText('GASTO (R$)', colGasto, currentY);
+                ctx.fillText('FATO. (R$)', colFaturamento, currentY);
+                ctx.fillText('CPM (R$)', colCPM, currentY);
+                ctx.fillText('ROAS (X)', colROAS, currentY);
+                ctx.fillText('CONVERSÕES', colConv, currentY);
+                currentY += 8; // Espaçamento extra após o cabeçalho
+
+                // Desenho das Linhas de Dados
+                rowsToShow.forEach(row => {
+                    currentY += dataRowHeight - 5; // Ajusta para o próximo Y
+                    
+                    const cpa = calculateCPA(row.investimento, row.conversionCount); // Recalcula se necessário
+                    const roas = calculateROAS(row.investimento, row.vendas);
+                    const cpm = calculateCPM(row.investimento, row.impressoes);
+
+                    ctx.font = '400 14px Poppins, sans-serif'; // Fonte de dados
+                    
+                    // Coluna DATA/CLIENTE
+                    const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
+                    const dateDisplay = getLocalDayDate(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                    ctx.fillStyle = LIGHT_TEXT;
+                    ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
+                    
+                    // Coluna GASTO (formato 1.000,32)
+                    ctx.fillStyle = COLORS.investimento; // Vermelho para Gasto
+                    ctx.fillText(formatValueBRL(row.investimento), colGasto, currentY);
+                    
+                    // Coluna FATURAMENTO (formato 1.000,32)
+                    ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
+                    ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
+                    
+                    // Coluna CPM (formato 1.000,32)
+                    ctx.fillStyle = COLORS.impressoes; // Azul
+                    ctx.fillText(formatValueBRL(cpm), colCPM, currentY);
+                    
+                    // Coluna ROAS (formato 0.00)
+                    ctx.fillStyle = COLORS.roas; // Amarelo
+                    ctx.fillText(`${formatNumber(roas)}X`, colROAS, currentY);
+                    
+                    // Coluna CONVERSÃO (tipo e contagem)
+                    ctx.fillStyle = LIGHT_TEXT;
+                    ctx.fillText(`${row.conversionType.substring(0, 5)}. (${row.conversionCount})`, colConv, currentY);
+                });
+
+                if (reportData.length > maxRows) {
+                    currentY += dataRowHeight;
+                    ctx.fillStyle = LIGHT_TEXT;
+                    ctx.font = '400 14px Poppins, sans-serif';
+                    ctx.fillText(`... e mais ${reportData.length - maxRows} registros. Use o CSV para o detalhe completo.`, margin, currentY);
+                }
+
+                // --- 4. Download ---
+                // NOVO: Adicionado atraso para garantir que o download seja disparado
+                setTimeout(() => {
+                    const dataUrl = compositeCanvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = `Novan_Relatorio_Feed_${reportSummaryMetrics.period.replace(/\s/g, '_').replace(/\//g, '-')}.png`;
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showMessage('Exportação do Relatório Consolidado (PNG) iniciada!');
+                }, 50); // Pequeno atraso
+
+            } catch (error) {
+                console.error("Erro fatal ao gerar PNG:", error);
+                showMessage("Erro ao gerar o relatório PNG. Verifique o console para mais detalhes.", 5000, true);
             }
-            
-            const reportData = reportDetailedResults;
-            
-            // Ajuste a altura do cabeçalho para acomodar mais KPIs
-            const headerHeight = 280; 
-            const margin = 20; 
-            const dataRowHeight = 28; 
-            const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; 
-
-            const rowsToShow = reportData.slice(0, maxRows); 
-            const totalDataHeight = rowsToShow.length * dataRowHeight;
-            
-            // Altura total ajustada ao conteúdo (máx 1350)
-            const totalHeight = headerHeight + totalDataHeight + margin * 3; 
-            const totalWidth = 1080; 
-
-            const compositeCanvas = document.createElement('canvas');
-            compositeCanvas.width = totalWidth;
-            compositeCanvas.height = totalHeight;
-            const ctx = compositeCanvas.getContext('2d');
-            
-            // Define a fonte base para o canvas
-            ctx.font = 'Poppins';
-            
-            // 1. Fundo (Azul Marinho)
-            ctx.fillStyle = NAVY_BLUE; 
-            ctx.fillRect(0, 0, totalWidth, totalHeight);
-            
-            // --- 2. Desenha o Cabeçalho e Métricas (RESUMO) ---
-            
-            // Título Principal
-            ctx.font = '700 36px Poppins'; 
-            ctx.fillStyle = COLORS.faturamento; 
-            ctx.fillText('RELATÓRIO NOVAN AGENCY', margin, margin + 40); 
-            
-            // Data de Geração 
-            ctx.font = '400 16px Poppins'; 
-            ctx.fillStyle = LIGHT_TEXT;
-            ctx.fillText(`Gerado em: ${reportSummaryMetrics.generationDate}`, margin, margin + 70); 
-
-            // Nome do Cliente
-            ctx.font = '600 24px Poppins'; 
-            ctx.fillStyle = LIGHT_TEXT;
-            const clientDisplay = reportSummaryMetrics.clientName === 'Todos os Clientes' 
-                ? reportSummaryMetrics.clientName 
-                : `CLIENTE: ${reportSummaryMetrics.clientName}`;
-            ctx.fillText(clientDisplay, margin, margin + 110); 
-            
-            // Período 
-            ctx.font = '400 18px Poppins'; 
-            ctx.fillStyle = LIGHT_TEXT;
-            ctx.fillText(`Período Analisado: ${reportSummaryMetrics.period}`, margin, margin + 140); 
-
-            // BLOCO DE KPIS DE DESTAQUE (3 LINHAS)
-            
-            let metricY = margin + 180; 
-            ctx.font = '700 22px Poppins'; 
-            const metricXSpacing = 350; // Aumentado o espaçamento X
-            const metricYSpacing = 40; // Espaçamento Y
-
-            // LINHA 1: GASTO e FATURAMENTO
-            ctx.fillStyle = COLORS.investimento;
-            ctx.fillText(`GASTO: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
-            
-            ctx.fillStyle = COLORS.faturamento;
-            ctx.fillText(`FATURAMENTO: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
-            
-            metricY += metricYSpacing; 
-            ctx.font = '700 22px Poppins'; 
-            
-            // LINHA 2: ROAS e CPA
-            ctx.fillStyle = COLORS.roas;
-            ctx.fillText(`ROAS: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
-            
-            ctx.fillStyle = COLORS.cpa; // Usando cor diferente para CPA
-            ctx.fillText(`CPA: R$ ${formatValueBRL(reportSummaryMetrics.avgCPA)}`, margin + metricXSpacing, metricY);
-
-            metricY += metricYSpacing; 
-            ctx.font = '700 22px Poppins'; 
-
-            // LINHA 3: CPM e CONVERSÕES (total)
-            ctx.fillStyle = COLORS.impressoes;
-            ctx.fillText(`CPM: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin, metricY);
-            
-            ctx.fillStyle = COLORS.primary; // Roxo para conversões
-            ctx.fillText(`CONVERSÕES: ${reportSummaryMetrics.totalConversoes.toLocaleString('pt-BR')}`, margin + metricXSpacing, metricY);
-
-
-            // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
-
-            let currentY = headerHeight + margin; 
-            
-            // Título da Tabela Detalhada
-            ctx.font = '700 18px Poppins';
-            ctx.fillStyle = LIGHT_TEXT;
-            ctx.fillText('DETALHE DE PERFORMANCE DIÁRIA:', margin, currentY);
-            currentY += margin;
-            
-            // Cabeçalho da Tabela
-            ctx.font = '600 15px Poppins'; // Fonte do cabeçalho levemente maior
-            ctx.fillStyle = COLORS.primary; // Roxo para o cabeçalho da tabela
-            const colDataCliente = 20;
-            const colGasto = 260; 
-            const colFaturamento = 400; 
-            const colCPM = 550; 
-            const colROAS = 680; 
-            const colConv = 800; 
-            
-            ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
-            ctx.fillText('GASTO (R$)', colGasto, currentY);
-            ctx.fillText('FATO. (R$)', colFaturamento, currentY);
-            ctx.fillText('CPM (R$)', colCPM, currentY);
-            ctx.fillText('ROAS (X)', colROAS, currentY);
-            ctx.fillText('CONVERSÕES', colConv, currentY);
-            currentY += 8; // Espaçamento extra após o cabeçalho
-
-            // Desenho das Linhas de Dados
-            rowsToShow.forEach(row => {
-                currentY += dataRowHeight - 5; // Ajusta para o próximo Y
-                
-                const cpa = calculateCPA(row.investimento, row.conversionCount); // Recalcula se necessário
-                const roas = calculateROAS(row.investimento, row.vendas);
-                const cpm = calculateCPM(row.investimento, row.impressoes);
-
-                ctx.font = '400 14px Poppins'; // Fonte de dados
-                
-                // Coluna DATA/CLIENTE
-                const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
-                const dateDisplay = getLocalDayDate(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                ctx.fillStyle = LIGHT_TEXT;
-                ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
-                
-                // Coluna GASTO (formato 1.000,32)
-                ctx.fillStyle = COLORS.investimento; // Vermelho para Gasto
-                ctx.fillText(formatValueBRL(row.investimento), colGasto, currentY);
-                
-                // Coluna FATURAMENTO (formato 1.000,32)
-                ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
-                ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
-                
-                // Coluna CPM (formato 1.000,32)
-                ctx.fillStyle = COLORS.impressoes; // Azul
-                ctx.fillText(formatValueBRL(cpm), colCPM, currentY);
-                
-                // Coluna ROAS (formato 0.00)
-                ctx.fillStyle = COLORS.roas; // Amarelo
-                ctx.fillText(`${formatNumber(roas)}X`, colROAS, currentY);
-                
-                // Coluna CONVERSÃO (tipo e contagem)
-                ctx.fillStyle = LIGHT_TEXT;
-                ctx.fillText(`${row.conversionType.substring(0, 5)}. (${row.conversionCount})`, colConv, currentY);
-            });
-
-            if (reportData.length > maxRows) {
-                currentY += dataRowHeight;
-                ctx.fillStyle = LIGHT_TEXT;
-                ctx.font = '400 14px Poppins';
-                ctx.fillText(`... e mais ${reportData.length - maxRows} registros. Use o CSV para o detalhe completo.`, margin, currentY);
-            }
-
-            // --- 4. Download ---
-            const dataUrl = compositeCanvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = `Novan_Relatorio_Feed_${reportSummaryMetrics.period.replace(/\s/g, '_').replace(/\//g, '-')}.png`;
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showMessage('Exportação do Relatório Consolidado (PNG) iniciada!');
         }
 
 
