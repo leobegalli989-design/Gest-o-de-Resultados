@@ -378,6 +378,13 @@
                         <button type="button" id="btnResumoQuinzenal" class="col-span-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Gerar Resumo Quinzenal
                         </button>
+                        
+                        <!-- NOVO: BOTÃO GEMINI API -->
+                        <button type="button" id="btnGerarAnalise" onclick="generatePerformanceAnalysis()" 
+                                class="col-span-1 md:col-span-4 bg-pink-600 hover:bg-pink-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            ✨ Gerar Análise de Desempenho Diário
+                        </button>
+                        <!-- FIM NOVO BOTÃO -->
                     </form>
                 </div>
 
@@ -402,6 +409,16 @@
                     <button onclick="renderResultsTable()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                         Aplicar Filtros
                     </button>
+                    
+                    <!-- NOVO: Botões de Filtro Rápido (Resultados) -->
+                    <div class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-gray-700 w-full">
+                        <span class="text-sm font-medium text-gray-300 self-center mr-2">Filtros Rápidos:</span>
+                        <button onclick="filterResultsByPreset('today')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Hoje</button>
+                        <button onclick="filterResultsByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 7 dias</button>
+                        <button onclick="filterResultsByPreset('15days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 15 dias</button>
+                        <button onclick="filterResultsByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
+                    </div>
+                    <!-- FIM NOVO: Botões de Filtro Rápido -->
                 </div>
                 <!-- FIM NOVO BLOCO DE FILTROS -->
 
@@ -474,6 +491,13 @@
                             <button type="submit" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                                 Salvar Tarefa
                             </button>
+                            
+                            <!-- NOVO: BOTÃO GEMINI API para Sugestão de Metas -->
+                            <button type="button" onclick="generateTaskGoals()" 
+                                class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                                ✨ Sugerir Metas para Tarefa
+                            </button>
+                            <!-- FIM NOVO BOTÃO -->
                         </form>
                     </div>
 
@@ -799,6 +823,12 @@
         const NAVY_BLUE = '#0E1B31'; 
         const LIGHT_TEXT = '#E2E8F0'; // light gray/off-white
 
+        // --- CONFIGURAÇÃO GEMINI API ---
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const API_KEY = ""; // Será preenchida pelo Canvas
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+
+
         // --- FUNÇÕES DE AUTENTICAÇÃO ---
         
         // Oculta a tela de login e mostra o dashboard
@@ -876,7 +906,7 @@
         });
 
         /** Alterna a visibilidade da senha no campo de login */
-        window.togglePasswordVisibility = function() {
+        window.togglePasswordVisibility = function() { // CORRIGIDO: Ligado ao window para ser acessível
             const passwordInput = document.getElementById('login_password');
             const toggleIcon = document.getElementById('togglePasswordIcon');
             const path1 = document.getElementById('togglePasswordPath1');
@@ -1928,7 +1958,7 @@
 
                     tasksHtml += `
                         <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusClass} border-l-4" 
-                             style="border-left-color: ${clientColor};"
+                             style="border-left-color: ${client.color || COLORS.primary};"
                              title="${taskTitle}">
                             ${clientName} - ${task.type.substring(0, 5)}
                         </div>
@@ -2064,7 +2094,7 @@
         // Função para fechar o modal de detalhes da tarefa
         window.closeTaskDetailModal = function() {
             document.getElementById('taskDetailModal').classList.add('hidden');
-            document.getElementById('taskDetailModal').classList.remove('flex');
+            document.getElementById('modalTaskDetailModal').classList.remove('flex');
         }
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
@@ -2259,6 +2289,42 @@
             generateReport();
             showMessage(`Filtro rápido de ${preset} aplicado.`);
         }
+
+        // NOVO: Função para o filtro rápido da ABA RESULTADOS
+        window.filterResultsByPreset = function(preset) {
+            const today = new Date();
+            const endDateInput = document.getElementById('results_filter_end_date');
+            const startDateInput = document.getElementById('results_filter_start_date');
+            
+            // Helper para formatar a data como YYYY-MM-DD (usando o fuso local)
+            const formatDate = (date) => {
+                const offset = date.getTimezoneOffset() * 60000;
+                const localDate = new Date(date.getTime() - offset);
+                return localDate.toISOString().split('T')[0];
+            };
+
+            const todayStr = formatDate(today);
+            endDateInput.value = todayStr;
+
+            let startDate = new Date(today);
+
+            if (preset === 'today') {
+                // Já está definido para hoje (startDate = today)
+            } else if (preset === '7days') {
+                startDate.setDate(today.getDate() - 6); 
+            } else if (preset === '15days') {
+                startDate.setDate(today.getDate() - 14);
+            } else if (preset === '30days') {
+                startDate.setDate(today.getDate() - 29);
+            }
+            
+            startDateInput.value = formatDate(startDate);
+
+            // Gera a visualização de resultados automaticamente
+            renderResultsTable();
+            showMessage(`Filtro rápido de ${preset} aplicado ao histórico.`);
+        }
+
 
         /** Gera os dados e gráficos do relatório */
         window.generateReport = function() {
@@ -2678,7 +2744,7 @@
         // --- FUNÇÃO PARA ANIMAÇÃO CODE RAIN (MATRIX) ---
         
         /** Inicializa o Efeito Code Rain (Matrix) */
-        function initMatrixEffect() {
+        window.initMatrixEffect = function() { // CORRIGIDO: Ligado ao window para ser acessível pelo DOMContentLoaded
             const canvas = document.getElementById('matrixCanvas');
             // Verifica se o elemento foi encontrado antes de prosseguir
             if (!canvas) return; 
@@ -2740,14 +2806,14 @@
 
         // --- INICIALIZAÇÃO DA APLICAÇÃO PRINCIPAL (Após Login) ---
 
-        function initAppContent() {
+        function initAppContent() { // CORRIGIDO: Mantida como função local, chamada por showDashboard
             loadData();
             // Preenche o campo de responsáveis com Léo e Fabio
             populateResponsiblesSelect(); 
             // Define a data atual no campo de resultados
             document.getElementById('res_data').valueAsDate = new Date();
             // Inicia na primeira aba
-            switchTab('clientes'); // CORRIGIDO: Iniciar em 'clientes'
+            switchTab('clientes'); 
             
             // Garante que o cálculo CPA/ROAS/CPM esteja zerado na inicialização
             updateMetricsDisplay();
