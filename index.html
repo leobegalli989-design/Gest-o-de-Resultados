@@ -432,8 +432,8 @@
                 </div>
                 <!-- FIM NOVO BLOCO: KPI Cards de Resumo -->
 
-                <!-- Histórico de Resultados -->
-                <div class="bg-novan-secondary p-6 rounded-xl shadow-lg overflow-x-auto">
+                <!-- Histórico de Resultados (Nova Visualização em Cartões) -->
+                <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                     <h2 class="text-xl font-semibold mb-4 text-white">Histórico e Evolução das Métricas</h2>
                     <div id="resultsListContainer" class="space-y-4">
                         <!-- Lista de resultados em formato de cartão será injetada aqui via JS -->
@@ -495,7 +495,6 @@
                                     <option value="Post">Post/Conteúdo</option>
                                     <option value="Reuniao">Reunião</option>
                                     <option value="Video">Entrega de Vídeo</option>
-                                    <option value="Relatorio">Relatório</option>
                                 <option value="Outro">Outro</option>
                             </select>
                                 <button class="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg text-sm">Ver Mês</button>
@@ -522,7 +521,7 @@
             </section>
 
             <!-- Tab 3: Cadastro de Clientes -->
-            <section id="clientes" class="tab-content active">
+            <section id="clientes" class="tab-content">
                 <h1 class="text-4xl font-bold text-white mb-6">👥 Cadastro de Clientes</h1>
 
                 <!-- Seletor de Tipo de Cliente -->
@@ -687,23 +686,34 @@
                         </button>
                         <!-- FIM BOTÕES DE EXPORTAÇÃO SEPARADOS -->
                     </div>
+                    
+                    <!-- NOVO: Botões de Filtro Rápido -->
+                    <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-700">
+                        <span class="text-sm font-medium text-gray-300 self-center mr-2">Filtros Rápidos:</span>
+                        <button onclick="filterReportByPreset('today')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Hoje (1 dia)</button>
+                        <button onclick="filterReportByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 7 dias</button>
+                        <button onclick="filterReportByPreset('15days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 15 dias</button>
+                        <button onclick="filterReportByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
+                    </div>
+                    <!-- FIM: Botões de Filtro Rápido -->
+
                 </div>
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-2">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
@@ -742,51 +752,6 @@
         </main>
     </div>
     <!-- Fim Dashboard Principal -->
-
-    <!-- Modal de Detalhes e Gestão de Tarefa (NOVO) -->
-    <div id="taskDetailModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
-                <h3 class="text-2xl font-bold text-white" id="modalTaskTitle">Detalhes da Tarefa</h3>
-                <button onclick="closeTaskDetailModal()" class="text-gray-400 hover:text-red-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            
-            <div class="text-gray-300 space-y-3">
-                <p><strong>Cliente:</strong> <span id="modalClientName" class="font-semibold text-novan-primary"></span></p>
-                <p><strong>Tipo:</strong> <span id="modalTaskType"></span></p>
-                <p><strong>Prazo:</strong> <span id="modalTaskDate"></span></p>
-                <p><strong>Status Atual:</strong> <span id="modalTaskStatus" class="font-semibold"></span></p>
-                
-                <div class="bg-gray-700 p-3 rounded-lg mt-4">
-                    <p class="font-bold text-white mb-1">Observações:</p>
-                    <p id="modalTaskObs" class="text-sm italic whitespace-pre-wrap"></p>
-                </div>
-            </div>
-
-            <div class="mt-6 border-t border-gray-700 pt-4 space-y-4">
-                <div class="flex items-center space-x-3">
-                    <label class="text-sm font-medium text-gray-300">Mudar Status:</label>
-                    <select id="modalStatusSelect" class="p-2 border text-sm rounded-lg bg-gray-700 text-white focus:ring-novan-primary">
-                        <option value="Pendente">Pendente</option>
-                        <option value="Em Andamento">Em Andamento</option>
-                        <option value="Concluido">Concluído</option>
-                    </select>
-                    <button onclick="applyStatusChange()" class="bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-lg text-sm">Aplicar</button>
-                </div>
-
-                <div class="flex justify-between space-x-2">
-                    <!-- Botão de Edição (apenas abre a aba de cadastro, o modal atual é fechado) -->
-                    <button id="modalEditButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-2 rounded-lg flex-grow">Editar Tarefa</button>
-                    <button id="modalDeleteButton" onclick="deleteTask(document.getElementById('modalTaskId').value); closeTaskDetailModal()" class="bg-red-600 hover:bg-red-700 text-white font-semibold p-2 rounded-lg">Excluir</button>
-                </div>
-            </div>
-            <!-- Campo oculto para armazenar o ID da tarefa -->
-            <input type="hidden" id="modalTaskId" value="">
-        </div>
-    </div>
-    <!-- Fim Modal de Detalhes e Gestão de Tarefa -->
 
     <script type="module">
         // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
@@ -927,7 +892,7 @@
                 path1.setAttribute('d', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z');
                 path2.setAttribute('d', 'M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z');
                 toggleIcon.setAttribute('title', 'Ocultar Senha');
-
+                
             } else {
                 // Mudar para senha (Olho fechado/slash)
                 passwordInput.type = 'password';
@@ -1494,6 +1459,8 @@
             const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
             const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
             
+            if (!listContainer) return; // Garante que o container existe
+
             // Filtra apenas resultados de clientes de TRÁFEGO PAGO
             const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
             let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
@@ -1560,16 +1527,19 @@
 
                 // Cartão de Resultado (Design Mobile-First e Legível)
                 listHtml += `
-                    <div class="bg-slate-800 p-4 rounded-xl shadow-md border-l-8 border-novan-primary" style="border-left-color: ${clientColor};">
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-md border-l-8 border-novan-primary hover:bg-slate-700 transition duration-150" style="border-left-color: ${clientColor};">
                         
                         <!-- Cabeçalho (Cliente e Data) -->
                         <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
                             <h3 class="text-lg font-bold text-white">${clientName}</h3>
-                            <span class="text-sm text-gray-400">${displayDate} (${res.plataforma})</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-400">${displayDate}</span>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-gray-700 text-gray-300">${res.plataforma}</span>
+                            </div>
                         </div>
 
                         <!-- Métricas Primárias (Grid 2x2) -->
-                        <div class="grid grid-cols-2 gap-3 mb-2">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
                             <div class="flex flex-col">
                                 <span class="text-sm text-gray-400">Gasto</span>
                                 <span class="font-bold text-red-500">${formatCurrency(res.investimento)}</span>
@@ -1589,14 +1559,14 @@
                         </div>
 
                         <!-- Métricas Secundárias (Conversão e CPM) -->
-                        <div class="text-xs text-gray-400 border-t border-gray-700 pt-2">
-                            <span class="font-semibold">Conversão:</span> ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
-                            <span class="ml-4 font-semibold">CPM:</span> ${formatCurrency(cpm)}
+                        <div class="text-sm text-gray-400 border-t border-gray-700 pt-2">
+                            <span class="font-semibold text-white">Conversão:</span> ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
+                            <span class="ml-4 font-semibold text-white">CPM:</span> ${formatCurrency(cpm)}
                         </div>
 
                         <!-- Observações e Ações -->
                         <p class="text-xs italic text-gray-500 mt-2">
-                            Obs: ${res.observacoes.substring(0, 50) || 'N/A'}...
+                            Obs: ${res.observacoes || 'N/A'}
                         </p>
                         <div class="flex justify-end space-x-3 mt-3">
                             <button onclick="editResult('${res.id}')" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold">Editar</button>
@@ -1615,7 +1585,7 @@
             results = results.filter(r => r.id !== resultId);
             saveData();
             renderResultsTable();
-            showMessage('Registro excluído.', true);
+            showMessage('Registro excluído.', 3000, true);
         }
 
         /** Calcula o Custo por Aquisição (CPA) */
@@ -2451,7 +2421,7 @@
                     ]
                 }, barChartOptions);
 
-                // 3. Gráfico de ROAS Médio Diário (BARRA) - REVERTIDO PARA BARRA
+                // 3. Gráfico de ROAS Médio Diário (BARRA)
                 roasChartInstance = initChart('roasChart', 'bar', { 
                     labels: reportLabels,
                     datasets: [
