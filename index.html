@@ -435,33 +435,9 @@
                 <!-- Histórico de Resultados -->
                 <div class="bg-novan-secondary p-6 rounded-xl shadow-lg overflow-x-auto">
                     <h2 class="text-xl font-semibold mb-4 text-white">Histórico e Evolução das Métricas</h2>
-                    <table id="resultsTable" class="w-full text-left text-gray-300">
-                        <thead class="bg-slate-800">
-                            <tr>
-                                <th>Data</th>
-                                <th>Cliente</th>
-                                <th>Plataforma</th>
-                                <!-- Trocado Investimento por Gasto -->
-                                <th>Gasto (R$)</th>
-                                <th>Impr.</th>
-                                <th>Cliques</th>
-                                <!-- NOVO CPM HEADER -->
-                                <th class="text-blue-500">CPM (R$)</th>
-                                <!-- FIM NOVO CPM HEADER -->
-                                <!-- NOVO CAMPO UNIFICADO -->
-                                <th class="text-purple-400">Conversão</th>
-                                <!-- FIM NOVO CAMPO -->
-                                <th>Vendas (R$)</th>
-                                <th class="text-red-500">CPA (R$)</th>
-                                <th class="text-green-500">ROAS (X)</th>
-                                <th>Obs.</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
-                            <!-- Resultados serão injetados aqui via JS -->
-                        </tbody>
-                    </table>
+                    <div id="resultsListContainer" class="space-y-4">
+                        <!-- Lista de resultados em formato de cartão será injetada aqui via JS -->
+                    </div>
                     <p id="noResults" class="text-center text-gray-400 mt-4 hidden">Nenhum resultado registrado ainda.</p>
                 </div>
             </section>
@@ -715,19 +691,19 @@
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-2">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
@@ -951,7 +927,7 @@
                 path1.setAttribute('d', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z');
                 path2.setAttribute('d', 'M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z');
                 toggleIcon.setAttribute('title', 'Ocultar Senha');
-                
+
             } else {
                 // Mudar para senha (Olho fechado/slash)
                 passwordInput.type = 'password';
@@ -1511,23 +1487,21 @@
             showMessage(`Modo de Edição ativado para o registro de ${getLocalDayDate(result.data).toLocaleDateString('pt-BR')}.`, 5000);
         }
 
-        /** Renderiza a tabela de resultados */
+        /** Renderiza o histórico de resultados em formato de Cartões/Lista */
         window.renderResultsTable = function() {
-            const body = document.getElementById('resultsTableBody');
-            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value; // NOVO: Filtro de Cliente
-            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value; // NOVO: Filtro de Data Inicial
-            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value; // NOVO: Filtro de Data Final
+            const listContainer = document.getElementById('resultsListContainer');
+            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value;
+            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
+            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
             
-            // Filtra apenas resultados de clientes de TRÁFEGO PAGO, pois os campos são de Ads.
+            // Filtra apenas resultados de clientes de TRÁFEGO PAGO
             const trafficClientsIds = clients.filter(c => c.serviceType === 'traffic' || !c.serviceType).map(c => c.id);
             let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
 
-            // 1. Aplica Filtro de Cliente
+            // Aplica Filtros
             if (resultsFilterClient) {
                 filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
             }
-
-            // 2. Aplica Filtro de Data
             if (resultsFilterStartDate) {
                 filteredResults = filteredResults.filter(r => r.data >= resultsFilterStartDate);
             }
@@ -1535,7 +1509,7 @@
                 filteredResults = filteredResults.filter(r => r.data <= resultsFilterEndDate);
             }
 
-            // --- NOVO: CÁLCULO DAS MÉTRICAS DE RESUMO (Geral) ---
+            // --- CÁLCULO DAS MÉTRICAS DE RESUMO (Geral) ---
             let summaryMetrics = {
                 totalGasto: 0, totalFaturamento: 0, totalConversoes: 0, totalImpressoes: 0,
                 avgROAS: 0, avgCPA: 0, avgCPM: 0
@@ -1559,7 +1533,7 @@
             renderKpiCards(filteredResults, summaryMetrics);
             // --- FIM DO NOVO CÁLCULO ---
 
-            body.innerHTML = '';
+            listContainer.innerHTML = '';
 
             if (filteredResults.length === 0) {
                 document.getElementById('noResults').classList.remove('hidden');
@@ -1569,47 +1543,70 @@
 
             // Ordena por data decrescente
             const sortedResults = filteredResults.sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            let listHtml = '';
 
             sortedResults.forEach(res => {
-                const clientName = clients.find(c => c.id === res.clientId)?.nome || 'Cliente Desconhecido';
-                const cpa = calculateCPA(res.investimento, res.conversionCount); // ATUALIZADO: Usando conversionCount
-                const roas = calculateROAS(res.investimento, res.vendas);
-                const cpm = calculateCPM(res.investimento, res.impressoes); // NOVO CPM
+                const client = clients.find(c => c.id === res.clientId);
+                const clientName = client?.nome || 'Cliente Desconhecido';
+                const clientColor = client?.color || COLORS.primary;
+                const displayDate = getLocalDayDate(res.data).toLocaleDateString('pt-BR');
                 
-                // Lidando com a nova estrutura de Conversão
+                const cpa = calculateCPA(res.investimento, res.conversionCount);
+                const roas = calculateROAS(res.investimento, res.vendas);
+                const cpm = calculateCPM(res.investimento, res.impressoes);
                 const conversionType = res.conversionType || 'N/D';
                 const conversionCount = res.conversionCount || 0;
 
-                const row = body.insertRow();
-                // A classe "text-xs" foi definida no CSS para o TD
-                row.innerHTML = `
-                    <td class="text-gray-300">${getLocalDayDate(res.data).toLocaleDateString('pt-BR')}</td>
-                    <td class="font-medium text-novan-primary">${clientName}</td>
-                    <td class="text-gray-300">${res.plataforma}</td>
-                    <td class="text-gray-300">${formatCurrency(res.investimento)}</td>
-                    <td class="text-gray-300">${res.impressoes.toLocaleString('pt-BR')}</td>
-                    <td class="text-gray-300">${res.cliques.toLocaleString('pt-BR')}</td>
-                    
-                    <!-- NOVO CPM CÉLULA -->
-                    <td class="text-blue-500 font-bold">${formatCurrency(cpm)}</td>
-                    <!-- FIM NOVO CPM CÉLULA -->
+                // Cartão de Resultado (Design Mobile-First e Legível)
+                listHtml += `
+                    <div class="bg-slate-800 p-4 rounded-xl shadow-md border-l-8 border-novan-primary" style="border-left-color: ${clientColor};">
+                        
+                        <!-- Cabeçalho (Cliente e Data) -->
+                        <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
+                            <h3 class="text-lg font-bold text-white">${clientName}</h3>
+                            <span class="text-sm text-gray-400">${displayDate} (${res.plataforma})</span>
+                        </div>
 
-                    <!-- NOVO CAMPO UNIFICADO -->
-                    <td class="text-gray-300" title="${conversionType}: ${conversionCount.toLocaleString('pt-BR')}">
-                        ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
-                    </td>
-                    <!-- FIM NOVO CAMPO -->
-                    
-                    <td class="text-gray-300">${formatCurrency(res.vendas)}</td>
-                    <td class="text-red-500 font-bold">${formatCurrency(cpa)}</td>
-                    <td class="text-green-500 font-bold">${formatNumber(roas)}</td>
-                    <td class="text-gray-300">${res.observacoes.substring(0, 20)}...</td>
-                    <td>
-                        <button onclick="editResult('${res.id}')" class="text-indigo-400 hover:text-indigo-300 text-xs mr-2">Editar</button>
-                        <button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-xs">X</button>
-                    </td>
+                        <!-- Métricas Primárias (Grid 2x2) -->
+                        <div class="grid grid-cols-2 gap-3 mb-2">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">Gasto</span>
+                                <span class="font-bold text-red-500">${formatCurrency(res.investimento)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">Faturamento</span>
+                                <span class="font-bold text-green-500">${formatCurrency(res.vendas)}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">ROAS</span>
+                                <span class="font-bold text-yellow-500">${formatNumber(roas)}X</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">CPA</span>
+                                <span class="font-bold text-indigo-500">${formatCurrency(cpa)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Métricas Secundárias (Conversão e CPM) -->
+                        <div class="text-xs text-gray-400 border-t border-gray-700 pt-2">
+                            <span class="font-semibold">Conversão:</span> ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
+                            <span class="ml-4 font-semibold">CPM:</span> ${formatCurrency(cpm)}
+                        </div>
+
+                        <!-- Observações e Ações -->
+                        <p class="text-xs italic text-gray-500 mt-2">
+                            Obs: ${res.observacoes.substring(0, 50) || 'N/A'}...
+                        </p>
+                        <div class="flex justify-end space-x-3 mt-3">
+                            <button onclick="editResult('${res.id}')" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold">Editar</button>
+                            <button onclick="deleteResult('${res.id}')" class="text-red-500 hover:text-red-400 text-sm">Excluir</button>
+                        </div>
+                    </div>
                 `;
             });
+            
+            listContainer.innerHTML = listHtml;
         }
         
         /** Deleta um registro de resultado */
@@ -1944,7 +1941,8 @@
                 dayTasks.forEach(task => {
                     const client = clients.find(c => c.id === task.clientId);
                     const clientColor = client?.color || '#334155'; // Cor padrão
-
+                    const clientName = client?.nome.substring(0, 10) || 'N/D';
+                    
                     // Corrigido: Usando a classe de status para o background
                     let statusClass = '';
                     if (task.status === 'Pendente') {
@@ -1954,8 +1952,6 @@
                     } else if (task.status === 'Concluido') {
                         statusClass = 'bg-status-Concluido'; // Define o background como verde
                     }
-                    
-                    const clientName = client?.nome.substring(0, 10) || 'N/D';
                     
                     const taskDateTime = new Date(task.date).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
                     const taskTitle = `CLIENTE: ${clientName}\nDATA/HORA: ${taskDateTime}\nTIPO: ${task.type}\nSTATUS: ${task.status}\nOBS: ${task.observacoes || 'N/A'}`;
@@ -2419,37 +2415,6 @@
                     }
                 };
                 
-                // NOVO: Opções para Gráfico de Linha (ROAS)
-                const lineChartOptions = {
-                    responsive: true,
-                    maintainAspectRatio: false, // Permite que o contêiner de 300px controle a altura
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#334155' },
-                            ticks: { color: '#E2E8F0' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#E2E8F0' }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#E2E8F0' } }
-                    },
-                    elements: {
-                        line: {
-                            tension: 0.4, // Suaviza a linha
-                            borderWidth: 3,
-                        },
-                        point: {
-                            radius: 5,
-                            hoverRadius: 7,
-                            backgroundColor: COLORS.roas,
-                        }
-                    }
-                };
-
                 // 1. Gráfico de Gasto vs Faturamento (BARRA)
                 invFatChartInstance = initChart('investimentoFaturamentoChart', 'bar', {
                     labels: reportLabels,
