@@ -269,27 +269,33 @@
                 Novan Agency
             </div>
             
-            <!-- Menu Items -->
+            <!-- Menu Items - NOVA ORDEM AQUI -->
             <nav>
-                <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2 active" data-tab="resultados">
+                <!-- 1. Cadastro de Clientes (Clientes) -->
+                <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2 active" data-tab="clientes">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                    Cadastro de Clientes
+                </div>
+                
+                <!-- 2. Resultados de Campanhas (Resultados) -->
+                <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="resultados">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                     Resultados de Campanhas
                 </div>
+
+                <!-- 3. Calendário de Tarefas (Calendario) -->
                 <div id="nav-calendario" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="calendario">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     Calendário de Tarefas
                 </div>
-                <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="clientes">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
-                    Cadastro de Clientes
-                </div>
                 
-                <!-- NOVA ABA: GESTÃO DE TAREFAS -->
+                <!-- 4. Gestão de Tarefas (Gestao) -->
                 <div id="nav-gestao" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="gestao">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
                     Gestão de Tarefas
                 </div>
 
+                <!-- 5. Relatórios e Insights (Relatorios) -->
                 <div id="nav-relatorios" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="relatorios">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
                     Relatórios e Insights
@@ -310,7 +316,7 @@
             <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
 
             <!-- Tab 1: Resultados de Campanhas -->
-            <section id="resultados" class="tab-content active">
+            <section id="resultados" class="tab-content">
                 <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
                 
                 <!-- Formulário de Registro Diário -->
@@ -540,7 +546,7 @@
             </section>
 
             <!-- Tab 3: Cadastro de Clientes -->
-            <section id="clientes" class="tab-content">
+            <section id="clientes" class="tab-content active">
                 <h1 class="text-4xl font-bold text-white mb-6">👥 Cadastro de Clientes</h1>
 
                 <!-- Seletor de Tipo de Cliente -->
@@ -760,6 +766,51 @@
         </main>
     </div>
     <!-- Fim Dashboard Principal -->
+
+    <!-- Modal de Detalhes e Gestão de Tarefa (NOVO) -->
+    <div id="taskDetailModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
+                <h3 class="text-2xl font-bold text-white" id="modalTaskTitle">Detalhes da Tarefa</h3>
+                <button onclick="closeTaskDetailModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="text-gray-300 space-y-3">
+                <p><strong>Cliente:</strong> <span id="modalClientName" class="font-semibold text-novan-primary"></span></p>
+                <p><strong>Tipo:</strong> <span id="modalTaskType"></span></p>
+                <p><strong>Prazo:</strong> <span id="modalTaskDate"></span></p>
+                <p><strong>Status Atual:</strong> <span id="modalTaskStatus" class="font-semibold"></span></p>
+                
+                <div class="bg-gray-700 p-3 rounded-lg mt-4">
+                    <p class="font-bold text-white mb-1">Observações:</p>
+                    <p id="modalTaskObs" class="text-sm italic whitespace-pre-wrap"></p>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-gray-700 pt-4 space-y-4">
+                <div class="flex items-center space-x-3">
+                    <label class="text-sm font-medium text-gray-300">Mudar Status:</label>
+                    <select id="modalStatusSelect" class="p-2 border text-sm rounded-lg bg-gray-700 text-white focus:ring-novan-primary">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluido">Concluído</option>
+                    </select>
+                    <button onclick="applyStatusChange()" class="bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-lg text-sm">Aplicar</button>
+                </div>
+
+                <div class="flex justify-between space-x-2">
+                    <!-- Botão de Edição (apenas abre a aba de cadastro, o modal atual é fechado) -->
+                    <button id="modalEditButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-2 rounded-lg flex-grow">Editar Tarefa</button>
+                    <button id="modalDeleteButton" onclick="deleteTask(document.getElementById('modalTaskId').value); closeTaskDetailModal()" class="bg-red-600 hover:bg-red-700 text-white font-semibold p-2 rounded-lg">Excluir</button>
+                </div>
+            </div>
+            <!-- Campo oculto para armazenar o ID da tarefa -->
+            <input type="hidden" id="modalTaskId" value="">
+        </div>
+    </div>
+    <!-- Fim Modal de Detalhes e Gestão de Tarefa -->
 
     <script type="module">
         // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
@@ -2197,15 +2248,6 @@
             if (existingChart) {
                 existingChart.destroy();
             }
-            // Adiciona um container div temporário para forçar o tamanho do canvas
-            // O Chart.js precisa de um contêiner com altura/largura definida para o maintainAspectRatio=false funcionar
-            const container = canvas.closest('.chart-container');
-            if(container) {
-                // Adiciona o container para manter a proporção no layout
-                canvas.style.width = '100%';
-                canvas.style.height = '100%'; 
-            }
-
             return new Chart(canvas, { type, data, options });
         }
 
@@ -2444,14 +2486,14 @@
                     ]
                 }, barChartOptions);
 
-                // 3. Gráfico de ROAS Médio Diário (BARRA) - CORRIGIDO PARA BARRA
+                // 3. Gráfico de ROAS Médio Diário (BARRA) - REVERTIDO PARA BARRA
                 roasChartInstance = initChart('roasChart', 'bar', { 
                     labels: reportLabels,
                     datasets: [
                         {
                             label: 'ROAS Médio',
                             data: roasData,
-                            backgroundColor: COLORS.roas, // Cor da barra (Âmbar/Amarelo)
+                            backgroundColor: COLORS.roas, // Amber 500
                         }
                     ]
                 }, barChartOptions);
@@ -2770,7 +2812,7 @@
             // Define a data atual no campo de resultados
             document.getElementById('res_data').valueAsDate = new Date();
             // Inicia na primeira aba
-            switchTab('resultados'); 
+            switchTab('clientes'); // CORRIGIDO: Iniciar em 'clientes'
             
             // Garante que o cálculo CPA/ROAS/CPM esteja zerado na inicialização
             updateMetricsDisplay();
