@@ -2804,6 +2804,181 @@
         // --- FIM DA FUNÇÃO PARA ANIMAÇÃO CODE RAIN (MATRIX) ---
 
 
+        // --- FUNÇÕES LLM GEMINI ---
+
+        /** Função utilitária para chamar a API Gemini */
+        async function callGeminiApi(systemPrompt, userQuery) {
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            let attempts = 0;
+            const maxRetries = 3;
+
+            while (attempts < maxRetries) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429) {
+                        // Too Many Requests - Implementa Backoff Exponencial
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou (429). Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!text) {
+                        console.error("Resposta Gemini vazia ou inesperada:", result);
+                        return "Erro: O LLM não retornou uma análise válida.";
+                    }
+
+                    return text;
+
+                } catch (error) {
+                    console.error("Erro na chamada da API Gemini:", error);
+                    // Tenta novamente apenas para erros de rede/timeout, não para erros 4xx/5xx diretos
+                    if (attempts < maxRetries - 1) {
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou. Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                    } else {
+                        return "Erro: Falha na comunicação com o LLM após o limite de retentativas.";
+                    }
+                }
+            }
+            return "Erro: Falha na comunicação com o LLM após o limite de retentativas.";
+        }
+
+        /** Gera Análise de Performance usando o LLM (ABA RESULTADOS) */
+        window.generatePerformanceAnalysis = async function() { // CORRIGIDO: Ligado ao window
+            const today = document.getElementById('res_data').value;
+            const dailyResults = results.filter(r => r.data === today);
+
+            if (dailyResults.length === 0) {
+                return showMessage('Nenhum registro encontrado para hoje para gerar a análise.', 3000, true);
+            }
+            
+            // Agregação dos dados para o LLM
+            let summary = dailyResults.reduce((acc, r) => {
+                acc.gasto += r.investimento;
+                acc.vendas += r.vendas;
+                acc.conversoes += r.conversionCount || 0;
+                acc.impressoes += r.impressoes;
+                
+                // Adiciona observações e detalhes
+                const clientName = clients.find(c => c.id === r.clientId)?.nome || 'Desconhecido';
+                acc.detalhes.push({
+                    cliente: clientName,
+                    plataforma: r.plataforma,
+                    investimento: r.investimento,
+                    vendas: r.vendas,
+                    cpa: calculateCPA(r.investimento, r.conversionCount),
+                    roas: calculateROAS(r.investimento, r.vendas),
+                    conversoes: r.conversionCount,
+                    obs: r.observacoes
+                });
+                return acc;
+            }, { gasto: 0, vendas: 0, conversoes: 0, impressoes: 0, detalhes: [] });
+
+            const totalCPA = calculateCPA(summary.gasto, summary.conversoes);
+            const totalROAS = calculateROAS(summary.gasto, summary.vendas);
+
+            // Constrói o prompt
+            const systemPrompt = `Você é um Analista de Tráfego Sênior da Novan Agency. Sua tarefa é fornecer uma análise concisa, clara e orientada a ações sobre o desempenho das campanhas diárias. Seu público é o gerente da agência.
+            Formate a sua resposta em dois parágrafos:
+            1. Resumo da Performance: Foco nas métricas globais (GASTO, ROAS, CPA) e a tendência geral.
+            2. Ações Recomendadas: Foco nas próximas 2-3 ações mais importantes ou anomalias encontradas nos detalhes.
+            Não use formatação Markdown (como ** ou cabeçalhos).`;
+
+            const userQuery = `Analise a performance diária de hoje (${new Date().toLocaleDateString('pt-BR')}) baseada nos seguintes dados agregados:
+            - Gasto Total: ${formatCurrency(summary.gasto)}
+            - Faturamento/Vendas Total: ${formatCurrency(summary.vendas)}
+            - CPA Agregado: ${formatCurrency(totalCPA)}
+            - ROAS Agregado: ${formatNumber(totalROAS)}X
+            - Detalhes por Cliente (onde buscar anomalias): ${JSON.stringify(summary.detalhes.map(d => ({
+                cliente: d.cliente,
+                gasto: d.investimento,
+                roas: formatNumber(d.roas),
+                obs: d.obs.substring(0, 50)
+            })))}`;
+
+            // 1. Mostrar o modal de carregamento
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a gerar a análise...</p>`;
+            openSummaryModal('✨ Gerando Análise de Desempenho', loadingHtml);
+
+            // 2. Chamar a API
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            // 3. Formatar e exibir o resultado
+            // Usando white-space: pre-wrap para respeitar quebras de linha do LLM.
+            const finalHtml = `<div class="whitespace-pre-wrap text-base leading-relaxed">${analysisText}</div>`;
+            openSummaryModal('✨ Análise de Desempenho Diário', finalHtml);
+        }
+
+        /** Gera sugestões de Metas e Milestones para uma Tarefa (ABA CALENDÁRIO) */
+        window.generateTaskGoals = async function() { // CORRIGIDO: Ligado ao window
+            const clientId = document.getElementById('task_cliente').value;
+            const taskType = document.getElementById('task_tipo').value;
+            const client = clients.find(c => c.id === clientId);
+
+            if (!clientId || !taskType) {
+                return showMessage('Selecione o Cliente e o Tipo de Tarefa primeiro.', 4000, true);
+            }
+
+            const clientInfo = client 
+                ? `Cliente: ${client.nome}. Nicho/Observações: ${client.observacoes}. Serviço: ${client.serviceType === 'traffic' ? 'Tráfego Pago' : 'Social Media'}`
+                : 'Cliente genérico.';
+
+            // Constrói o prompt
+            const systemPrompt = `Você é um Estrategista de Marketing Sênior e Growth. Sua tarefa é sugerir objetivos e metas detalhadas para uma nova tarefa.
+            A sua resposta deve ser uma lista concisa e formatada em Markdown, focada em 3 a 5 objetivos de alto nível (milestones) que o cliente deve alcançar.
+            A lista deve começar com '## Metas Sugeridas:' e cada meta deve começar com '- '. Não inclua nenhuma outra explicação antes ou depois da lista.`;
+
+            const userQuery = `Gere uma lista de metas (milestones) para o seguinte cenário, considerando o cliente:
+            - Tipo de Tarefa: ${taskType}
+            - Informações do Cliente: ${clientInfo}
+            - Contexto: A tarefa está a ser agendada.`;
+
+            // 1. Mostrar o spinner na textarea de observações
+            const obsEl = document.getElementById('task_observacoes');
+            const originalObs = obsEl.value;
+            obsEl.value = 'Gerando sugestões... Aguarde...';
+            
+            // 2. Chamar a API
+            const goalsText = await callGeminiApi(systemPrompt, userQuery);
+            
+            // 3. Formatar e exibir o resultado
+            
+            // Tenta remover o cabeçalho Markdown que pedimos ao LLM
+            let cleanedText = goalsText.replace(/## Metas Sugeridas:/i, '').trim();
+            // Substitui os pontos por traços para melhor visualização na textarea
+            cleanedText = cleanedText.replace(/\*/g, '-'); 
+            
+            // Preserva as observações originais se houver, adicionando as metas abaixo
+            if (originalObs && originalObs.trim() !== '') {
+                obsEl.value = originalObs + "\n\n--- Sugestões Gemini ---\n" + cleanedText;
+            } else {
+                obsEl.value = cleanedText;
+            }
+
+            showMessage('✨ Metas sugeridas adicionadas às observações!');
+        }
+
+
         // --- INICIALIZAÇÃO DA APLICAÇÃO PRINCIPAL (Após Login) ---
 
         function initAppContent() { // CORRIGIDO: Mantida como função local, chamada por showDashboard
