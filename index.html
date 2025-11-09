@@ -357,7 +357,7 @@
                                 <option value="Visualizacao">Visualização</option>
                                 <option value="Outro">Outro</option>
                             </select>
-                            <input type="number" id="res_conversion_count" placeholder="Total de Conversões" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2 bg-gray-700 text-white" />
+                            <input type="number" id="res_conversion_count" placeholder="Total de Conversões" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         </div>
                         <!-- Métricas Calculadas (CPA, ROAS, CPM) - Ocupa as 2 colunas restantes -->
                         <div class="col-span-1 md:col-span-2 flex items-center space-x-4">
@@ -412,6 +412,12 @@
                         <button onclick="filterResultsByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
                     </div>
                     <!-- FIM NOVO: Botões de Filtro Rápido -->
+
+                    <!-- NOVO: Botão de Análise Estratégica -->
+                    <button type="button" onclick="generateStrategicAnalysis()" class="col-span-1 md:col-span-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01] w-full mt-4">
+                        ✨ Análise Gemini Estratégica (7D / 15D / 30D)
+                    </button>
+                    <!-- FIM NOVO: Botão de Análise Estratégica -->
                 </div>
                 <!-- FIM NOVO BLOCO DE FILTROS -->
 
@@ -484,6 +490,13 @@
                             <button type="submit" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                                 Salvar Tarefa
                             </button>
+
+                            <!-- NOVO: BOTÃO GEMINI API para Sugestão de Metas -->
+                            <button type="button" onclick="generateTaskGoals()" 
+                                class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01] mt-2">
+                                ✨ Sugerir Metas para Tarefa
+                            </button>
+                            <!-- FIM NOVO BOTÃO -->
                         </form>
                     </div>
 
@@ -621,7 +634,14 @@
                         </div>
                         <!-- FIM CAMPOS ESPECÍFICOS DE SOCIAL MEDIA -->
 
-                        <textarea id="cli_observacoes" placeholder="Observações gerais e Nicho" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-2 bg-gray-700 text-white"></textarea>
+                        <!-- Textarea de Observações -->
+                        <textarea id="cli_observacoes" placeholder="Observações gerais e Nicho" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white col-span-1 md:col-span-2"></textarea>
+                        
+                        <!-- NOVO: BOTÃO GEMINI API para Otimizar Resumo -->
+                        <button type="button" onclick="optimizeClientObservation()" class="col-span-1 md:col-span-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            ✨ Otimizar Resumo Estratégico
+                        </button>
+                        <!-- FIM NOVO BOTÃO -->
 
                         <button type="submit" id="clientSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Cadastrar Cliente
@@ -1164,6 +1184,33 @@
             showMessage(`Modo de Edição ativado para ${client.nome}.`, false, true);
         }
 
+        /** Otimiza as observações do cliente usando o LLM (ABA CADASTRO DE CLIENTES) */
+        window.optimizeClientObservation = async function() {
+            const obsEl = document.getElementById('cli_observacoes');
+            const clientName = document.getElementById('cli_nome').value || 'Novo Cliente';
+            const rawObs = obsEl.value;
+
+            if (rawObs.trim().length < 10) {
+                return showMessage('Insira pelo menos 10 caracteres de observações para otimizar.', 4000, true);
+            }
+
+            // 1. Mostrar o spinner na textarea de observações
+            const originalObs = obsEl.value;
+            obsEl.value = 'Gerando otimização... Aguarde...';
+            
+            // Constrói o prompt
+            const systemPrompt = `Você é um Copywriter Estratégico da Novan Agency. Sua tarefa é refinar e otimizar as observações brutas de um cliente em um resumo estratégico conciso e de alto impacto, focado no nicho e nos desafios principais. O resumo deve ter no máximo 4 linhas.`;
+
+            const userQuery = `Refine o seguinte texto em um resumo estratégico claro para o cliente '${clientName}':\n\n${rawObs}`;
+
+            // 2. Chamar a API
+            const refinedText = await callGeminiApi(systemPrompt, userQuery);
+            
+            // 3. Exibir o resultado
+            obsEl.value = refinedText;
+
+            showMessage('✨ Resumo estratégico otimizado e inserido!');
+        }
 
         /** Renderiza a lista de clientes cadastrados */
         function renderClientList() {
@@ -2724,7 +2771,7 @@
         // --- FUNÇÃO PARA ANIMAÇÃO CODE RAIN (MATRIX) ---
         
         /** Inicializa o Efeito Code Rain (Matrix) */
-        function initMatrixEffect() {
+        window.initMatrixEffect = function() {
             const canvas = document.getElementById('matrixCanvas');
             // Verifica se o elemento foi encontrado antes de prosseguir
             if (!canvas) return; 
@@ -2784,7 +2831,263 @@
         // --- FIM DA FUNÇÃO PARA ANIMAÇÃO CODE RAIN (MATRIX) ---
 
 
-        // --- INICIALIZAÇÃO DA APLICAÇÃO PRINCIPAL (Após Login) ---
+        // --- FUNÇÕES LLM GEMINI ---
+
+        // Configuração Gemini API
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const API_KEY = ""; // Será preenchida pelo Canvas
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+
+
+        /** Função utilitária para chamar a API Gemini */
+        async function callGeminiApi(systemPrompt, userQuery) {
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            let attempts = 0;
+            const maxRetries = 3;
+
+            while (attempts < maxRetries) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429) {
+                        // Too Many Requests - Implementa Backoff Exponencial
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou (429). Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!text) {
+                        console.error("Resposta Gemini vazia ou inesperada:", result);
+                        return "Erro: O LLM não retornou uma análise válida.";
+                    }
+
+                    return text;
+
+                } catch (error) {
+                    console.error("Erro na chamada da API Gemini:", error);
+                    // Tenta novamente apenas para erros de rede/timeout, não para erros 4xx/5xx diretos
+                    if (attempts < maxRetries - 1) {
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou. Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                    } else {
+                        return "Erro: Falha na comunicação com o LLM após o limite de retentativas.";
+                    }
+                }
+            }
+            return "Erro: Falha na comunicação com o LLM após o limite de retentativas.";
+        }
+
+        /** Gera Análise de Performance usando o LLM (ABA RESULTADOS - Diário) */
+        window.generatePerformanceAnalysis = async function() {
+            const today = document.getElementById('res_data').value;
+            const dailyResults = results.filter(r => r.data === today);
+
+            if (dailyResults.length === 0) {
+                return showMessage('Nenhum registro encontrado para hoje para gerar a análise.', 3000, true);
+            }
+            
+            // Agregação dos dados para o LLM
+            let summary = dailyResults.reduce((acc, r) => {
+                acc.gasto += r.investimento;
+                acc.vendas += r.vendas;
+                acc.conversoes += r.conversionCount || 0;
+                acc.impressoes += r.impressoes;
+                
+                // Adiciona observações e detalhes
+                const clientName = clients.find(c => c.id === r.clientId)?.nome || 'Desconhecido';
+                acc.detalhes.push({
+                    cliente: clientName,
+                    plataforma: r.plataforma,
+                    investimento: r.investimento,
+                    vendas: r.vendas,
+                    cpa: calculateCPA(r.investimento, r.conversionCount),
+                    roas: calculateROAS(r.investimento, r.vendas),
+                    conversoes: r.conversionCount,
+                    obs: r.observacoes
+                });
+                return acc;
+            }, { gasto: 0, vendas: 0, conversoes: 0, impressoes: 0, detalhes: [] });
+
+            const totalCPA = calculateCPA(summary.gasto, summary.conversoes);
+            const totalROAS = calculateROAS(summary.gasto, summary.vendas);
+
+            // Constrói o prompt
+            const systemPrompt = `Você é um Analista de Tráfego Sênior da Novan Agency. Sua tarefa é fornecer uma análise concisa, clara e orientada a ações sobre o desempenho das campanhas diárias. Seu público é o gerente da agência.
+            Formate a sua resposta em dois parágrafos:
+            1. Resumo da Performance: Foco nas métricas globais (GASTO, ROAS, CPA) e a tendência geral.
+            2. Ações Recomendadas: Foco nas próximas 2-3 ações mais importantes ou anomalias encontradas nos detalhes.
+            Não use formatação Markdown (como ** ou cabeçalhos).`;
+
+            const userQuery = `Analise a performance diária de hoje (${new Date().toLocaleDateString('pt-BR')}) baseada nos seguintes dados agregados:
+            - Gasto Total: ${formatCurrency(summary.gasto)}
+            - Faturamento/Vendas Total: ${formatCurrency(summary.vendas)}
+            - CPA Agregado: ${formatCurrency(totalCPA)}
+            - ROAS Agregado: ${formatNumber(totalROAS)}X
+            - Detalhes por Cliente (onde buscar anomalias): ${JSON.stringify(summary.detalhes.map(d => ({
+                cliente: d.cliente,
+                gasto: d.investimento,
+                roas: formatNumber(d.roas),
+                obs: d.obs.substring(0, 50)
+            })))}`;
+
+            // 1. Mostrar o modal de carregamento
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a gerar a análise...</p>`;
+            openSummaryModal('✨ Gerando Análise de Desempenho', loadingHtml);
+
+            // 2. Chamar a API
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            // 3. Formatar e exibir o resultado
+            // Usando white-space: pre-wrap para respeitar quebras de linha do LLM.
+            const finalHtml = `<div class="whitespace-pre-wrap text-base leading-relaxed">${analysisText}</div>`;
+            openSummaryModal('✨ Análise de Desempenho Diário', finalHtml);
+        }
+
+        /** Gera Análise Estratégica comparando 7D, 15D, 30D usando o LLM (ABA RESULTADOS - Estratégico) */
+        window.generateStrategicAnalysis = async function() {
+            const clientFilter = document.getElementById('results_filter_cliente').value;
+            
+            if (!clientFilter) {
+                return showMessage('Selecione um cliente no filtro para realizar a Análise Estratégica.', 5000, true);
+            }
+            
+            const clientName = clients.find(c => c.id === clientFilter)?.nome || 'Cliente Desconhecido';
+            
+            // Função auxiliar para calcular métricas agregadas por período
+            const aggregateMetrics = (days) => {
+                const today = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - (days - 1));
+                const startDateString = startDate.toISOString().split('T')[0];
+
+                const periodResults = results.filter(r => r.clientId === clientFilter && r.data >= startDateString && r.data <= today);
+                
+                let summary = periodResults.reduce((acc, r) => {
+                    acc.gasto += r.investimento;
+                    acc.vendas += r.vendas;
+                    acc.conversoes += r.conversionCount || 0;
+                    return acc;
+                }, { gasto: 0, vendas: 0, conversoes: 0 });
+
+                return {
+                    dias: days,
+                    gasto: summary.gasto,
+                    vendas: summary.vendas,
+                    conversoes: summary.conversoes,
+                    roas: calculateROAS(summary.gasto, summary.vendas),
+                    cpa: calculateCPA(summary.gasto, summary.conversoes)
+                };
+            };
+
+            const data7D = aggregateMetrics(7);
+            const data15D = aggregateMetrics(15);
+            const data30D = aggregateMetrics(30);
+
+            if (data30D.gasto === 0) {
+                 return showMessage('Não há dados suficientes dos últimos 30 dias para gerar uma análise estratégica.', 5000, true);
+            }
+
+            // Constrói o Prompt Estratégico
+            const systemPrompt = `Você é um Consultor Estratégico de Marketing, focado em tendências de longo prazo. Sua tarefa é analisar a evolução do desempenho de um cliente em janelas de 7, 15 e 30 dias e identificar OPORTUNIDADES E RISCOS.
+            Sua resposta deve ter 3 secções:
+            1. Tendências (Max. 3 linhas): Resuma a evolução de ROAS e Gasto (melhorou, piorou, estagnou).
+            2. Oportunidades (Max. 3 sugestões): Sugira caminhos estratégicos claros (ex: aumentar budget em 15D, testar novo público, focar em conversão mais barata).
+            3. Riscos (Max. 2 pontos): Aponte problemas de sustentabilidade (ex: CPA subindo em 30D).
+            Formate a resposta usando Markdown para clareza (títulos de secção e listas de pontos). NÃO use parênteses ou negrito.`;
+
+
+            const userQuery = `Analise a performance do cliente ${clientName} em diferentes janelas:
+
+            - Últimos 7 dias: Gasto ${formatCurrency(data7D.gasto)}, ROAS ${formatNumber(data7D.roas)}X, CPA ${formatCurrency(data7D.cpa)}.
+            - Últimos 15 dias: Gasto ${formatCurrency(data15D.gasto)}, ROAS ${formatNumber(data15D.roas)}X, CPA ${formatCurrency(data15D.cpa)}.
+            - Últimos 30 dias: Gasto ${formatCurrency(data30D.gasto)}, ROAS ${formatNumber(data30D.roas)}X, CPA ${formatCurrency(data30D.cpa)}.
+            
+            Compare as tendências de 7D vs 30D.`;
+
+
+            // 1. Mostrar o modal de carregamento
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a gerar a análise estratégica...</p>`;
+            openSummaryModal('✨ Gerando Análise Estratégica', loadingHtml);
+
+            // 2. Chamar a API
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            // 3. Formatar e exibir o resultado
+            // Permite que o LLM use Markdown para formatação de listas.
+            const finalHtml = `<div class="text-base leading-relaxed text-left">${analysisText}</div>`; 
+            openSummaryModal('✨ Análise Estratégica de Tendências', finalHtml);
+        }
+
+        /** Gera sugestões de Metas e Milestones para uma Tarefa (ABA CALENDÁRIO) */
+        window.generateTaskGoals = async function() {
+            const clientId = document.getElementById('task_cliente').value;
+            const taskType = document.getElementById('task_tipo').value;
+            const client = clients.find(c => c.id === clientId);
+
+            if (!clientId || !taskType) {
+                return showMessage('Selecione o Cliente e o Tipo de Tarefa primeiro.', 4000, true);
+            }
+
+            const clientInfo = client 
+                ? `Cliente: ${client.nome}. Nicho/Observações: ${client.observacoes}. Serviço: ${client.serviceType === 'traffic' ? 'Tráfego Pago' : 'Social Media'}`
+                : 'Cliente genérico.';
+
+            // Constrói o prompt
+            const systemPrompt = `Você é um Estrategista de Marketing Sênior e Growth. Sua tarefa é sugerir objetivos e metas detalhadas para uma nova tarefa.
+            A sua resposta deve ser uma lista concisa e formatada em Markdown, focada em 3 a 5 objetivos de alto nível (milestones) que o cliente deve alcançar.
+            A lista deve começar com '## Metas Sugeridas:' e cada meta deve começar com '- '. Não inclua nenhuma outra explicação antes ou depois da lista.`;
+
+            const userQuery = `Gere uma lista de metas (milestones) para o seguinte cenário, considerando o cliente:
+            - Tipo de Tarefa: ${taskType}
+            - Informações do Cliente: ${clientInfo}
+            - Contexto: A tarefa está a ser agendada.`;
+
+            // 1. Mostrar o spinner na textarea de observações
+            const obsEl = document.getElementById('task_observacoes');
+            const originalObs = obsEl.value;
+            obsEl.value = 'Gerando sugestões... Aguarde...';
+            
+            // 2. Chamar a API
+            const goalsText = await callGeminiApi(systemPrompt, userQuery);
+            
+            // 3. Formatar e exibir o resultado
+            
+            // Tenta remover o cabeçalho Markdown que pedimos ao LLM
+            let cleanedText = goalsText.replace(/## Metas Sugeridas:/i, '').trim();
+            // Substitui os pontos por traços para melhor visualização na textarea
+            cleanedText = cleanedText.replace(/\*/g, '-'); 
+            
+            // Preserva as observações originais se houver, adicionando as metas abaixo
+            if (originalObs && originalObs.trim() !== '') {
+                obsEl.value = originalObs + "\n\n--- Sugestões Gemini ---\n" + cleanedText;
+            } else {
+                obsEl.value = cleanedText;
+            }
+
+            showMessage('✨ Metas sugeridas adicionadas às observações!');
+        }
+
+
+        // --- INICIALIZAÇÃO DA APLicação PRINCIPAL (Após Login) ---
 
         function initAppContent() {
             loadData();
@@ -2793,7 +3096,7 @@
             // Define a data atual no campo de resultados
             document.getElementById('res_data').valueAsDate = new Date();
             // Inicia na primeira aba
-            switchTab('clientes'); // CORRIGIDO: Iniciar em 'clientes'
+            switchTab('clientes'); 
             
             // Garante que o cálculo CPA/ROAS/CPM esteja zerado na inicialização
             updateMetricsDisplay();
