@@ -316,7 +316,7 @@
             <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
 
             <!-- Tab 1: Resultados de Campanhas -->
-            <section id="resultados" class="tab-content">
+            <section id="resultados" class="tab-content active">
                 <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
                 
                 <!-- Formulário de Registro Diário -->
@@ -706,19 +706,19 @@
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
                         <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-2">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container lg:col-span-2">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
@@ -730,37 +730,6 @@
         </main>
     </div>
     <!-- Fim Dashboard Principal -->
-
-    <!-- Modal de Confirmação de Conclusão (NOVO) -->
-    <div id="completionConfirmModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
-            <h3 class="text-2xl font-bold mb-4 text-green-500">✅ Confirmar Conclusão</h3>
-            <p class="text-gray-300 mb-6">Tem certeza que deseja marcar esta tarefa como **Concluída**?</p>
-            
-            <div class="space-y-4">
-                <label class="flex items-center text-gray-300">
-                    <input type="checkbox" id="checkCompleted" required class="h-4 w-4 text-green-500 border-gray-600 rounded focus:ring-green-500 mr-2">
-                    A tarefa foi realmente concluída e revisada.
-                </label>
-                <label class="flex items-center text-gray-300">
-                    <input type="checkbox" id="checkDriveUpload" required class="h-4 w-4 text-green-500 border-gray-600 rounded focus:ring-green-500 mr-2">
-                    Os arquivos finais foram hospedados/anexados no Google Drive/Cloud.
-                </label>
-            </div>
-
-            <p id="completionWarning" class="text-xs text-red-400 mt-4 hidden">Por favor, marque as duas caixas de confirmação para concluir a tarefa.</p>
-
-            <div class="flex justify-between space-x-3 mt-6">
-                <button id="cancelCompletionBtn" onclick="closeCompletionModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold p-2 rounded-lg flex-1">
-                    Cancelar
-                </button>
-                <button id="confirmCompletionBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-lg flex-1">
-                    Concluir e Salvar
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- Fim Modal de Confirmação de Conclusão -->
 
     <script type="module">
         // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
@@ -2194,7 +2163,7 @@
                     const taskMonth = new Date(t.date).getMonth();
                     const monthMatch = taskMonth === month;
 
-                    // CORRIGIDO: O filtro agora só usa cliente e mês
+                    // CORRIGIDO: O filtro agora usa o cliente selecionado
                     return dateMatch && clientMatch && monthMatch;
                 });
                 
@@ -2303,100 +2272,11 @@
             });
         }
 
-        /** Gera Sugestões de Metas para Tarefa (GEMINI API) */
-        window.generateTaskGoals = async function() {
-            const clientId = document.getElementById('task_cliente').value;
-            const taskType = document.getElementById('task_tipo').value;
-
-            if (!clientId || !taskType) {
-                return showMessage('Selecione o Cliente e o Tipo de Tarefa antes de gerar metas.', true);
-            }
-
-            const client = clients.find(c => c.id === clientId);
-            const clientName = client?.nome || 'Cliente Desconhecido';
-            const clientObs = client?.observacoes || 'Nenhuma observação disponível.';
-
-            const systemPrompt = `Você é um Especialista em Marketing e Planejamento. Sua tarefa é sugerir de 3 a 5 objetivos de alto nível (milestones/metas) para uma nova tarefa. A saída deve ser uma lista concisa e numerada, focada em resultados. Use o caractere "\\n" para quebras de linha.
-            Foque em: O que deve ser alcançado? (Ex: Aumentar o ROAS para X, Reduzir o CPA em Y%).`;
-
-            const userQuery = `Gere uma lista numerada de 3 a 5 metas estratégicas e mensuráveis para a seguinte tarefa, considerando o cliente e seu nicho:
-            Cliente: ${clientName}
-            Tipo de Tarefa: ${taskType}
-            Observações/Nicho do Cliente: ${clientObs}`;
-
-            // Mostrar carregamento
-            const obsTextarea = document.getElementById('task_observacoes');
-            const originalObs = obsTextarea.value;
-            obsTextarea.value = "Gerando sugestões de metas... Aguarde...";
-            obsTextarea.disabled = true;
-
-            const analysisText = await callGeminiApi(systemPrompt, userQuery);
-
-            obsTextarea.disabled = false;
-
-            if (analysisText.startsWith("Erro:")) {
-                obsTextarea.value = originalObs;
-                return showMessage(analysisText, true);
-            }
-
-            const formattedText = analysisText.replace(/\\n/g, '\n').trim();
-            obsTextarea.value = formattedText;
-            showMessage('Sugestões de metas inseridas nas Observações!');
-        }
-
         // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
-        
-        /** Abre o Modal de Confirmação de Conclusão */
-        window.openCompletionModal = function(taskId) {
-            window.taskIdToConfirm = taskId;
-            
-            // Limpa o estado do modal
-            document.getElementById('checkCompleted').checked = false;
-            document.getElementById('checkDriveUpload').checked = false;
-            document.getElementById('completionWarning').classList.add('hidden');
-            
-            // Exibe o modal
-            document.getElementById('completionConfirmModal').classList.remove('hidden');
-            document.getElementById('completionConfirmModal').classList.add('flex');
-        }
-        
-        /** Fecha o Modal de Confirmação de Conclusão */
-        window.closeCompletionModal = function() {
-            window.taskIdToConfirm = null;
-            document.getElementById('completionConfirmModal').classList.remove('flex');
-            document.getElementById('completionConfirmModal').classList.add('hidden');
-            
-            // Re-renderiza o Kanban para garantir que o dropdown volte ao estado original
-            renderTaskManagement();
-        }
-        
-        /** Lida com o clique no botão "Concluir e Salvar" do modal */
-        document.getElementById('confirmCompletionBtn').addEventListener('click', () => {
-            const isCompleted = document.getElementById('checkCompleted').checked;
-            const isUploaded = document.getElementById('checkDriveUpload').checked;
-            
-            if (isCompleted && isUploaded) {
-                // Se ambas as caixas estiverem marcadas, atualiza o status
-                updateTaskStatus(window.taskIdToConfirm, 'Concluido', true); // O 'true' força a conclusão
-                closeCompletionModal();
-            } else {
-                // Caso contrário, mostra o aviso
-                document.getElementById('completionWarning').classList.remove('hidden');
-            }
-        });
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
-        window.updateTaskStatus = function(taskId, newStatus, bypassCheck = false) {
-            
-            // 1. Se o status for "Concluído" e não estivermos ignorando o check (bypass), ABRE O MODAL
-            if (newStatus === 'Concluido' && !bypassCheck) {
-                openCompletionModal(taskId);
-                return; // Impede a atualização direta
-            }
-            
-            // Se o status for "Concluído" E passarmos pelo bypass (ou for outro status)
+        window.updateTaskStatus = function(taskId, newStatus) {
             const taskIndex = tasks.findIndex(t => t.id === taskId);
-            
             if (taskIndex !== -1) {
                 
                 // LÓGICA DE REGISTRO DE DATA DE CONCLUSÃO
@@ -2414,7 +2294,6 @@
                 showMessage(`Status da tarefa atualizado para: ${newStatus}`);
             }
         }
-
 
         /** Renderiza o painel de gestão de tarefas (Kanban-like) */
         window.renderTaskManagement = function() {
@@ -2484,28 +2363,16 @@
                         completionInfo = `<p class="text-xs text-green-500 font-medium mt-1">Concluída em: ${completeDate}</p>`;
                     }
 
-                    // Se o novo valor for 'Concluído', ele aciona o modal. Caso contrário, atualiza diretamente.
-                    const onChangeHandler = `
-                        if (this.value === 'Concluido') {
-                            openCompletionModal('${task.id}');
-                            // O status do select deve ser resetado para o valor anterior, 
-                            // para que o modal possa confirmar a mudança.
-                            this.value = '${task.status}'; 
-                        } else {
-                            updateTaskStatus('${task.id}', this.value, true);
-                        }
-                    `;
-
 
                     return `
-                        <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300">
+                        <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300" title="Observações: ${task.observacoes.replace(/"/g, '')}">
                             <p class="font-semibold text-sm text-white">${clientName} - ${task.type}</p>
                             <p class="text-xs text-gray-400">Prazo: ${taskDateTime}</p>
                             <p class="text-xs italic text-gray-400">${task.observacoes.substring(0, 50)}...</p>
                             ${completionInfo}
                             <div class="flex items-center space-x-2 pt-2">
                                 <label class="text-xs font-medium text-gray-400">Mudar Status:</label>
-                                <select onchange="${onChangeHandler}" class="p-1 border text-xs rounded-lg bg-gray-600 text-white focus:ring-novan-primary">
+                                <select onchange="updateTaskStatus('${task.id}', this.value)" class="p-1 border text-xs rounded-lg bg-gray-600 text-white focus:ring-novan-primary">
                                     ${statusOptions}
                                 </select>
                                 <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-400 text-xs">Excluir</button>
@@ -2549,85 +2416,6 @@
             return new Chart(canvas, { type, data, options });
         }
 
-        /** Renderiza os KPI Cards do Relatório (Separado para reuso) */
-        function renderReportKpiCards(summary) {
-            // Reuso da função principal de KPI cards, mas usando o ID específico para os Relatórios
-            // Corrigido: Para garantir que reportData está presente na estrutura do summary
-            renderKpiCards(summary.reportData || [], summary, 'reportKpiCardsContainer');
-        }
-        
-        /** NOVO: Define o período do relatório por presets (Hoje, 7 dias, etc.) */
-        window.filterReportByPreset = function(preset) {
-            const today = new Date();
-            const endDateInput = document.getElementById('report_end_date');
-            const startDateInput = document.getElementById('report_start_date');
-            
-            // Helper para formatar a data como YYYY-MM-DD (usando o fuso local)
-            const formatDate = (date) => {
-                // Usa a correção de fuso horário local
-                const offset = date.getTimezoneOffset() * 60000;
-                const localDate = new Date(date.getTime() - offset);
-                return localDate.toISOString().split('T')[0];
-            };
-
-            const todayStr = formatDate(today);
-            endDateInput.value = todayStr;
-
-            let startDate = new Date(today);
-
-            if (preset === 'today') {
-                // Já está definido para hoje (startDate = today)
-            } else if (preset === '7days') {
-                startDate.setDate(today.getDate() - 6); // 6 dias atrás + hoje = 7 dias
-            } else if (preset === '15days') {
-                startDate.setDate(today.getDate() - 14);
-            } else if (preset === '30days') {
-                startDate.setDate(today.getDate() - 29);
-            }
-            
-            startDateInput.value = formatDate(startDate);
-
-            // Gera o relatório automaticamente
-            generateReport();
-            showMessage(`Filtro rápido de ${preset} aplicado.`, true);
-        }
-
-        // NOVO: Função para o filtro rápido da ABA RESULTADOS
-        window.filterResultsByPreset = function(preset) {
-            const today = new Date();
-            const endDateInput = document.getElementById('results_filter_end_date');
-            const startDateInput = document.getElementById('results_filter_start_date');
-            
-            // Helper para formatar a data como YYYY-MM-DD (usando o fuso local)
-            const formatDate = (date) => {
-                const offset = date.getTimezoneOffset() * 60000;
-                const localDate = new Date(date.getTime() - offset);
-                return localDate.toISOString().split('T')[0];
-            };
-
-            const todayStr = formatDate(today);
-            endDateInput.value = todayStr;
-
-            let startDate = new Date(today);
-
-            if (preset === 'today') {
-                // Já está definido para hoje (startDate = today)
-            } else if (preset === '7days') {
-                startDate.setDate(today.getDate() - 6); 
-            } else if (preset === '15days') {
-                startDate.setDate(today.getDate() - 14);
-            } else if (preset === '30days') {
-                startDate.setDate(today.getDate() - 29);
-            }
-            
-            startDateInput.value = formatDate(startDate);
-
-            // Gera a visualização de resultados automaticamente
-            renderResultsTable();
-            showMessage(`Filtro rápido de ${preset} aplicado ao histórico.`);
-        }
-
-
         /** Gera os dados e gráficos do relatório */
         window.generateReport = function() {
             const clientId = document.getElementById('report_cliente').value;
@@ -2651,8 +2439,6 @@
                 document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
                 reportSummaryMetrics = null; // Limpa o resumo
                 reportDetailedResults = []; // Limpa detalhes
-                // Limpa e zera os KPIs do Relatório
-                renderReportKpiCards({ reportData: [] }); 
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
 
@@ -2708,17 +2494,13 @@
                 avgROAS: avgROAS,
                 avgCPA: avgCPA,
                 avgCPM: avgCPM,
-                totalConversoes: totalConversoes, // Adicionado para PNG
-                clientName: clientNameForReport, 
+                clientName: clientNameForReport, // ADICIONADO: Nome do cliente para o cabeçalho PNG
+                // Garantindo que a string de período é baseada nos rótulos gerados
                 period: reportLabels.length > 0 ? `${reportLabels[0]} a ${reportLabels[reportLabels.length - 1]}` : 'N/A',
+                // Data de Geração - CORRIGIDO: Usando toLocaleString para incluir data e hora
                 generationDate: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
             };
-            
-            // Inclui os dados filtrados para a função renderReportKpiCards
-            const summaryWithData = { ...reportSummaryMetrics, reportData: filteredResults }; 
 
-            // RENDERIZA OS KPI CARDS DO RELATÓRIO
-            renderReportKpiCards(summaryWithData); 
 
             // Usando setTimeout para garantir que o navegador calculou o tamanho do canvas
             // antes de o Chart.js tentar desenhar.
@@ -2727,7 +2509,6 @@
                 // Opções para tornar as barras mais finas
                 const barChartOptions = {
                     responsive: true,
-                    maintainAspectRatio: false, // Permite que o contêiner de 300px controle a altura
                     scales: {
                         y: { 
                             beginAtZero: true,
@@ -2798,7 +2579,7 @@
                         }
                     ]
                 }, barChartOptions);
-                
+
                 showMessage('Relatório gerado com sucesso!');
                 
             }, 50); // Atraso de 50ms
