@@ -272,13 +272,13 @@
             <!-- Menu Items - NOVA ORDEM AQUI -->
             <nav>
                 <!-- 1. Cadastro de Clientes (Clientes) -->
-                <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2 active" data-tab="clientes">
+                <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="clientes">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
                     Cadastro de Clientes
                 </div>
                 
                 <!-- 2. Resultados de Campanhas (Resultados) -->
-                <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2" data-tab="resultados">
+                <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2 active" data-tab="resultados">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                     Resultados de Campanhas
                 </div>
@@ -326,7 +326,7 @@
                         <!-- NOVO: ID oculto para edição -->
                         <input type="hidden" id="res_id_edit" value=""> 
 
-                        <!-- LINHA 1 -->
+                        <!-- LINHA 1 (Data, Cliente, Plataforma, Gasto) -->
                         <input type="date" id="res_data" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" value="" />
                         <select id="res_cliente" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                             <option value="">Selecione o Cliente</option>
@@ -342,11 +342,11 @@
                         <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         <input type="number" id="res_alcance" placeholder="Alcance" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         <input type="number" id="res_cliques" placeholder="Cliques no Site" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
-                        <!-- Vendas / Faturamento movido para a 4ª coluna da Linha 2 -->
+                        <!-- Vendas / Faturamento -->
                         <input type="number" step="0.01" id="res_vendas" placeholder="Vendas (incl. Compras) / Faturamento (R$)" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white" />
                         
                         <!-- LINHA 3 (Conversão e Métricas Calculadas) -->
-                        <!-- BLOCO DE CONVERSÃO - Agora ocupa 2 colunas para mais visibilidade -->
+                        <!-- BLOCO DE CONVERSÃO -->
                         <div class="col-span-1 md:col-span-2 flex items-center space-x-2">
                             <select id="res_conversion_type" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2 bg-gray-700 text-white">
                                 <option value="">Tipo Conversão</option>
@@ -359,14 +359,18 @@
                             </select>
                             <input type="number" id="res_conversion_count" placeholder="Total de Conversões" required class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary w-1/2 bg-gray-700 text-white" />
                         </div>
-                        <!-- Métricas Calculadas (CPA, ROAS, CPM) - Ocupa as 2 colunas restantes -->
+                        <!-- Métricas Calculadas (CPA, ROAS, CPM) -->
                         <div class="col-span-1 md:col-span-2 flex items-center space-x-4">
                             <div class="text-sm font-medium text-gray-300">CPA: R$ <span id="cpa_calc" class="font-bold text-red-500">0.00</span></div>
                             <div class="text-sm font-medium text-gray-300">ROAS: <span id="roas_calc" class="font-bold text-green-500">0.00</span></div>
                             <div class="text-sm font-medium text-gray-300">CPM: R$ <span id="cpm_calc" class="font-bold text-blue-500">0.00</span></div>
                         </div>
                         
-                        <!-- LINHA 4 (Observações e Botões) -->
+                        <!-- LINHA 4 (Observações, Parsing e Botões) -->
+                        <textarea id="rawMetricsInput" placeholder="Cole a mensagem pronta aqui (opcional)" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-4 bg-gray-700 text-white h-16"></textarea>
+                        <button type="button" onclick="parseAndFillMetrics()" class="col-span-1 md:col-span-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            🤖 Preencher com Mensagem Pronta
+                        </button>
                         <textarea id="res_observacoes" placeholder="Observações do dia" class="p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary col-span-1 md:col-span-4 bg-gray-700 text-white"></textarea>
 
                         <button type="submit" id="resultsSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
@@ -378,6 +382,13 @@
                         <button type="button" id="btnResumoQuinzenal" class="col-span-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
                             Gerar Resumo Quinzenal
                         </button>
+                        
+                        <!-- NOVO: BOTÃO GEMINI API -->
+                        <button type="button" onclick="generatePerformanceAnalysis()" 
+                                class="col-span-1 md:col-span-4 bg-pink-600 hover:bg-pink-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
+                            ✨ Gerar Análise de Desempenho Diário
+                        </button>
+                        <!-- FIM NOVO BOTÃO -->
                     </form>
                 </div>
 
@@ -410,6 +421,10 @@
                         <button onclick="filterResultsByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 7 dias</button>
                         <button onclick="filterResultsByPreset('15days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 15 dias</button>
                         <button onclick="filterResultsByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
+                        <button onclick="generateStrategicAnalysis()" 
+                                class="text-xs bg-pink-600 hover:bg-pink-700 text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">
+                                ✨ Análise Gemini Estratégica
+                        </button>
                     </div>
                     <!-- FIM NOVO: Botões de Filtro Rápido -->
                 </div>
@@ -440,7 +455,7 @@
                         <p class="text-2xl font-bold text-blue-500 mt-1">R$ 0,00</p>
                     </div>
                 </div>
-                <!-- FIM NOVO BLOCO: KPI Cards de Resumo -->
+                <!-- FIM NOVO BLOCO DE FILTROS -->
 
                 <!-- Histórico de Resultados (Nova Visualização em Cartões) -->
                 <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
@@ -496,19 +511,10 @@
                                 <button id="nextMonth" class="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-lg font-bold transition-transform transform hover:scale-[1.05]">&gt;</button>
                             </div>
                             <div class="flex space-x-2">
-                                <select id="filterClient" class="p-2 border border-gray-600 rounded-lg text-sm bg-gray-700 text-white">
-                                    <option value="">Filtrar por Cliente</option>
+                                <select id="filterClient" class="p-2 border border-gray-600 rounded-lg text-sm bg-gray-700 text-white" onchange="renderCalendar()">
+                                    <option value="">Todos os Clientes</option>
                                 </select>
-                                <select id="filterType" class="p-2 border border-gray-600 rounded-lg text-sm bg-gray-700 text-white">
-                                    <option value="">Filtrar por Tipo</option>
-                                    <option value="Campanha">Campanha Ads</option>
-                                    <option value="Post">Post/Conteúdo</option>
-                                    <option value="Reuniao">Reunião</option>
-                                    <option value="Video">Entrega de Vídeo</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                                <button class="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg text-sm">Ver Mês</button>
-                                <!-- Adicionar 'Ver Semana' se houver tempo, por enquanto 'Ver Mês' -->
+                                <button onclick="renderCalendar()" class="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg text-sm">Ver Mês</button>
                             </div>
                         </div>
 
@@ -696,67 +702,29 @@
                         </button>
                         <!-- FIM BOTÕES DE EXPORTAÇÃO SEPARADOS -->
                     </div>
-                    
-                    <!-- NOVO: Botões de Filtro Rápido -->
-                    <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-700">
-                        <span class="text-sm font-medium text-gray-300 self-center mr-2">Filtros Rápidos:</span>
-                        <button onclick="filterReportByPreset('today')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Hoje (1 dia)</button>
-                        <button onclick="filterReportByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 7 dias</button>
-                        <button onclick="filterReportByPreset('15days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 15 dias</button>
-                        <button onclick="filterReportByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
-                    </div>
-                    <!-- FIM: Botões de Filtro Rápido -->
-
                 </div>
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-2">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
                     
                     <p id="noReportData" class="text-center text-gray-400 col-span-full hidden">Selecione filtros e gere o relatório para visualizar os gráficos.</p>
                 </div>
-
-                <!-- NOVO BLOCO: KPI Cards de Resumo Agregado (Abaixo dos Gráficos) -->
-                <h2 class="text-xl font-semibold mb-4 text-white mt-8">Resumo Agregado (KPIs do Período)</h2>
-                <div id="reportKpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                    <!-- Cards KPI serão injetados aqui -->
-                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-red-500">
-                        <p class="text-sm font-medium text-gray-400">Gasto Total</p>
-                        <p class="text-2xl font-bold text-red-500 mt-1">R$ 0,00</p>
-                    </div>
-                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-green-500">
-                        <p class="text-sm font-medium text-gray-400">Faturamento</p>
-                        <p class="text-2xl font-bold text-green-500 mt-1">R$ 0,00</p>
-                    </div>
-                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-yellow-500">
-                        <p class="text-sm font-medium text-gray-400">ROAS Médio (X)</p>
-                        <p class="text-2xl font-bold text-yellow-500 mt-1">0.00X</p>
-                    </div>
-                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-indigo-500">
-                        <p class="text-sm font-medium text-gray-400">CPA Médio (R$)</p>
-                        <p class="text-2xl font-bold text-indigo-500 mt-1">R$ 0,00</p>
-                    </div>
-                    <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-blue-500">
-                        <p class="text-sm font-medium text-gray-400">CPM Médio (R$)</p>
-                        <p class="text-2xl font-bold text-blue-500 mt-1">R$ 0,00</p>
-                    </div>
-                </div>
-                <!-- FIM NOVO BLOCO: KPI Cards de Resumo Agregado -->
 
             </section>
         </main>
@@ -808,6 +776,12 @@
         // Cores do Relatório PNG
         const NAVY_BLUE = '#0E1B31'; 
         const LIGHT_TEXT = '#E2E8F0'; // light gray/off-white
+
+        // --- CONFIGURAÇÃO GEMINI API ---
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const API_KEY = ""; // Será preenchida pelo Canvas
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+
 
         // --- FUNÇÕES DE AUTENTICAÇÃO ---
         
@@ -867,10 +841,10 @@
         window.handleLogout = function() {
             signOut(auth).then(() => {
                 // O onAuthStateChanged lidará com a transição para a tela de login
-                showMessage("Sessão encerrada com sucesso.", true);
+                showMessage("Sessão encerrada com sucesso.", 3000, true);
             }).catch((error) => {
                 console.error("Erro ao fazer logout:", error);
-                showMessage("Erro ao sair. Verifique sua conexão.", true);
+                showMessage("Erro ao sair. Verifique sua conexão.", 3000, true);
             });
         }
 
@@ -898,7 +872,6 @@
                 // Mudar para texto (Olho aberto)
                 passwordInput.type = 'text';
                 // Ícone de Olho Aberto (Ajustar paths se necessário)
-                // Os paths já são do olho aberto, mas se fosse mudar para olho slash
                 path1.setAttribute('d', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z');
                 path2.setAttribute('d', 'M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z');
                 toggleIcon.setAttribute('title', 'Ocultar Senha');
@@ -1384,6 +1357,223 @@
 
         // --- ABA 1: RESULTADOS DE CAMPANHAS ---
 
+        /** Função utilitária para chamar a API Gemini */
+        async function callGeminiApi(systemPrompt, userQuery) {
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            let attempts = 0;
+            const maxRetries = 3;
+
+            while (attempts < maxRetries) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429) {
+                        // Too Many Requests - Implementa Backoff Exponencial
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou (429). Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!text) {
+                        console.error("Resposta Gemini vazia ou inesperada:", result);
+                        return "Erro: O LLM não retornou uma análise válida.";
+                    }
+
+                    return text;
+
+                } catch (error) {
+                    console.error("Erro na chamada da API Gemini:", error);
+                    // Tenta novamente apenas para erros de rede/timeout, não para erros 4xx/5xx diretos
+                    if (attempts < maxRetries - 1) {
+                        const delay = Math.pow(2, attempts) * 1000;
+                        console.warn(`Tentativa ${attempts + 1} falhou. Retentando em ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        attempts++;
+                    } else {
+                        return "Erro: Falha na comunicação com o LLM após várias tentativas.";
+                    }
+                }
+            }
+            return "Erro: Falha na comunicação com o LLM após o limite de retentativas.";
+        }
+
+        /** Gera Análise de Performance Diária usando o LLM (Botão Principal) */
+        window.generatePerformanceAnalysis = async function() {
+            const today = document.getElementById('res_data').value;
+            const dailyResults = results.filter(r => r.data === today);
+
+            if (dailyResults.length === 0) {
+                return showMessage('Nenhum registro encontrado para hoje para gerar a análise.', true);
+            }
+            
+            // Agregação dos dados para o LLM
+            let summary = dailyResults.reduce((acc, r) => {
+                acc.gasto += r.investimento;
+                acc.vendas += r.vendas;
+                acc.conversoes += r.conversionCount || 0;
+                acc.impressoes += r.impressoes;
+                
+                // Adiciona observações e detalhes
+                const clientName = clients.find(c => c.id === r.clientId)?.nome || 'Desconhecido';
+                acc.detalhes.push({
+                    cliente: clientName,
+                    plataforma: r.plataforma,
+                    investimento: r.investimento,
+                    vendas: r.vendas,
+                    cpa: calculateCPA(r.investimento, r.conversionCount),
+                    roas: calculateROAS(r.investimento, r.vendas),
+                    conversoes: r.conversionCount,
+                    obs: r.observacoes
+                });
+                return acc;
+            }, { gasto: 0, vendas: 0, conversoes: 0, impressoes: 0, detalhes: [] });
+
+            const totalCPA = calculateCPA(summary.gasto, summary.conversoes);
+            const totalROAS = calculateROAS(summary.gasto, summary.vendas);
+
+            // Constrói o prompt
+            const systemPrompt = `Você é um Analista de Tráfego Sênior da Novan Agency. Sua tarefa é fornecer uma análise concisa, clara e orientada a ações sobre o desempenho das campanhas diárias. Seu público é o gerente da agência.
+            Formate a sua resposta em dois parágrafos:
+            1. Resumo da Performance: Foco nas métricas globais (GASTO, ROAS, CPA) e a tendência geral.
+            2. Ações Recomendadas: Foco nas próximas 2-3 ações mais importantes ou anomalias encontradas nos detalhes.
+            Não use formatação Markdown (como ** ou cabeçalhos).`;
+
+            const userQuery = `Analise a performance diária de hoje (${new Date().toLocaleDateString('pt-BR')}) baseada nos seguintes dados agregados:
+            - Gasto Total: ${formatCurrency(summary.gasto)}
+            - Faturamento/Vendas Total: ${formatCurrency(summary.vendas)}
+            - CPA Agregado: ${formatCurrency(totalCPA)}
+            - ROAS Agregado: ${formatNumber(totalROAS)}X
+            - Detalhes por Cliente (onde buscar anomalias): ${JSON.stringify(summary.detalhes.map(d => ({
+                cliente: d.cliente,
+                gasto: d.investimento,
+                roas: formatNumber(d.roas),
+                obs: d.obs.substring(0, 50)
+            })))}`;
+
+            // 1. Mostrar o modal de carregamento
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a gerar a análise...</p>`;
+            openSummaryModal('✨ Gerando Análise de Desempenho', loadingHtml);
+
+            // 2. Chamar a API
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            // 3. Formatar e exibir o resultado
+            // Usando white-space: pre-wrap para respeitar quebras de linha do LLM.
+            const finalHtml = `<div class="whitespace-pre-wrap text-base leading-relaxed">${analysisText}</div>`;
+            openSummaryModal('✨ Análise de Desempenho Diário', finalHtml);
+        }
+        
+        /** Gera Análise Estratégica nos últimos 7/15/30 dias (GEMINI API) */
+        window.generateStrategicAnalysis = async function() {
+            // A análise estratégica deve basear-se nos filtros de data e cliente definidos.
+            const filterClient = document.getElementById('results_filter_cliente').value;
+
+            if (results.length === 0) {
+                return showMessage('Nenhum dado registrado para análise.', true);
+            }
+            if (!filterClient) {
+                return showMessage('Selecione um cliente no filtro para análise estratégica.', true);
+            }
+            
+            // Helpers para calcular datas
+            const getDaysAgo = (days) => {
+                const d = new Date();
+                d.setDate(d.getDate() - days + 1);
+                const offset = d.getTimezoneOffset() * 60000;
+                return new Date(d.getTime() - offset).toISOString().split('T')[0];
+            };
+
+            const periods = {
+                '7 dias': getDaysAgo(7),
+                '15 dias': getDaysAgo(15),
+                '30 dias': getDaysAgo(30)
+            };
+
+            const clientName = clients.find(c => c.id === filterClient)?.nome || 'Cliente Desconhecido';
+
+            let comparisonData = [];
+
+            for (const [label, startDate] of Object.entries(periods)) {
+                const currentData = results.filter(r => r.clientId === filterClient && r.data >= startDate);
+                
+                if (currentData.length > 0) {
+                    const summary = currentData.reduce((acc, r) => {
+                        acc.gasto += r.investimento;
+                        acc.faturamento += r.vendas;
+                        acc.conversoes += r.conversionCount || 0;
+                        return acc;
+                    }, { gasto: 0, faturamento: 0, conversoes: 0 });
+
+                    const roas = calculateROAS(summary.gasto, summary.faturamento);
+                    const cpa = calculateCPA(summary.gasto, summary.conversoes);
+
+                    comparisonData.push({
+                        periodo: label,
+                        gasto: summary.gasto,
+                        faturamento: summary.faturamento,
+                        roas: roas,
+                        cpa: cpa
+                    });
+                }
+            }
+
+            if (comparisonData.length === 0) {
+                return showMessage(`Nenhum dado encontrado para ${clientName} nos últimos 30 dias.`, true);
+            }
+
+            // Constrói o Prompt Estratégico
+            const systemPrompt = `Você é um Estrategista de Marketing Digital de alto nível na Novan Agency. Sua função é analisar as tendências de performance do cliente em diferentes janelas de tempo (7, 15, 30 dias).
+            Sua resposta deve ser estruturada em 3 seções, usando o caractere "\\n" para quebras de linha:
+            1. Análise de Tendência (1 parágrafo, focado em ROAS e Gasto).
+            2. Pontos Fortes e Fracos (Bullet Points de 3-4 pontos).
+            3. Sugestões Estratégicas (3 Sugestões acionáveis: Ex: Testar nova audiência X, Otimizar para CPA abaixo de R$ Y, Aumentar budget em 15%).
+            Não use formatação Markdown (como ** ou cabeçalhos).`;
+
+            const userQuery = `Gere uma análise estratégica para o cliente "${clientName}" com base na seguinte comparação de performance (Gasto, Faturamento, ROAS, CPA) entre os últimos 7, 15 e 30 dias.
+
+            Dados de Performance:
+            ${JSON.stringify(comparisonData.map(d => ({
+                periodo: d.periodo,
+                gasto: formatCurrency(d.gasto),
+                faturamento: formatCurrency(d.faturamento),
+                roas: formatNumber(d.roas),
+                cpa: formatCurrency(d.cpa)
+            })))}
+            
+            Foque a análise nas tendências de ROAS e CPA ao longo do tempo.`;
+
+            const loadingHtml = `<div class="spinner"></div><p class="text-gray-400 mt-4">A Gemini está a analisar as tendências estratégicas...</p>`;
+            openSummaryModal('✨ Análise Gemini Estratégica', loadingHtml);
+
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            if (analysisText.startsWith("Erro:")) {
+                return openSummaryModal('Erro na Análise', analysisText);
+            }
+
+            // Formatar e exibir o resultado
+            const formattedHtml = analysisText.replace(/\\n/g, '<br>').trim();
+            openSummaryModal('✨ Análise Gemini Estratégica', `<div class="text-base leading-relaxed">${formattedHtml}</div>`);
+        }
+
+
         /** Renderiza os KPI Cards (Agregados) */
         function renderKpiCards(data, summary, containerId = 'kpiCardsContainer') {
             const container = document.getElementById(containerId);
@@ -1459,15 +1649,15 @@
             // 5. Scrolla para o topo para garantir visibilidade do formulário
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            showMessage(`Modo de Edição ativado para o registro de ${getLocalDayDate(result.data).toLocaleDateString('pt-BR')}.`, 5000);
+            showMessage(`Modo de Edição ativado para o registro de ${new Date(result.data).toLocaleDateString('pt-BR')}.`, false, true);
         }
 
         /** Renderiza o histórico de resultados em formato de Cartões/Lista */
         window.renderResultsTable = function() {
             const listContainer = document.getElementById('resultsListContainer');
-            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value;
-            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value;
-            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value;
+            const resultsFilterClient = document.getElementById('results_filter_cliente')?.value; // NOVO: Filtro de Cliente
+            const resultsFilterStartDate = document.getElementById('results_filter_start_date')?.value; // NOVO: Filtro de Data Inicial
+            const resultsFilterEndDate = document.getElementById('results_filter_end_date')?.value; // NOVO: Filtro de Data Final
             
             if (!listContainer) return; // Garante que o container existe
 
@@ -1527,7 +1717,7 @@
                 const client = clients.find(c => c.id === res.clientId);
                 const clientName = client?.nome || 'Cliente Desconhecido';
                 const clientColor = client?.color || COLORS.primary;
-                const displayDate = getLocalDayDate(res.data).toLocaleDateString('pt-BR');
+                const displayDate = new Date(res.data).toLocaleDateString('pt-BR');
                 
                 const cpa = calculateCPA(res.investimento, res.conversionCount);
                 const roas = calculateROAS(res.investimento, res.vendas);
@@ -1595,7 +1785,7 @@
             results = results.filter(r => r.id !== resultId);
             saveData();
             renderResultsTable();
-            showMessage('Registro excluído.', 3000, true);
+            showMessage('Registro excluído.', true);
         }
 
         /** Calcula o Custo por Aquisição (CPA) */
@@ -1615,6 +1805,63 @@
         function calculateCPM(investimento, impressoes) {
             if (impressoes === 0 || investimento === 0) return 0;
             return (investimento / impressoes) * 1000;
+        }
+
+        /** Lógica de Parsing do texto (Mensagem Pronta) */
+        window.parseAndFillMetrics = function() {
+            const rawText = document.getElementById('rawMetricsInput').value;
+            if (!rawText) return showMessage('Cole o texto da mensagem pronta no campo acima.', true);
+
+            const numericValue = (text, key) => {
+                // Regex para encontrar o valor após a chave, suportando R$ e separadores BRL.
+                const regex = new RegExp(`${key}.*?:\\s*R?\\$?\\s*([\\d\\.\\,]+)`, 'i');
+                const match = text.match(regex);
+                if (match && match[1]) {
+                    // Remove pontos de milhar, substitui vírgula por ponto para float
+                    return parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+                }
+                return null;
+            };
+
+            const integerValue = (text, key) => {
+                // Regex para encontrar o valor inteiro (sem decimais)
+                const regex = new RegExp(`${key}.*?:\\s*([\\d\\.\\,]+)`, 'i');
+                const match = text.match(regex);
+                if (match && match[1]) {
+                    // Remove pontos/vírgulas de milhar/decimal e converte para inteiro
+                    return parseInt(match[1].replace(/[\.,]/g, ''));
+                }
+                return null;
+            }
+
+
+            const investimento = numericValue(rawText, 'Investimento Total');
+            const impressoes = integerValue(rawText, 'Impressões');
+            const alcance = integerValue(rawText, 'Alcance');
+            const cliques = integerValue(rawText, 'Cliques');
+            const vendas = numericValue(rawText, 'Faturamento Total');
+            const conversoes = integerValue(rawText, 'Pedidos');
+
+            let filledCount = 0;
+
+            if (investimento !== null) { document.getElementById('res_investimento').value = investimento.toFixed(2); filledCount++; }
+            if (vendas !== null) { document.getElementById('res_vendas').value = vendas.toFixed(2); filledCount++; }
+            if (impressoes !== null) { document.getElementById('res_impressoes').value = impressoes; filledCount++; }
+            if (alcance !== null) { document.getElementById('res_alcance').value = alcance; filledCount++; }
+            if (cliques !== null) { document.getElementById('res_cliques').value = cliques; filledCount++; }
+            if (conversoes !== null) { 
+                document.getElementById('res_conversion_count').value = conversoes;
+                document.getElementById('res_conversion_type').value = 'Compras'; // Assumindo Pedidos = Compras
+                filledCount++; 
+            }
+
+            if (filledCount > 0) {
+                updateMetricsDisplay();
+                document.getElementById('rawMetricsInput').value = ''; // Limpa o campo de entrada
+                showMessage(`✅ ${filledCount} métricas preenchidas automaticamente!`);
+            } else {
+                showMessage('❌ Nenhuma métrica reconhecida. Verifique se o formato está correto.', true);
+            }
         }
 
 
@@ -1674,7 +1921,7 @@
                 observacoes: document.getElementById('res_observacoes').value,
             };
 
-            const displayDate = getLocalDayDate(newResult.data).toLocaleDateString('pt-BR');
+            const displayDate = new Date(newResult.data).toLocaleDateString('pt-BR');
 
 
             // Lógica de Atualização/Criação
@@ -1686,7 +1933,7 @@
                 } else {
                     // Não deveria acontecer, mas se o ID de edição for inválido, salva como novo.
                     results.push(newResult);
-                    showMessage(`Registro inválido encontrado, salvo como novo resultado.`, 5000, true);
+                    showMessage(`Registro inválido encontrado, salvo como novo resultado.`, true);
                 }
                 
                 // Reseta o modo de edição
@@ -1744,32 +1991,21 @@
             });
             html += '</ul>';
 
-            // CORRIGIDO: Usando getLocalDayDate para garantir que o título está correto
-            const todayDateString = getLocalDayDate(today).toLocaleDateString('pt-BR');
-            openSummaryModal('Resumo Diário - ' + todayDateString, html);
+            openSummaryModal('Resumo Diário - ' + new Date().toLocaleDateString('pt-BR'), html);
         });
 
         /** Gera resumo quinzenal */
         document.getElementById('btnResumoQuinzenal').addEventListener('click', () => {
             const today = new Date();
-            const todayString = today.toISOString().split('T')[0];
-            
-            // Calculando 15 dias atrás
             const date15DaysAgo = new Date(today);
-            date15DaysAgo.setDate(today.getDate() - 15); // Define 15 dias antes
-            const date15DaysAgoString = date15DaysAgo.toISOString().split('T')[0];
+            date15DaysAgo.setDate(today.getDate() - 15);
 
-            // Calculando 30 dias atrás
+            const thisPeriod = results.filter(r => new Date(r.data) >= date15DaysAgo && new Date(r.data) <= today);
+            
+            // Período anterior (16 a 30 dias atrás)
             const date30DaysAgo = new Date(today);
-            date30DaysAgo.setDate(today.getDate() - 30); // Define 30 dias antes
-            const date30DaysAgoString = date30DaysAgo.toISOString().split('T')[0];
-
-            // Este Período (Últimos 15 dias, incluindo hoje) - Comparação de string YYYY-MM-DD
-            const thisPeriod = results.filter(r => r.data >= date15DaysAgoString && r.data <= todayString);
-            
-            // Período Anterior (16 a 30 dias atrás)
-            const lastPeriod = results.filter(r => r.data >= date30DaysAgoString && r.data < date15DaysAgoString);
-            
+            date30DaysAgo.setDate(today.getDate() - 30);
+            const lastPeriod = results.filter(r => new Date(r.data) >= date30DaysAgo && new Date(r.data) < date15DaysAgo);
 
             const summarize = (data) => {
                 return data.reduce((acc, r) => {
@@ -1779,12 +2015,12 @@
                     }
                     acc[clientId].investimento += r.investimento;
                     acc[clientId].vendas += r.vendas;
-                    acc[clientId].totalConversions += r.conversionCount || 0; 
-                    acc[clientId].impressoes += r.impressoes; 
+                    acc[clientId].totalConversions += r.conversionCount || 0; // totalConversions is available
+                    acc[clientId].impressoes += r.impressoes; // Adicionado Impressões
                     acc[clientId].roasSum += r.roas;
                     acc[clientId].roasCount += r.roas > 0 ? 1 : 0;
-                    acc[clientId].cpmSum += r.cpm; 
-                    acc[clientId].cpmCount += r.cpm > 0 ? 1 : 0; 
+                    acc[clientId].cpmSum += r.cpm; // Adicionado CPM
+                    acc[clientId].cpmCount += r.cpm > 0 ? 1 : 0; // Adicionado contagem CPM
                     acc[clientId].count += 1;
                     return acc;
                 }, {});
@@ -1806,8 +2042,8 @@
                     const roasThis = sThis.roasCount > 0 ? sThis.roasSum / sThis.roasCount : 0;
                     const roasLast = sLast.roasCount > 0 ? sLast.roasSum / sLast.roasCount : 0;
                     
-                    const cpmAvgThis = sThis.cpmCount > 0 ? sThis.cpmSum / sThis.cpmCount : 0; 
-                    const cpmAvgLast = sLast.cpmCount > 0 ? sLast.cpmSum / sLast.cpmCount : 0; 
+                    const cpmAvgThis = sThis.cpmCount > 0 ? sThis.cpmSum / sThis.cpmCount : 0; // NOVO CPM Médio
+                    const cpmAvgLast = sLast.cpmCount > 0 ? sLast.cpmSum / sLast.cpmCount : 0; // NOVO CPM Médio Anterior
                     
                     const percentChange = (current, previous) => previous === 0 ? (current > 0 ? '+∞' : '0%') : ((current - previous) / previous * 100).toFixed(1) + '%';
                     
@@ -1856,7 +2092,7 @@
         
         /** Exibe um resumo de todas as tarefas para um dia específico ao clicar no dia do calendário. */
         window.showDaySummary = function(dateString) {
-            const dateObj = getLocalDayDate(dateString); // Usando a nova função para evitar erros de timezone
+            const dateObj = new Date(dateString); // Usando a nova função para evitar erros de timezone
             
             const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
 
@@ -1890,8 +2126,13 @@
         }
 
         /** Renderiza o calendário (Mês Atual) */
-        function renderCalendar() {
+        window.renderCalendar = function() {
             const grid = document.getElementById('calendarGrid');
+            const filterClientId = document.getElementById('filterClient').value; // Novo: Lendo o filtro de Cliente
+
+            // Removido filtroType pois o usuário solicitou apenas filtro por cliente
+            // const filterType = document.getElementById('filterType').value; 
+
             grid.innerHTML = '';
             
             document.getElementById('currentMonthYear').textContent = currentMonth.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' });
@@ -1915,12 +2156,24 @@
                 const dateString = date.toISOString().split('T')[0];
                 const isToday = date.toDateString() === today.toDateString();
                 
-                const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
+                // 1. FILTRAGEM PRÉVIA DAS TAREFAS
+                const dayTasks = tasks.filter(t => {
+                    const dateMatch = t.date.startsWith(dateString);
+                    const clientMatch = !filterClientId || t.clientId === filterClientId;
+                    // const typeMatch = !filterType || t.type === filterType; // Removido filtro de tipo
+
+                    // O mês do calendário deve bater com o mês da tarefa
+                    const taskMonth = new Date(t.date).getMonth();
+                    const monthMatch = taskMonth === month;
+
+                    // CORRIGIDO: O filtro agora só usa cliente e mês
+                    return dateMatch && clientMatch && monthMatch;
+                });
                 
                 let tasksHtml = '';
                 dayTasks.forEach(task => {
                     const client = clients.find(c => c.id === task.clientId);
-                    const clientColor = client?.color || '#334155'; // Cor padrão
+                    const clientColor = client?.color || COLORS.primary; // Cor padrão
                     const clientName = client?.nome.substring(0, 10) || 'N/D';
                     
                     // Corrigido: Usando a classe de status para o background
@@ -1937,8 +2190,8 @@
                     const taskTitle = `CLIENTE: ${clientName}\nDATA/HORA: ${taskDateTime}\nTIPO: ${task.type}\nSTATUS: ${task.status}\nOBS: ${task.observacoes || 'N/A'}`;
 
                     tasksHtml += `
-                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusClass} border-l-4" 
-                             style="border-left-color: ${client.color || COLORS.primary};"
+                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusClass}" 
+                             style="border-left-color: ${clientColor};"
                              title="${taskTitle}">
                             ${clientName} - ${task.type.substring(0, 5)}
                         </div>
@@ -2022,60 +2275,48 @@
             });
         }
 
+        /** Gera Sugestões de Metas para Tarefa (GEMINI API) */
+        window.generateTaskGoals = async function() {
+            const clientId = document.getElementById('task_cliente').value;
+            const taskType = document.getElementById('task_tipo').value;
+
+            if (!clientId || !taskType) {
+                return showMessage('Selecione o Cliente e o Tipo de Tarefa antes de gerar metas.', true);
+            }
+
+            const client = clients.find(c => c.id === clientId);
+            const clientName = client?.nome || 'Cliente Desconhecido';
+            const clientObs = client?.observacoes || 'Nenhuma observação disponível.';
+
+            const systemPrompt = `Você é um Especialista em Marketing e Planejamento. Sua tarefa é sugerir de 3 a 5 objetivos de alto nível (milestones/metas) para uma nova tarefa. A saída deve ser uma lista concisa e numerada, focada em resultados. Use o caractere "\\n" para quebras de linha.
+            Foque em: O que deve ser alcançado? (Ex: Aumentar o ROAS para X, Reduzir o CPA em Y%).`;
+
+            const userQuery = `Gere uma lista numerada de 3 a 5 metas estratégicas e mensuráveis para a seguinte tarefa, considerando o cliente e seu nicho:
+            Cliente: ${clientName}
+            Tipo de Tarefa: ${taskType}
+            Observações/Nicho do Cliente: ${clientObs}`;
+
+            // Mostrar carregamento
+            const obsTextarea = document.getElementById('task_observacoes');
+            const originalObs = obsTextarea.value;
+            obsTextarea.value = "Gerando sugestões de metas... Aguarde...";
+            obsTextarea.disabled = true;
+
+            const analysisText = await callGeminiApi(systemPrompt, userQuery);
+
+            obsTextarea.disabled = false;
+
+            if (analysisText.startsWith("Erro:")) {
+                obsTextarea.value = originalObs;
+                return showMessage(analysisText, true);
+            }
+
+            const formattedText = analysisText.replace(/\\n/g, '\n').trim();
+            obsTextarea.value = formattedText;
+            showMessage('Sugestões de metas inseridas nas Observações!');
+        }
+
         // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
-
-        /** Abre o modal de detalhes da tarefa */
-        window.openTaskDetailModal = function(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (!task) return showMessage('Tarefa não encontrada.', true);
-
-            const client = clients.find(c => c.id === task.clientId);
-            const clientName = client?.nome || 'Cliente N/D';
-            
-            const taskDateTime = new Date(task.date).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-            
-            // Define a cor de acordo com o status
-            let statusColorClass = 'text-gray-400';
-            if (task.status === 'Concluido') statusColorClass = 'text-green-500';
-            else if (task.status === 'Em Andamento') statusColorClass = 'text-yellow-500';
-            else if (task.status === 'Pendente') statusColorClass = 'text-red-500';
-            
-            // Preenche o modal
-            document.getElementById('modalTaskId').value = taskId;
-            document.getElementById('modalTaskTitle').textContent = `${clientName} - ${task.type}`;
-            document.getElementById('modalClientName').textContent = clientName;
-            document.getElementById('modalTaskType').textContent = task.type;
-            document.getElementById('modalTaskDate').textContent = taskDateTime;
-            
-            const statusEl = document.getElementById('modalTaskStatus');
-            statusEl.textContent = task.status;
-            statusEl.className = `font-semibold ${statusColorClass}`;
-            
-            document.getElementById('modalTaskObs').textContent = task.observacoes || 'Nenhuma observação detalhada.';
-            
-            // Define o valor do dropdown de status no modal
-            document.getElementById('modalStatusSelect').value = task.status;
-            
-            // Atribui a função de edição ao botão (simula a abertura da aba de cadastro)
-            document.getElementById('modalEditButton').onclick = () => {
-                // Fechamos este modal
-                window.closeTaskDetailModal();
-                // Alternamos para a aba de cadastro
-                switchTab('calendario'); 
-                // A edição no formulário de cadastro (calendario) deve ser implementada separadamente
-                showMessage('Implementar edição direta no formulário de cadastro de tarefas.', false, true);
-            };
-
-            // Exibe o modal
-            document.getElementById('taskDetailModal').classList.remove('hidden');
-            document.getElementById('taskDetailModal').classList.add('flex');
-        }
-
-        // Função para fechar o modal de detalhes da tarefa
-        window.closeTaskDetailModal = function() {
-            document.getElementById('taskDetailModal').classList.add('hidden');
-            document.getElementById('taskDetailModal').classList.remove('flex');
-        }
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
         window.updateTaskStatus = function(taskId, newStatus) {
@@ -2096,14 +2337,6 @@
                 renderTaskManagement(); 
                 showMessage(`Status da tarefa atualizado para: ${newStatus}`);
             }
-        }
-        
-        // Função para aplicar a mudança de status a partir do modal
-        window.applyStatusChange = function() {
-            const taskId = document.getElementById('modalTaskId').value;
-            const newStatus = document.getElementById('modalStatusSelect').value;
-            updateTaskStatus(taskId, newStatus);
-            closeTaskDetailModal();
         }
 
         /** Renderiza o painel de gestão de tarefas (Kanban-like) */
@@ -2267,7 +2500,7 @@
 
             // Gera o relatório automaticamente
             generateReport();
-            showMessage(`Filtro rápido de ${preset} aplicado.`);
+            showMessage(`Filtro rápido de ${preset} aplicado.`, true);
         }
 
         // NOVO: Função para o filtro rápido da ABA RESULTADOS
@@ -2317,8 +2550,6 @@
             if (clientId) {
                 filteredResults = filteredResults.filter(r => r.clientId === clientId);
             }
-            
-            // CORREÇÃO: Utiliza a comparação de string YYYY-MM-DD, que é segura
             if (startDate) {
                 filteredResults = filteredResults.filter(r => r.data >= startDate);
             }
@@ -2331,8 +2562,6 @@
                 document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
                 reportSummaryMetrics = null; // Limpa o resumo
                 reportDetailedResults = []; // Limpa detalhes
-                // Limpa e zera os KPIs do Relatório
-                renderReportKpiCards({ reportData: [] }); 
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
 
@@ -2535,189 +2764,169 @@
 
         /** Exporta o Relatório Consolidado (TEXTO) como PNG */
         window.exportCombinedReportAsPNG = async function() { 
-            try {
-                if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
-                    return showMessage('Gere o relatório primeiro antes de exportar o PNG.', 5000, true);
-                }
-                
-                const reportData = reportDetailedResults;
-                
-                // Ajuste a altura do cabeçalho para acomodar mais KPIs
-                const headerHeight = 280; 
-                const margin = 20; 
-                const dataRowHeight = 28; 
-                const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; 
-
-                const rowsToShow = reportData.slice(0, maxRows); 
-                const totalDataHeight = rowsToShow.length * dataRowHeight;
-                
-                // Altura total ajustada ao conteúdo (máx 1350)
-                const totalHeight = headerHeight + totalDataHeight + margin * 3; 
-                const totalWidth = 1080; 
-
-                const compositeCanvas = document.createElement('canvas');
-                compositeCanvas.width = totalWidth;
-                compositeCanvas.height = totalHeight;
-                const ctx = compositeCanvas.getContext('2d');
-                
-                // Define a fonte base para o canvas com fallback
-                ctx.font = 'Poppins, sans-serif'; 
-                
-                // 1. Fundo (Azul Marinho)
-                ctx.fillStyle = NAVY_BLUE; 
-                ctx.fillRect(0, 0, totalWidth, totalHeight);
-                
-                // --- 2. Desenha o Cabeçalho e Métricas (RESUMO) ---
-                
-                // Título Principal
-                ctx.font = '700 36px Poppins, sans-serif'; 
-                ctx.fillStyle = COLORS.faturamento; 
-                ctx.fillText('RELATÓRIO NOVAN AGENCY', margin, margin + 40); 
-                
-                // Data de Geração 
-                ctx.font = '400 16px Poppins, sans-serif'; 
-                ctx.fillStyle = LIGHT_TEXT;
-                ctx.fillText(`Gerado em: ${reportSummaryMetrics.generationDate}`, margin, margin + 70); 
-
-                // Nome do Cliente
-                ctx.font = '600 24px Poppins, sans-serif'; 
-                ctx.fillStyle = LIGHT_TEXT;
-                const clientDisplay = reportSummaryMetrics.clientName === 'Todos os Clientes' 
-                    ? reportSummaryMetrics.clientName 
-                    : `CLIENTE: ${reportSummaryMetrics.clientName}`;
-                ctx.fillText(clientDisplay, margin, margin + 110); 
-                
-                // Período 
-                ctx.font = '400 18px Poppins, sans-serif'; 
-                ctx.fillStyle = LIGHT_TEXT;
-                ctx.fillText(`Período Analisado: ${reportSummaryMetrics.period}`, margin, margin + 140); 
-
-                // BLOCO DE KPIS DE DESTAQUE (3 LINHAS)
-                
-                let metricY = margin + 180; 
-                ctx.font = '700 22px Poppins, sans-serif'; 
-                const metricXSpacing = 350; // Aumentado o espaçamento X
-                const metricYSpacing = 40; // Espaçamento Y
-
-                // LINHA 1: GASTO e FATURAMENTO
-                ctx.fillStyle = COLORS.investimento;
-                ctx.fillText(`GASTO: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
-                
-                ctx.fillStyle = COLORS.faturamento;
-                ctx.fillText(`FATURAMENTO: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
-                
-                metricY += metricYSpacing; 
-                ctx.font = '700 22px Poppins, sans-serif'; 
-                
-                // LINHA 2: ROAS e CPA
-                ctx.fillStyle = COLORS.roas;
-                ctx.fillText(`ROAS: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
-                
-                ctx.fillStyle = COLORS.cpa; // Usando cor diferente para CPA
-                ctx.fillText(`CPA: R$ ${formatValueBRL(reportSummaryMetrics.avgCPA)}`, margin + metricXSpacing, metricY);
-
-                metricY += metricYSpacing; 
-                ctx.font = '700 22px Poppins, sans-serif'; 
-
-                // LINHA 3: CPM e CONVERSÕES (total)
-                ctx.fillStyle = COLORS.impressoes;
-                ctx.fillText(`CPM: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin, metricY);
-                
-                ctx.fillStyle = COLORS.primary; // Roxo para conversões
-                ctx.fillText(`CONVERSÕES: ${reportSummaryMetrics.totalConversoes.toLocaleString('pt-BR')}`, margin + metricXSpacing, metricY);
-
-
-                // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
-
-                let currentY = headerHeight + margin; 
-                
-                // Título da Tabela Detalhada
-                ctx.font = '700 18px Poppins, sans-serif';
-                ctx.fillStyle = LIGHT_TEXT;
-                ctx.fillText('DETALHE DE PERFORMANCE DIÁRIA:', margin, currentY);
-                currentY += margin;
-                
-                // Cabeçalho da Tabela
-                ctx.font = '600 15px Poppins, sans-serif'; // Fonte do cabeçalho levemente maior
-                ctx.fillStyle = COLORS.primary; // Roxo para o cabeçalho da tabela
-                const colDataCliente = 20;
-                const colGasto = 260; 
-                const colFaturamento = 400; 
-                const colCPM = 550; 
-                const colROAS = 680; 
-                const colConv = 800; 
-                
-                ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
-                ctx.fillText('GASTO (R$)', colGasto, currentY);
-                ctx.fillText('FATO. (R$)', colFaturamento, currentY);
-                ctx.fillText('CPM (R$)', colCPM, currentY);
-                ctx.fillText('ROAS (X)', colROAS, currentY);
-                ctx.fillText('CONVERSÕES', colConv, currentY);
-                currentY += 8; // Espaçamento extra após o cabeçalho
-
-                // Desenho das Linhas de Dados
-                rowsToShow.forEach(row => {
-                    currentY += dataRowHeight - 5; // Ajusta para o próximo Y
-                    
-                    const cpa = calculateCPA(row.investimento, row.conversionCount); // Recalcula se necessário
-                    const roas = calculateROAS(row.investimento, row.vendas);
-                    const cpm = calculateCPM(row.investimento, row.impressoes);
-
-                    ctx.font = '400 14px Poppins, sans-serif'; // Fonte de dados
-                    
-                    // Coluna DATA/CLIENTE
-                    const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
-                    const dateDisplay = getLocalDayDate(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                    ctx.fillStyle = LIGHT_TEXT;
-                    ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
-                    
-                    // Coluna GASTO (formato 1.000,32)
-                    ctx.fillStyle = COLORS.investimento; // Vermelho para Gasto
-                    ctx.fillText(formatValueBRL(row.investimento), colGasto, currentY);
-                    
-                    // Coluna FATURAMENTO (formato 1.000,32)
-                    ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
-                    ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
-                    
-                    // Coluna CPM (formato 1.000,32)
-                    ctx.fillStyle = COLORS.impressoes; // Azul
-                    ctx.fillText(formatValueBRL(cpm), colCPM, currentY);
-                    
-                    // Coluna ROAS (formato 0.00)
-                    ctx.fillStyle = COLORS.roas; // Amarelo
-                    ctx.fillText(`${formatNumber(roas)}X`, colROAS, currentY);
-                    
-                    // Coluna CONVERSÃO (tipo e contagem)
-                    ctx.fillStyle = LIGHT_TEXT;
-                    ctx.fillText(`${row.conversionType.substring(0, 5)}. (${row.conversionCount})`, colConv, currentY);
-                });
-
-                if (reportData.length > maxRows) {
-                    currentY += dataRowHeight;
-                    ctx.fillStyle = LIGHT_TEXT;
-                    ctx.font = '400 14px Poppins, sans-serif';
-                    ctx.fillText(`... e mais ${reportData.length - maxRows} registros. Use o CSV para o detalhe completo.`, margin, currentY);
-                }
-
-                // --- 4. Download ---
-                // NOVO: Adicionado atraso para garantir que o download seja disparado
-                setTimeout(() => {
-                    const dataUrl = compositeCanvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    link.href = dataUrl;
-                    link.download = `Novan_Relatorio_Feed_${reportSummaryMetrics.period.replace(/\s/g, '_').replace(/\//g, '-')}.png`;
-                    
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    showMessage('Exportação do Relatório Consolidado (PNG) iniciada!');
-                }, 50); // Pequeno atraso
-
-            } catch (error) {
-                console.error("Erro fatal ao gerar PNG:", error);
-                showMessage("Erro ao gerar o relatório PNG. Verifique o console para mais detalhes.", 5000, true);
+            if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
+                return showMessage('Gere o relatório primeiro antes de exportar o PNG.', true);
             }
+            
+            const reportData = reportDetailedResults;
+            
+            const headerHeight = 240; 
+            const margin = 20; 
+            const dataRowHeight = 28; // Altura para cada linha de dados
+            const maxRows = Math.floor((1350 - headerHeight - (margin * 2)) / dataRowHeight) - 2; // ~35 linhas
+
+            const rowsToShow = reportData.slice(0, maxRows); 
+            const totalDataHeight = rowsToShow.length * dataRowHeight;
+            
+            // Altura total ajustada ao conteúdo (máx 1350)
+            const totalHeight = headerHeight + totalDataHeight + margin * 3; // +3 margens para espaçamento
+            const totalWidth = 1080; 
+
+            const compositeCanvas = document.createElement('canvas');
+            compositeCanvas.width = totalWidth;
+            compositeCanvas.height = totalHeight;
+            const ctx = compositeCanvas.getContext('2d');
+            
+            // Define a fonte base para o canvas
+            ctx.font = 'Poppins';
+            
+            // 1. Fundo (Azul Marinho)
+            ctx.fillStyle = NAVY_BLUE; 
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
+            
+            // --- 2. Desenha o Cabeçalho e Métricas (RESUMO) ---
+            
+            // Título Principal
+            ctx.font = '700 36px Poppins'; 
+            ctx.fillStyle = COLORS.faturamento; 
+            ctx.fillText('RELATÓRIO NOVAN AGENCY', margin, margin + 40); 
+            
+            // Data de Geração 
+            ctx.font = '400 16px Poppins'; 
+            ctx.fillStyle = LIGHT_TEXT;
+            ctx.fillText(`Gerado em: ${reportSummaryMetrics.generationDate}`, margin, margin + 70); 
+
+            // Nome do Cliente
+            ctx.font = '600 24px Poppins'; 
+            ctx.fillStyle = LIGHT_TEXT;
+            const clientDisplay = reportSummaryMetrics.clientName === 'Todos os Clientes' 
+                ? reportSummaryMetrics.clientName 
+                : `CLIENTE: ${reportSummaryMetrics.clientName}`;
+            ctx.fillText(clientDisplay, margin, margin + 110); 
+            
+            // Período 
+            ctx.font = '400 18px Poppins'; 
+            ctx.fillStyle = LIGHT_TEXT;
+            ctx.fillText(`Período Analisado: ${reportSummaryMetrics.period}`, margin, margin + 140); 
+
+            // Bloco de Métricas Chave (Métricas Totais)
+            let metricY = margin + 180; 
+            ctx.font = '700 22px Poppins'; 
+            const metricXSpacing = 300; 
+            
+            // GASTO TOTAL (Usando formatValueBRL para 1.000,32)
+            ctx.fillStyle = COLORS.investimento;
+            ctx.fillText(`GASTO TOTAL: R$ ${formatValueBRL(reportSummaryMetrics.totalGasto)}`, margin, metricY);
+            
+            // FATURAMENTO TOTAL (Usando formatValueBRL para 1.000,32)
+            ctx.fillStyle = COLORS.faturamento;
+            ctx.fillText(`FATURAMENTO TOTAL: R$ ${formatValueBRL(reportSummaryMetrics.totalFaturamento)}`, margin + metricXSpacing, metricY);
+            
+            metricY += 40; 
+            ctx.font = '700 22px Poppins'; 
+            
+            // ROAS MÉDIO
+            ctx.fillStyle = COLORS.roas;
+            ctx.fillText(`ROAS MÉDIO: ${formatNumber(reportSummaryMetrics.avgROAS)}X`, margin, metricY);
+            
+            // CPM MÉDIO
+            ctx.fillStyle = COLORS.impressoes;
+            ctx.fillText(`CPM MÉDIO: R$ ${formatValueBRL(reportSummaryMetrics.avgCPM)}`, margin + metricXSpacing, metricY);
+
+
+            // --- 3. Desenha os Detalhes Diários (Tabela de Texto) ---
+
+            let currentY = headerHeight + margin; 
+            
+            // Título da Tabela Detalhada
+            ctx.font = '700 18px Poppins';
+            ctx.fillStyle = LIGHT_TEXT;
+            ctx.fillText('DETALHE DE PERFORMANCE DIÁRIA:', margin, currentY);
+            currentY += margin;
+            
+            // Cabeçalho da Tabela
+            ctx.font = '600 15px Poppins'; // Fonte do cabeçalho levemente maior
+            ctx.fillStyle = COLORS.primary; // Roxo para o cabeçalho da tabela
+            const colDataCliente = 20;
+            const colGasto = 260; 
+            const colFaturamento = 400; 
+            const colCPM = 550; 
+            const colROAS = 680; 
+            const colConv = 800; 
+            
+            ctx.fillText('DATA | CLIENTE', colDataCliente, currentY);
+            ctx.fillText('GASTO (R$)', colGasto, currentY);
+            ctx.fillText('FATO. (R$)', colFaturamento, currentY);
+            ctx.fillText('CPM (R$)', colCPM, currentY);
+            ctx.fillText('ROAS (X)', colROAS, currentY);
+            ctx.fillText('CONVERSÕES', colConv, currentY);
+            currentY += 8; // Espaçamento extra após o cabeçalho
+
+            // Desenho das Linhas de Dados
+            rowsToShow.forEach(row => {
+                currentY += dataRowHeight - 5; // Ajusta para o próximo Y
+                
+                const cpa = calculateCPA(row.investimento, row.conversionCount); // Recalcula se necessário
+                const roas = calculateROAS(row.investimento, row.vendas);
+                const cpm = calculateCPM(row.investimento, row.impressoes);
+
+                ctx.font = '400 14px Poppins'; // Fonte de dados
+                
+                // Coluna DATA/CLIENTE
+                const clientName = clients.find(c => c.id === row.clientId)?.nome || 'N/D';
+                const dateDisplay = new Date(row.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText(`${dateDisplay} | ${clientName.substring(0, 10)}`, colDataCliente, currentY);
+                
+                // Coluna GASTO (formato 1.000,32)
+                ctx.fillStyle = COLORS.investimento; // Vermelho para Gasto
+                ctx.fillText(formatValueBRL(row.investimento), colGasto, currentY);
+                
+                // Coluna FATURAMENTO (formato 1.000,32)
+                ctx.fillStyle = COLORS.faturamento; // Verde para Faturamento
+                ctx.fillText(formatValueBRL(row.vendas), colFaturamento, currentY);
+                
+                // Coluna CPM (formato 1.000,32)
+                ctx.fillStyle = COLORS.impressoes; // Azul
+                ctx.fillText(formatValueBRL(cpm), colCPM, currentY);
+                
+                // Coluna ROAS (formato 0.00)
+                ctx.fillStyle = COLORS.roas; // Amarelo
+                ctx.fillText(`${formatNumber(roas)}X`, colROAS, currentY);
+                
+                // Coluna CONVERSÃO (tipo e contagem)
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.fillText(`${row.conversionType.substring(0, 5)}. (${row.conversionCount})`, colConv, currentY);
+            });
+
+            if (reportData.length > maxRows) {
+                currentY += dataRowHeight;
+                ctx.fillStyle = LIGHT_TEXT;
+                ctx.font = '400 14px Poppins';
+                ctx.fillText(`... e mais ${reportData.length - maxRows} registros. Use o CSV para o detalhe completo.`, margin, currentY);
+            }
+
+            // --- 4. Download ---
+            const dataUrl = compositeCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = `Novan_Relatorio_Feed_${reportSummaryMetrics.period.replace(/\s/g, '_').replace(/\//g, '-')}.png`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage('Exportação do Relatório Consolidado (PNG) iniciada!');
         }
 
 
@@ -2793,7 +3002,7 @@
             // Define a data atual no campo de resultados
             document.getElementById('res_data').valueAsDate = new Date();
             // Inicia na primeira aba
-            switchTab('clientes'); // CORRIGIDO: Iniciar em 'clientes'
+            switchTab('resultados'); 
             
             // Garante que o cálculo CPA/ROAS/CPM esteja zerado na inicialização
             updateMetricsDisplay();
