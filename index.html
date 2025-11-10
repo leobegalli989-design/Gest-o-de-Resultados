@@ -731,6 +731,37 @@
     </div>
     <!-- Fim Dashboard Principal -->
 
+    <!-- Modal de Confirmação de Conclusão (NOVO) -->
+    <div id="completionConfirmModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
+            <h3 class="text-2xl font-bold mb-4 text-green-500">✅ Confirmar Conclusão</h3>
+            <p class="text-gray-300 mb-6">Tem certeza que deseja marcar esta tarefa como **Concluída**?</p>
+            
+            <div class="space-y-4">
+                <label class="flex items-center text-gray-300">
+                    <input type="checkbox" id="checkCompleted" required class="h-4 w-4 text-green-500 border-gray-600 rounded focus:ring-green-500 mr-2">
+                    A tarefa foi realmente concluída e revisada.
+                </label>
+                <label class="flex items-center text-gray-300">
+                    <input type="checkbox" id="checkDriveUpload" required class="h-4 w-4 text-green-500 border-gray-600 rounded focus:ring-green-500 mr-2">
+                    Os arquivos finais foram hospedados/anexados no Google Drive/Cloud.
+                </label>
+            </div>
+
+            <p id="completionWarning" class="text-xs text-red-400 mt-4 hidden">Por favor, marque as duas caixas de confirmação para concluir a tarefa.</p>
+
+            <div class="flex justify-between space-x-3 mt-6">
+                <button id="cancelCompletionBtn" onclick="closeCompletionModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold p-2 rounded-lg flex-1">
+                    Cancelar
+                </button>
+                <button id="confirmCompletionBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold p-2 rounded-lg flex-1">
+                    Concluir e Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Fim Modal de Confirmação de Conclusão -->
+
     <script type="module">
         // --- CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
@@ -755,6 +786,7 @@
         let results = [];
         let tasks = [];
         let currentMonth = new Date();
+        let taskIdToConfirm = null; // Variável global para armazenar a tarefa sendo confirmada
         
         let invFatChartInstance, imprCliquesChartInstance, roasChartInstance;
         let reportSummaryMetrics = null; // Armazena as métricas de resumo
@@ -2092,7 +2124,7 @@
         
         /** Exibe um resumo de todas as tarefas para um dia específico ao clicar no dia do calendário. */
         window.showDaySummary = function(dateString) {
-            const dateObj = new Date(dateString); // Usando a nova função para evitar erros de timezone
+            const dateObj = getLocalDayDate(dateString); // Usando a nova função para evitar erros de timezone
             
             const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
 
@@ -2126,12 +2158,9 @@
         }
 
         /** Renderiza o calendário (Mês Atual) */
-        window.renderCalendar = function() {
+        function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const filterClientId = document.getElementById('filterClient').value; // Novo: Lendo o filtro de Cliente
-
-            // Removido filtroType pois o usuário solicitou apenas filtro por cliente
-            // const filterType = document.getElementById('filterType').value; 
 
             grid.innerHTML = '';
             
@@ -2160,8 +2189,7 @@
                 const dayTasks = tasks.filter(t => {
                     const dateMatch = t.date.startsWith(dateString);
                     const clientMatch = !filterClientId || t.clientId === filterClientId;
-                    // const typeMatch = !filterType || t.type === filterType; // Removido filtro de tipo
-
+                    
                     // O mês do calendário deve bater com o mês da tarefa
                     const taskMonth = new Date(t.date).getMonth();
                     const monthMatch = taskMonth === month;
@@ -2317,10 +2345,58 @@
         }
 
         // --- ABA 5: GESTÃO DE TAREFAS (KANBAN) ---
+        
+        /** Abre o Modal de Confirmação de Conclusão */
+        window.openCompletionModal = function(taskId) {
+            window.taskIdToConfirm = taskId;
+            
+            // Limpa o estado do modal
+            document.getElementById('checkCompleted').checked = false;
+            document.getElementById('checkDriveUpload').checked = false;
+            document.getElementById('completionWarning').classList.add('hidden');
+            
+            // Exibe o modal
+            document.getElementById('completionConfirmModal').classList.remove('hidden');
+            document.getElementById('completionConfirmModal').classList.add('flex');
+        }
+        
+        /** Fecha o Modal de Confirmação de Conclusão */
+        window.closeCompletionModal = function() {
+            window.taskIdToConfirm = null;
+            document.getElementById('completionConfirmModal').classList.remove('flex');
+            document.getElementById('completionConfirmModal').classList.add('hidden');
+            
+            // Re-renderiza o Kanban para garantir que o dropdown volte ao estado original
+            renderTaskManagement();
+        }
+        
+        /** Lida com o clique no botão "Concluir e Salvar" do modal */
+        document.getElementById('confirmCompletionBtn').addEventListener('click', () => {
+            const isCompleted = document.getElementById('checkCompleted').checked;
+            const isUploaded = document.getElementById('checkDriveUpload').checked;
+            
+            if (isCompleted && isUploaded) {
+                // Se ambas as caixas estiverem marcadas, atualiza o status
+                updateTaskStatus(window.taskIdToConfirm, 'Concluido', true); // O 'true' força a conclusão
+                closeCompletionModal();
+            } else {
+                // Caso contrário, mostra o aviso
+                document.getElementById('completionWarning').classList.remove('hidden');
+            }
+        });
 
         /** Atualiza o status de uma tarefa e salva/renderiza */
-        window.updateTaskStatus = function(taskId, newStatus) {
+        window.updateTaskStatus = function(taskId, newStatus, bypassCheck = false) {
+            
+            // 1. Se o status for "Concluído" e não estivermos ignorando o check (bypass), ABRE O MODAL
+            if (newStatus === 'Concluido' && !bypassCheck) {
+                openCompletionModal(taskId);
+                return; // Impede a atualização direta
+            }
+            
+            // Se o status for "Concluído" E passarmos pelo bypass (ou for outro status)
             const taskIndex = tasks.findIndex(t => t.id === taskId);
+            
             if (taskIndex !== -1) {
                 
                 // LÓGICA DE REGISTRO DE DATA DE CONCLUSÃO
@@ -2338,6 +2414,7 @@
                 showMessage(`Status da tarefa atualizado para: ${newStatus}`);
             }
         }
+
 
         /** Renderiza o painel de gestão de tarefas (Kanban-like) */
         window.renderTaskManagement = function() {
@@ -2407,6 +2484,18 @@
                         completionInfo = `<p class="text-xs text-green-500 font-medium mt-1">Concluída em: ${completeDate}</p>`;
                     }
 
+                    // Se o novo valor for 'Concluído', ele aciona o modal. Caso contrário, atualiza diretamente.
+                    const onChangeHandler = `
+                        if (this.value === 'Concluido') {
+                            openCompletionModal('${task.id}');
+                            // O status do select deve ser resetado para o valor anterior, 
+                            // para que o modal possa confirmar a mudança.
+                            this.value = '${task.status}'; 
+                        } else {
+                            updateTaskStatus('${task.id}', this.value, true);
+                        }
+                    `;
+
 
                     return `
                         <div class="bg-gray-700 p-4 rounded-lg shadow-md border-t-2 ${border} space-y-2 text-gray-300">
@@ -2416,7 +2505,7 @@
                             ${completionInfo}
                             <div class="flex items-center space-x-2 pt-2">
                                 <label class="text-xs font-medium text-gray-400">Mudar Status:</label>
-                                <select onchange="updateTaskStatus('${task.id}', this.value)" class="p-1 border text-xs rounded-lg bg-gray-600 text-white focus:ring-novan-primary">
+                                <select onchange="${onChangeHandler}" class="p-1 border text-xs rounded-lg bg-gray-600 text-white focus:ring-novan-primary">
                                     ${statusOptions}
                                 </select>
                                 <button onclick="deleteTask('${task.id}')" class="text-red-500 hover:text-red-400 text-xs">Excluir</button>
@@ -2562,6 +2651,8 @@
                 document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
                 reportSummaryMetrics = null; // Limpa o resumo
                 reportDetailedResults = []; // Limpa detalhes
+                // Limpa e zera os KPIs do Relatório
+                renderReportKpiCards({ reportData: [] }); 
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
 
