@@ -1533,7 +1533,7 @@
                 summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
             }
             
-            // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS (Topo)
+            // CORREÇÃO: RENDERIZAÇÃO DOS KPI CARDS AGREGADOS
             renderKpiCards(filteredResults, summaryMetrics, 'kpiCardsContainer');
 
             listContainer.innerHTML = '';
@@ -1864,8 +1864,8 @@
         function openSummaryModal(title, content) {
             document.getElementById('summaryTitle').textContent = title;
             document.getElementById('summaryContent').innerHTML = content;
-            document.getElementById('summaryModal').classList.remove('hidden');
-            document.getElementById('summaryModal').classList.add('flex');
+            document.getElementById('summaryModal').classList.remove('flex');
+            document.getElementById('summaryModal').classList.add('hidden');
         }
 
 
@@ -2290,10 +2290,11 @@
 
         /** Renderiza os KPI Cards do Relatório (Separado para reuso) */
         function renderReportKpiCards(summary) {
-            // Renderiza KPIs no contêiner #reportKpiCardsContainer
+            // Usa o ID específico para os Relatórios
             const container = document.getElementById('reportKpiCardsContainer');
             if (!container) return;
 
+            // Se não houver dados, exibe zeros
             const data = summary.reportData || [];
             const metrics = data.length > 0 ? summary : { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
             
@@ -2352,7 +2353,7 @@
                 reportSummaryMetrics = null; 
                 reportDetailedResults = [];
                 // Renderiza KPIs zerados
-                renderReportKpiCards({ reportData: [] }); 
+                renderReportKpiCards({}); 
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
 
@@ -2407,8 +2408,8 @@
                 generationDate: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
             };
             
-            // CORREÇÃO: Renderiza KPIs do Relatório
-            renderReportKpiCards(reportSummaryMetrics); 
+            // CORREÇÃO: Renderiza KPIs do Relatório (Passando o summaryMetrics calculado)
+            renderReportKpiCards(reportSummaryMetrics, 'reportKpiCardsContainer'); 
 
             setTimeout(() => {
                 
@@ -3016,7 +3017,7 @@
             document.getElementById('results_filter_start_date').addEventListener('change', renderResultsTable);
             document.getElementById('results_filter_end_date').addEventListener('change', renderResultsTable);
             
-            // FILTROS RÁPIDOS DO RELATÓRIO (RESTITUIDOS)
+            // FILTROS RÁPIDOS DO RELATÓRIO (RESTITUIDOS E LIGADOS)
             document.getElementById('report_cliente').addEventListener('change', generateReport);
         }
 
