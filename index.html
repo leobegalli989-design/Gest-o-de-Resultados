@@ -690,19 +690,19 @@
 
                 <div id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Gráfico 1: Gasto vs Faturamento -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Gasto vs Faturamento (R$)</h3>
                         <canvas id="investimentoFaturamentoChart"></canvas>
                     </div>
                     
                     <!-- Gráfico 2: Impressões vs Cliques -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg">
                         <h3 class="text-lg font-semibold mb-4 text-white">Impressões vs Cliques (Volume)</h3>
                         <canvas id="impressoesCliquesChart"></canvas>
                     </div>
 
                     <!-- Gráfico 3: ROAS Médio por Período -->
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg chart-container">
+                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg lg:col-span-2">
                         <h3 class="text-lg font-semibold mb-4 text-white">ROAS Médio Diário (X)</h3>
                         <canvas id="roasChart"></canvas>
                     </div>
@@ -1018,7 +1018,7 @@
             item.addEventListener('click', () => switchTab(item.dataset.tab));
         });
         
-        // --- ABA 3: CADASTRO DE CLIENTES (CRUD FIRESTORE) ---
+        // --- ABA 3: CADASTRO DE CLIENTES ---
 
         /** Aplica a máscara (00) 00000-0000 ao telefone */
         window.maskPhone = function(input) {
@@ -1158,7 +1158,7 @@
         }
 
 
-        /** Renderiza a lista de clientes cadastrados (Chamado pelo onSnapshot) */
+        /** Renderiza a lista de clientes cadastrados */
         function renderClientList() {
             const listEl = document.getElementById('clientList');
             const noClientsEl = document.getElementById('noClients');
@@ -1866,7 +1866,7 @@
         }
 
         /** Renderiza o calendário (Mês Atual) */
-        function renderCalendar() {
+        window.renderCalendar = function() {
             const grid = document.getElementById('calendarGrid');
             const filterClientId = document.getElementById('filterClient').value; // Lendo o filtro
 
@@ -1917,7 +1917,7 @@
                     const taskTitle = `CLIENTE: ${clientName}\nDATA/HORA: ${taskDateTime}\nTIPO: ${task.type}\nSTATUS: ${task.status}\nOBS: ${task.observacoes || 'N/A'}`;
 
                     tasksHtml += `
-                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded text-xs truncate ${statusClass}" 
+                        <div class="task-item text-white shadow-sm px-1 py-0.5 rounded-lg text-xs truncate ${statusClass}" 
                              style="border-left-color: ${clientColor};"
                              title="${taskTitle}">
                             ${clientName} - ${task.type.substring(0, 5)}
@@ -2214,8 +2214,6 @@
         /** Renderiza os KPI Cards do Relatório (Separado para reuso) */
         function renderReportKpiCards(summary) {
             // Reuso da função principal de KPI cards, mas usando o ID específico para os Relatórios
-            // O contêiner para os KPIs do relatório é 'reportKpiCardsContainer', mas o HTML usa 'kpiCardsContainer'
-            // Vou usar 'reportKpiCardsContainer' no código para ser mais claro.
             renderKpiCards(summary.reportData || [], summary, 'reportKpiCardsContainer');
         }
 
@@ -2888,16 +2886,24 @@
                 return;
             }
             
-            // Inicia os listeners de dados
+            // 1. Inicia os listeners de dados
             await initRealtimeListeners(userId); // REMOVIDO: loadData() OBSOLETO
             
-            // Configura a UI inicial (que não depende de dados)
+            // 2. Configura a UI inicial (que não depende de dados)
             populateResponsiblesSelect(); 
             document.getElementById('res_data').valueAsDate = new Date();
             updateMetricsDisplay();
             
-            // Define a aba inicial (conforme o HTML mais recente)
+            // 3. Define a aba inicial (conforme o HTML mais recente)
             switchTab('clientes'); // Inicia em Clientes
+
+            // 4. CORREÇÃO: Move listeners que dependem do DOM para aqui.
+            document.getElementById('task_manager_filter_client').addEventListener('change', renderTaskManagement);
+            document.getElementById('task_manager_filter_status').addEventListener('change', renderTaskManagement);
+
+            document.getElementById('results_filter_cliente').addEventListener('change', renderResultsTable);
+            document.getElementById('results_filter_start_date').addEventListener('change', renderResultsTable);
+            document.getElementById('results_filter_end_date').addEventListener('change', renderResultsTable);
         }
 
     </script>
