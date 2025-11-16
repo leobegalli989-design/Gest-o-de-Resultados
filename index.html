@@ -1575,6 +1575,7 @@
                             </div>
                         </div>
 
+                        <!-- Métricas Financeiras -->
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
                             <div class="flex flex-col">
                                 <span class="text-sm text-gray-400">Gasto</span>
@@ -1594,10 +1595,26 @@
                             </div>
                         </div>
 
-                        <div class="text-sm text-gray-400 border-t border-gray-700 pt-2">
-                            <span class="font-semibold text-white">Conversão:</span> ${conversionType.substring(0, 5)}. (${conversionCount.toLocaleString('pt-BR')})
-                            <span class="ml-4 font-semibold text-white">CPM:</span> ${formatCurrency(cpm)}
+                        <!-- Métricas de Volume (Nova seção) -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2 border-t border-gray-700 pt-2">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">Impressões</span>
+                                <span class="font-bold text-blue-500">${res.impressoes.toLocaleString('pt-BR')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">Alcance</span>
+                                <span class="font-bold text-blue-500">${res.alcance.toLocaleString('pt-BR')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">Cliques</span>
+                                <span class="font-bold text-pink-500">${res.cliques.toLocaleString('pt-BR')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-400">Conversões</span>
+                                <span class="font-bold text-novan-primary">${conversionCount.toLocaleString('pt-BR')}</span>
+                            </div>
                         </div>
+
 
                         <!-- Observações e Ações -->
                         <p class="text-xs italic text-gray-500 mt-2">
@@ -2506,7 +2523,7 @@
         window.exportCombinedReportAsPNG = async function() { 
             try {
                 if (!reportSummaryMetrics || reportDetailedResults.length === 0) {
-                    return showMessage('Gere o relatório primeiro antes de exportar o PNG.', 5000, true);
+                    return showMessage('Gere o relatório primeiro antes de exportar o PNG.', true);
                 }
                 
                 const reportData = reportDetailedResults;
