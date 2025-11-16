@@ -1536,7 +1536,7 @@
                 summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
             }
             
-            // CORREÇÃO: RENDERIZAÇÃO DOS KPI CARDS AGREGADOS
+            // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS
             renderKpiCards(summaryMetrics, 'kpiCardsContainer');
 
             listContainer.innerHTML = '';
@@ -2431,7 +2431,7 @@
             };
             
             // CORREÇÃO: Renderiza KPIs do Relatório
-            renderReportKpiCards(reportSummaryMetrics, 'reportKpiCardsContainer'); 
+            renderReportKpiCards(reportSummaryMetrics); 
 
             setTimeout(() => {
                 
