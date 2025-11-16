@@ -106,7 +106,7 @@
         }
         @keyframes pulseGlow {
             0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.05); }
+            100% { transform: scale(1.05); }
         }
 
         /* PEÇAS DE JOGO ANIMADAS */
@@ -1866,8 +1866,7 @@
         window.showDaySummary = function(dateString) {
             const dateObj = getLocalDayDate(dateString); // Usando a nova função para evitar erros de timezone
             
-            // Filtra o array local 'tasks'
-            const dayTasks = tasks.filter(t => t.date.startsWith(dateString)); 
+            const dayTasks = tasks.filter(t => t.date.startsWith(dateString));
 
             const title = `Resumo de Tarefas: ${dateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
 
@@ -1899,7 +1898,7 @@
         }
 
         /** Renderiza o calendário (Mês Atual) */
-        function renderCalendar() {
+        window.renderCalendar = function() {
             const grid = document.getElementById('calendarGrid');
             const filterClientId = document.getElementById('filterClient').value; // Lendo o filtro
 
@@ -2243,10 +2242,46 @@
             }
             return new Chart(canvas, { type, data, options });
         }
+        
+        /** NOVO: Define o período do relatório por presets (Hoje, 7 dias, etc.) */
+        window.filterReportByPreset = function(preset) {
+            const today = new Date();
+            const endDateInput = document.getElementById('report_end_date');
+            const startDateInput = document.getElementById('report_start_date');
+            
+            // Helper para formatar a data como YYYY-MM-DD (usando o fuso local)
+            const formatDate = (date) => {
+                const offset = date.getTimezoneOffset() * 60000;
+                const localDate = new Date(date.getTime() - offset);
+                return localDate.toISOString().split('T')[0];
+            };
+
+            const todayStr = formatDate(today);
+            endDateInput.value = todayStr;
+
+            let startDate = new Date(today);
+
+            if (preset === 'today') {
+                // Já está definido para hoje (startDate = today)
+            } else if (preset === '7days') {
+                startDate.setDate(today.getDate() - 6); // 6 dias atrás + hoje = 7 dias
+            } else if (preset === '15days') {
+                startDate.setDate(today.getDate() - 14);
+            } else if (preset === '30days') {
+                startDate.setDate(today.getDate() - 29);
+            }
+            
+            startDateInput.value = formatDate(startDate);
+
+            // Gera o relatório automaticamente
+            generateReport();
+            showMessage(`Filtro rápido de ${preset} aplicado.`);
+        }
+
 
         /** Renderiza os KPI Cards do Relatório (Separado para reuso) */
         function renderReportKpiCards(summary) {
-            // Reuso da função principal de KPI cards, mas usando o ID específico para os Relatórios
+            // Usa o ID específico para os Relatórios
             renderKpiCards(summary.reportData || [], summary, 'reportKpiCardsContainer');
         }
 
@@ -2937,6 +2972,9 @@
             document.getElementById('results_filter_cliente').addEventListener('change', renderResultsTable);
             document.getElementById('results_filter_start_date').addEventListener('change', renderResultsTable);
             document.getElementById('results_filter_end_date').addEventListener('change', renderResultsTable);
+            
+            // FILTROS RÁPIDOS DO RELATÓRIO (RESTITUIDOS)
+            document.getElementById('report_cliente').addEventListener('change', generateReport);
         }
 
     </script>
