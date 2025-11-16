@@ -106,7 +106,7 @@
         }
         @keyframes pulseGlow {
             0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.05); }
+            100% { transform: scale(1.05); }
         }
 
         /* PEÇAS DE JOGO ANIMADAS */
@@ -306,7 +306,7 @@
             <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
 
             <!-- Tab 1: Resultados de Campanhas -->
-            <section id="resultados" class="tab-content">
+            <section id="resultados" class="tab-content active">
                 <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
                 
                 <!-- Formulário de Registro Diário -->
@@ -1451,39 +1451,41 @@
         // --- ABA 1: RESULTADOS DE CAMPANHAS (CRUD FIRESTORE) ---
 
         /** Renderiza os KPI Cards (Agregados) */
-        function renderKpiCards(data, summary, containerId) {
+        function renderKpiCards(summary, containerId) { // Simplificado para receber APENAS o objeto summary
             const container = document.getElementById(containerId);
             if (!container) return;
 
-            // Se não houver dados, exibe zeros
             // O objeto metrics é reportSummaryMetrics, que já tem os totais calculados
-            const metrics = data.length > 0 ? summary : { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
+            const metrics = summary || { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
             
+            // Garantir que os valores de retorno sejam 0 se forem NaN
+            const safeMetric = (key) => metrics[key] === undefined || isNaN(metrics[key]) ? 0 : metrics[key];
+
             const kpiCardsHtml = `
                 <!-- KPI 1: Gasto Total -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-red-500">
                     <p class="text-sm font-medium text-gray-400">Gasto Total</p>
-                    <p class="text-2xl font-bold text-red-500 mt-1">${formatCurrency(metrics.totalGasto)}</p>
+                    <p class="text-2xl font-bold text-red-500 mt-1">${formatCurrency(safeMetric('totalGasto'))}</p>
                 </div>
                 <!-- KPI 2: Faturamento -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-green-500">
                     <p class="text-sm font-medium text-gray-400">Faturamento</p>
-                    <p class="text-2xl font-bold text-green-500 mt-1">${formatCurrency(metrics.totalFaturamento)}</p>
+                    <p class="text-2xl font-bold text-green-500 mt-1">${formatCurrency(safeMetric('totalFaturamento'))}</p>
                 </div>
                 <!-- KPI 3: ROAS Médio -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-yellow-500">
                     <p class="text-sm font-medium text-gray-400">ROAS Médio (X)</p>
-                    <p class="text-2xl font-bold text-yellow-500 mt-1">${formatNumber(metrics.avgROAS)}X</p>
+                    <p class="text-2xl font-bold text-yellow-500 mt-1">${formatNumber(safeMetric('avgROAS'))}X</p>
                 </div>
                 <!-- KPI 4: CPA Médio -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-indigo-500">
                     <p class="text-sm font-medium text-gray-400">CPA Médio (R$)</p>
-                    <p class="text-2xl font-bold text-indigo-500 mt-1">${formatCurrency(metrics.avgCPA)}</p>
+                    <p class="text-2xl font-bold text-indigo-500 mt-1">${formatCurrency(safeMetric('avgCPA'))}</p>
                 </div>
                 <!-- KPI 5: CPM Médio -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-blue-500">
                     <p class="text-sm font-medium text-gray-400">CPM Médio (R$)</p>
-                    <p class="text-2xl font-bold text-blue-500 mt-1">${formatCurrency(metrics.avgCPM)}</p>
+                    <p class="text-2xl font-bold text-blue-500 mt-1">${formatCurrency(safeMetric('avgCPM'))}</p>
                 </div>
             `;
 
@@ -1535,7 +1537,7 @@
             }
             
             // CORREÇÃO: RENDERIZAÇÃO DOS KPI CARDS AGREGADOS
-            renderKpiCards(filteredResults, summaryMetrics, 'kpiCardsContainer');
+            renderKpiCards(summaryMetrics, 'kpiCardsContainer');
 
             listContainer.innerHTML = '';
 
@@ -2296,35 +2298,36 @@
             if (!container) return;
 
             // Se não houver dados, exibe zeros
-            const data = summary.reportData || [];
-            // O objeto metrics é reportSummaryMetrics, que já tem os totais calculados
-            const metrics = data.length > 0 ? summary : { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
+            const metrics = summary || { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
             
+            // Garantir que os valores de retorno sejam 0 se forem NaN
+            const safeMetric = (key) => metrics[key] === undefined || isNaN(metrics[key]) ? 0 : metrics[key];
+
             const kpiCardsHtml = `
                 <!-- KPI 1: Gasto Total -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-red-500">
                     <p class="text-sm font-medium text-gray-400">Gasto Total</p>
-                    <p class="text-2xl font-bold text-red-500 mt-1">${formatCurrency(metrics.totalGasto)}</p>
+                    <p class="text-2xl font-bold text-red-500 mt-1">${formatCurrency(safeMetric('totalGasto'))}</p>
                 </div>
                 <!-- KPI 2: Faturamento -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-green-500">
                     <p class="text-sm font-medium text-gray-400">Faturamento</p>
-                    <p class="text-2xl font-bold text-green-500 mt-1">${formatCurrency(metrics.totalFaturamento)}</p>
+                    <p class="text-2xl font-bold text-green-500 mt-1">${formatCurrency(safeMetric('totalFaturamento'))}</p>
                 </div>
                 <!-- KPI 3: ROAS Médio -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-yellow-500">
                     <p class="text-sm font-medium text-gray-400">ROAS Médio (X)</p>
-                    <p class="text-2xl font-bold text-yellow-500 mt-1">${formatNumber(metrics.avgROAS)}X</p>
+                    <p class="text-2xl font-bold text-yellow-500 mt-1">${formatNumber(safeMetric('avgROAS'))}X</p>
                 </div>
                 <!-- KPI 4: CPA Médio -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-indigo-500">
                     <p class="text-sm font-medium text-gray-400">CPA Médio (R$)</p>
-                    <p class="text-2xl font-bold text-indigo-500 mt-1">${formatCurrency(metrics.avgCPA)}</p>
+                    <p class="text-2xl font-bold text-indigo-500 mt-1">${formatCurrency(safeMetric('avgCPA'))}</p>
                 </div>
                 <!-- KPI 5: CPM Médio -->
                 <div class="bg-slate-800 p-4 rounded-xl shadow-lg border-l-4 border-blue-500">
                     <p class="text-sm font-medium text-gray-400">CPM Médio (R$)</p>
-                    <p class="text-2xl font-bold text-blue-500 mt-1">${formatCurrency(metrics.avgCPM)}</p>
+                    <p class="text-2xl font-bold text-blue-500 mt-1">${formatCurrency(safeMetric('avgCPM'))}</p>
                 </div>
             `;
 
@@ -2410,8 +2413,8 @@
                 generationDate: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
             };
             
-            // CORREÇÃO: Renderiza KPIs do Relatório (Passando o summaryMetrics calculado)
-            renderReportKpiCards(reportSummaryMetrics); 
+            // CORREÇÃO: Renderiza KPIs do Relatório
+            renderReportKpiCards(reportSummaryMetrics, 'reportKpiCardsContainer'); 
 
             setTimeout(() => {
                 
