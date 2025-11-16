@@ -1494,7 +1494,7 @@
             let filteredResults = results.filter(r => trafficClientsIds.includes(r.clientId));
 
             // Aplica Filtros
-            if (resultsFilterClient) {
+            if (resultsFilterClient && resultsFilterClient !== "") {
                 filteredResults = filteredResults.filter(r => r.clientId === resultsFilterClient);
             }
             if (resultsFilterStartDate) {
@@ -1899,7 +1899,7 @@
         }
 
         /** Renderiza o calendário (Mês Atual) */
-        window.renderCalendar = function() {
+        function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const filterClientId = document.getElementById('filterClient').value; // Lendo o filtro
 
