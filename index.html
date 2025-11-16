@@ -106,7 +106,7 @@
         }
         @keyframes pulseGlow {
             0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.05); }
+            100% { transform: scale(1.05); }
         }
 
         /* PEÇAS DE JOGO ANIMADAS */
@@ -1348,8 +1348,8 @@
             clientData.observacoes = document.getElementById('cli_observacoes').value;
             
             // Guarda valores antigos para comparação (apenas para Tráfego Pago)
-            const oldBudgetType = isEditing ? clients[clientIndex]?.budgetType : null;
-            const oldBudgetValue = isEditing ? clients[clientIndex]?.budgetValue : null;
+            const oldBudgetType = clientData.budgetType;
+            const oldBudgetValue = clientData.budgetValue;
 
             // Inicializa ou mantém o histórico de orçamento
             clientData.budgetHistory = isEditing && clients[clientIndex]?.budgetHistory ? clients[clientIndex].budgetHistory : [];
@@ -1451,13 +1451,12 @@
         // --- ABA 1: RESULTADOS DE CAMPANHAS (CRUD FIRESTORE) ---
 
         /** Renderiza os KPI Cards (Agregados) */
-        function renderKpiCards(data, summary, containerId = 'kpiCardsContainer') {
+        function renderKpiCards(data, summary, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
 
             // Se não houver dados, exibe zeros
-            const defaultMetrics = { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
-            const metrics = data.length > 0 ? summary : defaultMetrics;
+            const metrics = data.length > 0 ? summary : { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
             
             const kpiCardsHtml = `
                 <!-- KPI 1: Gasto Total -->
@@ -1535,7 +1534,7 @@
             }
             
             // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS (Topo)
-            renderKpiCards(filteredResults, summaryMetrics);
+            renderKpiCards(filteredResults, summaryMetrics, 'kpiCardsContainer');
 
             listContainer.innerHTML = '';
 
