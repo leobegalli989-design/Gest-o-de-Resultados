@@ -106,7 +106,7 @@
         }
         @keyframes pulseGlow {
             0% { opacity: 0.3; transform: scale(1); }
-            100% { transform: scale(1.05); }
+            100% { opacity: 0.6; transform: scale(1.05); }
         }
 
         /* PEÇAS DE JOGO ANIMADAS */
@@ -306,7 +306,7 @@
             <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
 
             <!-- Tab 1: Resultados de Campanhas -->
-            <section id="resultados" class="tab-content">
+            <section id="resultados" class="tab-content active">
                 <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
                 
                 <!-- Formulário de Registro Diário -->
@@ -2296,6 +2296,7 @@
 
             // Se não houver dados, exibe zeros
             const data = summary.reportData || [];
+            // O objeto metrics é reportSummaryMetrics, que já tem os totais calculados
             const metrics = data.length > 0 ? summary : { totalGasto: 0, totalFaturamento: 0, avgROAS: 0, avgCPA: 0, avgCPM: 0 };
             
             const kpiCardsHtml = `
@@ -2352,7 +2353,7 @@
                 document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
                 reportSummaryMetrics = null; 
                 reportDetailedResults = [];
-                // Renderiza KPIs zerados
+                // CORREÇÃO: Renderiza KPIs zerados
                 renderReportKpiCards({}); 
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
@@ -2408,8 +2409,8 @@
                 generationDate: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
             };
             
-            // CORREÇÃO: Renderiza KPIs do Relatório (Passando o summaryMetrics calculado)
-            renderReportKpiCards(reportSummaryMetrics, 'reportKpiCardsContainer'); 
+            // CORREÇÃO: Renderiza KPIs do Relatório
+            renderReportKpiCards(reportSummaryMetrics); 
 
             setTimeout(() => {
                 
