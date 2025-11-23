@@ -115,7 +115,7 @@
         }
         @keyframes pulseGlow {
             0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.05); }
+            100% { transform: scale(1.05); }
         }
 
         /* PEÇAS DE JOGO ANIMADAS */
@@ -1503,40 +1503,43 @@
             container.innerHTML = kpiCardsHtml;
         }
 
-        /** Carrega os dados de um resultado na tela para edição */
-        window.editResult = function(resultId) {
-            const result = results.find(r => r.id === resultId);
-            if (!result) {
-                return showMessage('Registro de resultado não encontrado.', 3000, true);
+        /**
+         * NOVO: Filtra os resultados por preset (Hoje, Ontem, 7D, etc.) e aplica o filtro.
+         * LIGADO AO WINDOW para ser chamado pelos botões da Aba Resultados.
+         */
+        window.filterResultsByPreset = function(preset) {
+            const today = new Date();
+            const endDateInput = document.getElementById('results_filter_end_date');
+            const startDateInput = document.getElementById('results_filter_start_date');
+            
+            const formatDate = (date) => {
+                const offset = date.getTimezoneOffset() * 60000;
+                const localDate = new Date(date.getTime() - offset);
+                return localDate.toISOString().split('T')[0];
+            };
+
+            const todayStr = formatDate(today);
+            endDateInput.value = todayStr;
+
+            let startDate = new Date(today);
+
+            if (preset === 'today') {
+                startDate = new Date(today);
+            } else if (preset === 'yesterday') {
+                startDate.setDate(today.getDate() - 1);
+            } else if (preset === '7days') {
+                startDate.setDate(today.getDate() - 6);
+            } else if (preset === '15days') {
+                startDate.setDate(today.getDate() - 14);
+            } else if (preset === '30days') {
+                startDate.setDate(today.getDate() - 29);
             }
-
-            // 1. Define o ID de edição
-            document.getElementById('res_id_edit').value = resultId;
-
-            // 2. Popula todos os campos
-            document.getElementById('res_data').value = result.data;
-            document.getElementById('res_cliente').value = result.clientId;
-            document.getElementById('res_plataforma').value = result.plataforma;
-            document.getElementById('res_investimento').value = result.investimento;
-            document.getElementById('res_impressoes').value = result.impressoes;
-            document.getElementById('res_alcance').value = result.alcance;
-            document.getElementById('res_cliques').value = result.cliques;
-            document.getElementById('res_vendas').value = result.vendas;
-            document.getElementById('res_conversion_type').value = result.conversionType;
-            document.getElementById('res_conversion_count').value = result.conversionCount;
-            document.getElementById('res_observacoes').value = result.observacoes;
             
-            // 3. Atualiza as métricas calculadas na tela
-            updateMetricsDisplay();
-            
-            // 4. Muda o texto do botão de submit
-            const submitButton = document.getElementById('resultsSubmitButton');
-            if(submitButton) submitButton.textContent = 'Salvar Alterações';
+            startDateInput.value = formatDate(startDate);
 
-            // 5. Scrolla para o topo para garantir visibilidade do formulário
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            showMessage(`Modo de Edição ativado para o registro de ${getLocalDayDate(result.data).toLocaleDateString('pt-BR')}.`, 5000);
+            // Força a renderização da tabela (que aplica o filtro com base nos inputs)
+            renderResultsTable();
+            showMessage(`Filtro rápido de ${preset} aplicado.`);
         }
 
         /** Renderiza o histórico de resultados em formato de Cartões/Lista (Chamado pelo onSnapshot) */
@@ -1974,7 +1977,7 @@
         }
 
         /** Renderiza o calendário (Mês Atual) */
-        function renderCalendar() {
+        window.renderCalendar = function() {
             const grid = document.getElementById('calendarGrid');
             const filterClientId = document.getElementById('filterClient').value; // Lendo o filtro
 
@@ -2332,6 +2335,9 @@
                 return localDate.toISOString().split('T')[0];
             };
 
+            const todayStr = formatDate(today);
+            endDateInput.value = todayStr;
+
             let startDate = new Date(today);
 
             if (preset === 'today') {
@@ -2339,7 +2345,7 @@
             } else if (preset === 'yesterday') {
                 startDate.setDate(today.getDate() - 1);
             } else if (preset === '7days') {
-                startDate.setDate(today.getDate() - 6);
+                startDate.setDate(today.getDate() - 6); // 6 dias atrás + hoje = 7 dias
             } else if (preset === '15days') {
                 startDate.setDate(today.getDate() - 14);
             } else if (preset === '30days') {
@@ -2347,7 +2353,6 @@
             }
             
             startDateInput.value = formatDate(startDate);
-            endDateInput.value = formatDate(today);
 
             // Gera o relatório automaticamente
             generateReport();
