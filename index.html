@@ -8,23 +8,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carrega Chart.js para geração de gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-    <!-- Configuração da fonte Poppins e cores personalizadas do Tailwind -->
+    
+    <!-- CORREÇÃO: Bloco de configuração do Tailwind movido para depois do CDN -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'novan-primary': '#6D28D9', // Roxo principal
-                        'novan-secondary': '#0F172A', // Preto/Cinza Escuro (fundo)
-                        'novan-light': '#F8FAFC', // Cinza Claro (cards/inputs)
-                    },
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
+        // CORREÇÃO: Usamos setTimeout(0) para garantir que o script do CDN tenha carregado antes de configurar a variável global 'tailwind'.
+        setTimeout(() => {
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                'novan-primary': '#6D28D9', // Roxo principal
+                                'novan-secondary': '#0F172A', // Preto/Cinza Escuro (fundo)
+                                'novan-light': '#F8FAFC', // Cinza Claro (cards/inputs)
+                            },
+                            fontFamily: {
+                                sans: ['Poppins', 'sans-serif'],
+                            },
+                        }
+                    }
                 }
+            } else {
+                console.error("Tailwind CDN not loaded.");
             }
-        }
+        }, 0);
     </script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -306,7 +315,7 @@
             <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
 
             <!-- Tab 1: Resultados de Campanhas -->
-            <section id="resultados" class="tab-content active">
+            <section id="resultados" class="tab-content">
                 <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
                 
                 <!-- Formulário de Registro Diário -->
@@ -408,6 +417,7 @@
                     <div class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-gray-700 w-full">
                         <span class="text-sm font-medium text-gray-300 self-center mr-2">Filtros Rápidos:</span>
                         <button onclick="filterResultsByPreset('today')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Hoje</button>
+                        <button onclick="filterResultsByPreset('yesterday')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Ontem</button>
                         <button onclick="filterResultsByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 7 dias</button>
                         <button onclick="filterResultsByPreset('15days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 15 dias</button>
                         <button onclick="filterResultsByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white font-semibold py-1 px-3 rounded-lg shadow-md transition-all">Últimos 30 dias</button>
@@ -483,7 +493,7 @@
                             <select id="task_status" required class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:border-novan-primary bg-gray-700 text-white">
                                 <option value="Pendente">Pendente</option>
                                 <option value="Em Andamento">Em Andamento</option>
-                                <option value="Concluido">Concluído</option>
+                                <option value="Concluido">Concluí do</option>
                             </select>
                             <textarea id="task_observacoes" placeholder="Observações" class="w-full p-2 border border-gray-600 rounded-lg focus:ring-novan-primary focus:focus:border-novan-primary bg-gray-700 text-white"></textarea>
                             <button type="submit" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
@@ -1536,7 +1546,7 @@
                 summaryMetrics.avgCPM = calculateCPM(summaryMetrics.totalGasto, summaryMetrics.totalImpressoes);
             }
             
-            // RENDERIZAÇÃO DOS KPI CARDS AGREGADOS
+            // CORREÇÃO: RENDERIZAÇÃO DOS KPI CARDS AGREGADOS
             renderKpiCards(summaryMetrics, 'kpiCardsContainer');
 
             listContainer.innerHTML = '';
@@ -2374,7 +2384,7 @@
                 document.getElementById('chartsContainer').querySelectorAll('canvas').forEach(c => c.style.display = 'none');
                 reportSummaryMetrics = null; 
                 reportDetailedResults = [];
-                // CORREÇÃO: Renderiza KPIs zerados
+                // Renderiza KPIs zerados
                 renderReportKpiCards({}); 
                 return showMessage('Nenhum dado encontrado para os filtros selecionados.', true);
             }
