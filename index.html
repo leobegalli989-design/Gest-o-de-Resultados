@@ -466,41 +466,54 @@
 
             <!-- Tab: Calendário -->
             <section id="calendario" class="tab-content">
-                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Agenda</h1>
-                <div class="grid lg:grid-cols-4 gap-6">
-                    <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-700 h-fit">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-white tracking-wide"><span class="text-novan-primary">#</span> Agenda</h1>
+                    <button onclick="toggleTaskForm()" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+                        Nova Tarefa
+                    </button>
+                </div>
+
+                <!-- Modal de Tarefa (Hidden by default) -->
+                <div id="taskFormContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all duration-300">
+                    <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-cyan-500/30 relative">
+                        <button onclick="toggleTaskForm()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                        <h2 class="text-sm font-bold mb-6 text-cyan-400 uppercase tracking-widest border-b border-slate-700 pb-2">Agendar Tarefa</h2>
                         <form id="taskForm" class="space-y-4">
-                            <select id="task_cliente" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700"></select>
-                            <select id="task_tipo" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700">
+                            <select id="task_cliente" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 text-white"></select>
+                            <select id="task_tipo" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 text-white">
                                 <option value="Campanha">Campanha</option>
                                 <option value="Post">Post</option>
                                 <option value="Reuniao">Reunião</option>
                             </select>
-                            <input type="datetime-local" id="task_data" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700" />
-                            <select id="task_status" class="w-full p-3 rounded-lg bg-slate-900 border-slate-700">
+                            <input type="datetime-local" id="task_data" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 text-white" />
+                            <select id="task_status" class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 text-white">
                                 <option value="Pendente">Pendente</option>
                                 <option value="Em Andamento">Em Andamento</option>
                             </select>
-                            <textarea id="task_observacoes" placeholder="Descrição..." class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 h-24 resize-none"></textarea>
+                            <textarea id="task_observacoes" placeholder="Descrição..." class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 h-24 resize-none text-white"></textarea>
                             <button type="submit" class="w-full bg-novan-primary hover:bg-novan-hover text-white p-3 rounded-lg font-bold shadow-neon transition">AGENDAR</button>
                         </form>
                     </div>
-                    <div class="lg:col-span-3 bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-6 text-white">
-                            <div class="flex items-center gap-4">
-                                <button onclick="changeMonth(-1)" class="bg-slate-700 hover:bg-novan-primary p-2 rounded-lg transition">◀</button>
-                                <h2 id="currentMonthYear" class="text-2xl font-bold tracking-tight"></h2>
-                                <button onclick="changeMonth(1)" class="bg-slate-700 hover:bg-novan-primary p-2 rounded-lg transition">▶</button>
-                            </div>
-                            <select id="filterClient" class="p-2 rounded bg-slate-700 text-white text-sm border-none" onchange="renderCalendar()">
-                                <option value="">Todos</option>
-                            </select>
+                </div>
+
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 w-full">
+                    <div class="flex justify-between items-center mb-6 text-white">
+                        <div class="flex items-center gap-4">
+                            <button onclick="changeMonth(-1)" class="bg-slate-700 hover:bg-novan-primary p-2 rounded-lg transition">◀</button>
+                            <h2 id="currentMonthYear" class="text-2xl font-bold tracking-tight"></h2>
+                            <button onclick="changeMonth(1)" class="bg-slate-700 hover:bg-novan-primary p-2 rounded-lg transition">▶</button>
                         </div>
-                        <div class="grid grid-cols-7 text-center text-cyan-400 font-bold mb-2 text-sm uppercase">
-                            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-                        </div>
-                        <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+                        <select id="filterClient" class="p-2 rounded bg-slate-700 text-white text-sm border-none" onchange="renderCalendar()">
+                            <option value="">Todos</option>
+                        </select>
                     </div>
+                    <div class="grid grid-cols-7 text-center text-cyan-400 font-bold mb-2 text-sm uppercase">
+                        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
                 </div>
             </section>
 
@@ -563,6 +576,23 @@
             <h3 id="summaryTitle" class="text-2xl font-bold mb-4 text-white"></h3>
             <div id="summaryContent" class="text-gray-300 max-h-[60vh] overflow-y-auto mb-6 custom-scrollbar"></div>
             <button onclick="closeSummaryModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-lg font-bold border border-slate-700">FECHAR</button>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmação Futurista -->
+    <div id="confirmationModal" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-4 z-50 backdrop-blur-md">
+        <div class="bg-slate-900 p-8 rounded-2xl w-full max-w-sm border border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.3)] text-center">
+            <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-white">Excluir Registro?</h3>
+            <p class="text-gray-400 mb-6 text-sm">Esta ação é irreversível e removerá permanentemente os dados do sistema.</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition">Cancelar</button>
+                <button onclick="confirmDeleteAction()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold shadow-lg shadow-red-900/40 transition">Confirmar</button>
+            </div>
         </div>
     </div>
 
@@ -907,13 +937,62 @@
                                 <span>Ret: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span>
-                            <span class="text-[9px] uppercase text-gray-500">ROAS</span>
+                        <div class="flex items-center gap-4">
+                            <div class="text-right">
+                                <span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span>
+                                <span class="text-[9px] uppercase text-gray-500">ROAS</span>
+                            </div>
+                            <button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir Resultado">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `;
             });
+        };
+
+        // --- NEW DELETE LOGIC (UPDATED) ---
+        window.deleteResult = (id) => {
+            window.pendingDeleteId = id;
+            window.pendingDeleteCollection = 'results'; // Set collection
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.deleteTask = (id) => {
+            window.pendingDeleteId = id;
+            window.pendingDeleteCollection = 'tasks'; // Set collection
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeConfirmModal = () => {
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            window.pendingDeleteId = null;
+            window.pendingDeleteCollection = null;
+        };
+
+        window.confirmDeleteAction = async () => {
+            const id = window.pendingDeleteId;
+            const collectionName = window.pendingDeleteCollection;
+
+            if(!id || !collectionName) return;
+            
+            closeConfirmModal();
+            
+            try {
+                await deleteDoc(doc(db, 'users', userId, collectionName, id));
+                showMessage("Item excluído com sucesso!");
+            } catch(e) {
+                console.error(e);
+                showMessage("Erro ao excluir. Verifique permissões.", true);
+            }
         };
 
         window.generateDailySummary = async () => {
@@ -928,6 +1007,11 @@
             document.getElementById('summaryModal').classList.add('flex');
             document.getElementById('summaryTitle').textContent = "Resumo Diário";
             document.getElementById('summaryContent').innerHTML = content;
+        };
+
+        window.toggleTaskForm = () => {
+            const f = document.getElementById('taskFormContainer');
+            f.classList.toggle('hidden');
         };
 
         // --- INSIGHTS ---
@@ -1024,11 +1108,16 @@
                     <div class="space-y-3">${columnTasks.map(t => {
                         const cli = clients.find(c => c.id === t.clientId);
                         return `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 shadow-lg hover:border-cyan-500/50 transition relative group">
-                            <div class="text-[10px] text-cyan-400 font-bold uppercase tracking-wide mb-1">${cli?.nome || 'Geral'}</div>
+                            <button onclick="deleteTask('${t.id}')" class="absolute top-2 right-2 text-slate-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                            <div class="text-[10px] text-cyan-400 font-bold uppercase tracking-wide mb-1 pr-6">${cli?.nome || 'Geral'}</div>
                             <div class="text-sm text-white font-medium mb-2">${t.type}</div>
                             <div class="flex justify-between items-center mt-2 border-t border-slate-700 pt-2">
                                 <span class="text-[10px] text-gray-500">${new Date(t.date).toLocaleDateString()}</span>
-                                <select onchange="updateTaskStatus('${t.id}', this.value)" class="text-[9px] bg-slate-900 text-gray-300 rounded p-1 border-none focus:ring-0 w-20">
+                                <select onchange="updateTaskStatus('${t.id}', this.value)" class="text-[9px] bg-slate-900 text-gray-300 rounded p-1 border-none focus:ring-0 w-20 cursor-pointer hover:bg-slate-800 transition">
                                     <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                                     <option value="Em Andamento" ${status === 'Em Andamento' ? 'selected' : ''}>Andamento</option>
                                     <option value="Concluido" ${status === 'Concluido' ? 'selected' : ''}>Feito</option>
@@ -1118,6 +1207,7 @@
             showMessage("Dados salvos!");
             e.target.reset();
             document.getElementById('res_id_edit').value = "";
+            toggleResultForm();
         });
 
         document.getElementById('taskForm').addEventListener('submit', async (e) => {
@@ -1132,6 +1222,7 @@
             await addDoc(tasksCollection, data);
             showMessage("Tarefa criada!");
             e.target.reset();
+            toggleTaskForm();
         });
 
         // Matrix Effect Start on Load
