@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novan Agency | Painel de Gestão de Tráfego e Tarefas</title>
-    <!-- Carrega Tailwind CSS para estilização moderna e responsiva -->
+    <title>Novan Agency | Painel Futurista</title>
+    <!-- Carrega Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carrega Chart.js para geração de gráficos -->
+    <!-- Carrega Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-    <!-- Carrega html2canvas para exportação de imagens -->
+    <!-- Carrega html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
@@ -18,13 +18,19 @@
                     theme: {
                         extend: {
                             colors: {
-                                'novan-primary': '#6D28D9',
-                                'novan-secondary': '#0F172A',
-                                'novan-light': '#F8FAFC',
+                                'novan-bg': '#020617',     /* Slate 950 - Fundo Profundo */
+                                'novan-card': '#0f172a',   /* Slate 900 - Cards */
+                                'novan-primary': '#06b6d4', /* Cyan 500 - Acento Principal Futurista */
+                                'novan-hover': '#0891b2',   /* Cyan 600 */
+                                'novan-secondary': '#1e293b', /* Slate 800 */
+                                'novan-light': '#f8fafc',
                             },
                             fontFamily: {
                                 sans: ['Poppins', 'sans-serif'],
                             },
+                            boxShadow: {
+                                'neon': '0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3)',
+                            }
                         }
                     }
                 }
@@ -37,43 +43,80 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #1E293B;
+            background-color: #020617; /* Fundo muito escuro */
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); /* Gradiente sutil */
+            color: #e2e8f0;
         }
+
+        /* Scrollbar Futurista */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b; 
+            border-radius: 4px;
+            border: 1px solid #0f172a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4; 
+        }
+
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease-in-out;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .tab-content.active {
             display: block;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
+
+        /* Sidebar Item - Estilo Tech */
         .sidebar-item {
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            border-right: 2px solid transparent;
+            margin-bottom: 4px;
+            border-radius: 0.5rem;
+        }
+        .sidebar-item:hover {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #22d3ee; /* Cyan 400 */
+            transform: translateX(4px);
         }
         .sidebar-item.active {
-            background-color: #5B21B6;
-            border-left: 4px solid #FBBF24;
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.15) 0%, transparent 100%);
+            border-left: 3px solid #06b6d4;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
         }
         
+        /* Calendario */
         .calendar-day {
             min-height: 100px;
-            border: 1px solid #334155;
-            background-color: #1E293B;
-            transition: transform 0.1s;
-            color: #E2E8F0;
+            border: 1px solid #1e293b;
+            background-color: #0f172a;
+            transition: all 0.2s;
+            color: #94a3b8;
         }
         .calendar-day:hover {
-            transform: scale(1.02);
+            transform: translateY(-2px);
             cursor: pointer;
-            background-color: #334155;
+            background-color: #1e293b;
+            border-color: #06b6d4;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
+            z-index: 10;
         }
         
+        /* Login Page */
         #login-page {
-            background-color: #0E1B31;
+            background-color: #020617;
             position: relative;
             overflow: hidden;
         }
@@ -85,53 +128,38 @@
             width: 100%;
             height: 100%;
             z-index: 0; 
-            opacity: 0.6;
+            opacity: 0.4;
         }
         
+        /* Floating Pieces - Agora Azuis/Cianos */
         .futuristic-piece {
             position: absolute;
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #a78bfa 0%, #6D28D9 100%);
-            box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5);
+            background: radial-gradient(circle at 30% 30%, #67e8f9 0%, #06b6d4 100%); /* Cyan gradient */
+            box-shadow: 0 0 20px #06b6d4, inset 0 0 10px rgba(255, 255, 255, 0.6);
             z-index: 1;
-            opacity: 0.7;
-            animation: floatPiece 15s ease-in-out infinite alternate, pulsePiece 3s ease-in-out infinite;
+            opacity: 0.6;
+            filter: blur(1px);
+            animation: floatPiece 15s ease-in-out infinite alternate, pulsePiece 4s ease-in-out infinite;
         }
 
         .piece-1 { top: 10%; left: 10%; transform: scale(0.8); }
-        .piece-2 { bottom: 15%; right: 10%; width: 90px; height: 90px; background: radial-gradient(circle at 70% 70%, #d8b4fe 0%, #6D28D9 100%); animation-delay: 2s; }
-        .piece-3 { top: 50%; left: 5%; transform: scale(0.6); animation-delay: 4s; }
-        .piece-4 { bottom: 5%; left: 40%; width: 40px; height: 40px; animation-delay: 6s; }
+        .piece-2 { bottom: 15%; right: 10%; width: 120px; height: 120px; background: radial-gradient(circle at 70% 70%, #22d3ee 0%, #0891b2 100%); animation-delay: 2s; opacity: 0.4; }
+        .piece-3 { top: 40%; left: 5%; transform: scale(0.5); animation-delay: 4s; }
+        .piece-4 { bottom: 10%; left: 30%; width: 40px; height: 40px; animation-delay: 6s; background: white; box-shadow: 0 0 15px white; }
 
         @keyframes floatPiece {
             0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(50px, -50px) rotate(10deg); }
+            100% { transform: translate(40px, -40px) rotate(15deg); }
         }
 
         @keyframes pulsePiece {
-            0% { box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5); }
-            50% { box-shadow: 0 0 25px #c4b5fd, inset 0 0 15px #a78bfa; }
-            100% { box-shadow: 0 0 15px #6D28D9, inset 0 0 8px rgba(255, 255, 255, 0.5); }
+            0% { box-shadow: 0 0 15px #06b6d4, inset 0 0 5px rgba(255, 255, 255, 0.4); }
+            50% { box-shadow: 0 0 30px #22d3ee, inset 0 0 10px rgba(255, 255, 255, 0.8); }
+            100% { box-shadow: 0 0 15px #06b6d4, inset 0 0 5px rgba(255, 255, 255, 0.4); }
         }
-        
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #6D28D9;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .bg-status-Pendente { background-color: #DC2626; }
-        .bg-status-Em_Andamento { background-color: #F59E0B; }
-        .bg-status-Concluido { background-color: #10B981; }
         
         .chart-container {
             min-height: 250px;
@@ -140,25 +168,55 @@
         .chart-container canvas {
             max-height: 100%;
         }
+
+        /* Inputs estilizados */
+        input, select, textarea {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: white !important;
+            transition: all 0.3s !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #06b6d4 !important;
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2) !important;
+            background-color: #0f172a !important;
+        }
+
+        /* Modal Transitions */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s ease-out; }
+        .modal-exit { opacity: 1; transform: scale(1); }
+        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: all 0.2s ease-in; }
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen text-slate-200">
     
     <!-- Tela de Login -->
-    <div id="login-page" class="flex items-center justify-center min-h-screen w-full bg-novan-secondary">
+    <div id="login-page" class="flex items-center justify-center min-h-screen w-full">
         <canvas id="matrixCanvas"></canvas>
         <div class="futuristic-piece piece-1"></div>
         <div class="futuristic-piece piece-2"></div>
         <div class="futuristic-piece piece-3"></div>
         <div class="futuristic-piece piece-4"></div>
 
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md z-10">
-            <h1 class="text-4xl font-bold text-center text-novan-primary mb-6">Novan Agency</h1>
-            <p class="text-center text-gray-600 mb-8">Acesso restrito. Faça login para continuar.</p>
-            <form id="loginForm" class="space-y-4">
-                <input type="email" id="login_email" placeholder="Email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary text-slate-800" />
+        <!-- Cartão Login Estilo Glass -->
+        <div class="bg-slate-900/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md z-10 border border-slate-700/50">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 bg-novan-primary rounded-full flex items-center justify-center shadow-neon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-center text-white mb-2 tracking-wide">Novan Agency</h1>
+            <p class="text-center text-cyan-400 mb-8 text-sm uppercase tracking-widest">Portal de Gestão</p>
+            
+            <form id="loginForm" class="space-y-5">
                 <div class="relative">
-                    <input type="password" id="login_password" placeholder="Senha" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-novan-primary focus:border-novan-primary pr-10 text-slate-800" />
+                    <input type="email" id="login_email" placeholder="Email" required class="w-full p-3 rounded-lg border focus:ring-novan-primary focus:border-novan-primary" />
+                </div>
+                <div class="relative">
+                    <input type="password" id="login_password" placeholder="Senha" required class="w-full p-3 rounded-lg border focus:ring-novan-primary focus:border-novan-primary pr-10" />
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-novan-primary transition-colors">
                         <svg id="togglePasswordIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path id="togglePasswordPath1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -166,131 +224,126 @@
                         </svg>
                     </button>
                 </div>
-                <div class="flex items-center justify-between">
-                    <label for="rememberMe" class="flex items-center text-sm text-gray-600">
-                        <input type="checkbox" id="rememberMe" checked class="h-4 w-4 text-novan-primary border-gray-300 rounded focus:ring-novan-primary mr-2">
-                        Lembrar de Mim
-                    </label>
-                </div>
-                <button type="submit" id="loginButton" class="w-full bg-novan-primary hover:bg-violet-700 text-white font-semibold p-3 rounded-lg shadow-md transition-transform transform hover:scale-[1.01]">
-                    Entrar
+                <button type="submit" id="loginButton" class="w-full bg-novan-primary hover:bg-novan-hover text-white font-bold p-3 rounded-lg shadow-lg transition-all transform hover:scale-[1.02] hover:shadow-neon">
+                    ENTRAR
                 </button>
             </form>
-            <p id="authError" class="text-center text-red-500 mt-4 text-sm hidden"></p>
+            <p id="authError" class="text-center text-red-400 mt-4 text-sm hidden bg-red-900/20 p-2 rounded border border-red-500/30"></p>
         </div>
     </div>
 
     <!-- Dashboard Principal -->
     <div id="dashboard-container" class="hidden contents">
-        <aside id="sidebar" class="bg-novan-secondary text-white w-full lg:w-64 flex-shrink-0 p-4 shadow-2xl lg:shadow-none">
-            <div class="text-3xl font-bold mb-8 text-novan-primary border-b border-gray-700 pb-4">Novan Agency</div>
-            <nav>
-                <div id="nav-clientes" class="sidebar-item p-3 rounded-lg flex items-center mb-2 active" onclick="switchTab('clientes')" data-tab="clientes">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
-                    Gestão de Clientes
+        <!-- Sidebar - Dark Blue Theme -->
+        <aside id="sidebar" class="bg-[#0f172a] text-gray-300 w-full lg:w-64 flex-shrink-0 p-4 border-r border-slate-800">
+            <div class="flex items-center gap-3 mb-8 px-2 border-b border-slate-800 pb-4">
+                <div class="bg-novan-primary p-1.5 rounded-lg shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
                 </div>
-                <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2" onclick="switchTab('resultados')" data-tab="resultados">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2v14a2 2 0 002 2z" /></svg>
-                    Resultados de Campanhas
+                <span class="text-2xl font-bold text-white tracking-tight">Novan</span>
+            </div>
+            <nav class="space-y-1">
+                <div id="nav-clientes" class="sidebar-item p-3 flex items-center active" onclick="switchTab('clientes')" data-tab="clientes">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                    Clientes
                 </div>
-                <div id="nav-calendario" class="sidebar-item p-3 rounded-lg flex items-center mb-2" onclick="switchTab('calendario')" data-tab="calendario">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    Calendário de Tarefas
+                <div id="nav-resultados" class="sidebar-item p-3 flex items-center" onclick="switchTab('resultados')" data-tab="resultados">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2v14a2 2 0 002 2z" /></svg>
+                    Resultados
                 </div>
-                <div id="nav-gestao" class="sidebar-item p-3 rounded-lg flex items-center mb-2" onclick="switchTab('gestao')" data-tab="gestao">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
-                    Gestão de Tarefas
+                <div id="nav-calendario" class="sidebar-item p-3 flex items-center" onclick="switchTab('calendario')" data-tab="calendario">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Calendário
                 </div>
-                <div id="nav-relatorios" class="sidebar-item p-3 rounded-lg flex items-center mb-2" onclick="switchTab('relatorios')" data-tab="relatorios">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
-                    Relatórios e Insights
+                <div id="nav-gestao" class="sidebar-item p-3 flex items-center" onclick="switchTab('gestao')" data-tab="gestao">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
+                    Tarefas
                 </div>
-                <div onclick="handleLogout()" class="sidebar-item p-3 rounded-lg flex items-center mb-2 mt-8 bg-red-600 hover:bg-red-700 text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                <div id="nav-relatorios" class="sidebar-item p-3 flex items-center" onclick="switchTab('relatorios')" data-tab="relatorios">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                    Insights
+                </div>
+                <div onclick="handleLogout()" class="sidebar-item p-3 flex items-center mt-12 text-red-400 hover:text-red-300 hover:bg-red-900/20 border border-transparent hover:border-red-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     Sair
                 </div>
             </nav>
         </aside>
 
         <main class="flex-grow p-4 md:p-8 overflow-x-hidden">
-            <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-3 rounded-lg shadow-xl hidden z-50 transition-all duration-300"></div>
+            <div id="messageBox" class="fixed top-4 right-4 bg-novan-primary text-white p-4 rounded-xl shadow-lg hidden z-50 transition-all duration-300 font-medium"></div>
 
             <!-- Tab: Clientes -->
             <section id="clientes" class="tab-content">
-                <h1 class="text-4xl font-bold text-white mb-6">👥 Cadastro & Gestão de Clientes</h1>
-                
-                <button onclick="toggleClientForm()" class="w-full md:w-auto mb-6 bg-novan-primary hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    Novo Cadastro
-                </button>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-white tracking-wide">
+                        <span class="text-novan-primary">#</span> Clientes
+                    </h1>
+                    <button onclick="toggleClientForm()" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Novo Cliente
+                    </button>
+                </div>
 
                 <!-- Registration Form Block -->
-                <div id="clientRegistrationContainer" class="hidden bg-slate-800 p-6 rounded-xl shadow-lg mb-8 max-w-2xl mx-auto border border-gray-700 transition-all duration-300">
-                    <h2 class="text-xl font-semibold mb-4 text-novan-primary border-b border-gray-700 pb-2">Registo de Novo Cliente</h2>
+                <div id="clientRegistrationContainer" class="hidden bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl mb-8 border border-slate-700 max-w-2xl mx-auto transition-all duration-300">
+                    <h2 class="text-lg font-semibold mb-4 text-cyan-400 border-b border-slate-700 pb-2 uppercase tracking-wide">Ficha Técnica</h2>
                     <form id="clientForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="hidden" id="cli_id_edit" value="">
                         
                         <div class="col-span-1 md:col-span-2">
-                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Tipo de Serviço</label>
-                             <div class="flex gap-2">
-                                <button type="button" id="form_btn_traffic" onclick="toggleFormCategory('traffic')" class="flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white border border-novan-primary transition">Tráfego Pago</button>
-                                <button type="button" id="form_btn_social" onclick="toggleFormCategory('social')" class="flex-1 py-2 rounded-lg font-semibold bg-gray-700 text-gray-300 border border-gray-600 transition">Social Media</button>
+                             <label class="text-xs text-gray-400 uppercase font-bold ml-1">Tipo de Serviço</label>
+                             <div class="flex gap-2 mt-1">
+                                <button type="button" id="form_btn_traffic" onclick="toggleFormCategory('traffic')" class="flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition">Tráfego</button>
+                                <button type="button" id="form_btn_social" onclick="toggleFormCategory('social')" class="flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 hover:text-white transition">Social</button>
                              </div>
                              <input type="hidden" id="cli_service_type" value="traffic">
                         </div>
 
                         <div class="col-span-1 md:col-span-2">
-                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Dados da Empresa</label>
-                             <input type="text" id="cli_nome" placeholder="Nome da Empresa" required class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-novan-primary outline-none" />
+                             <input type="text" id="cli_nome" placeholder="Nome da Empresa" required class="w-full p-3 rounded-lg" />
                         </div>
                         
                         <div>
-                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Responsável</label>
-                             <select id="cli_responsavel" required class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none">
-                                <option value="Agência">Agência</option>
-                                <option value="Freelancer">Freelancer</option>
+                             <select id="cli_responsavel" required class="w-full p-3 rounded-lg">
+                                <option value="Agência">Gestão: Agência</option>
+                                <option value="Freelancer">Gestão: Freelancer</option>
                              </select>
                         </div>
                         
                         <div>
-                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">WhatsApp</label>
-                             <input type="tel" id="cli_telefone" placeholder="(00) 00000-0000" required class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none" oninput="maskPhone(this)" maxlength="15" />
+                             <input type="tel" id="cli_telefone" placeholder="WhatsApp (00) 0..." required class="w-full p-3 rounded-lg" oninput="maskPhone(this)" maxlength="15" />
                         </div>
 
                         <div class="col-span-1 md:col-span-2">
-                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Link (Site/Perfil)</label>
-                             <input type="url" id="cli_link" placeholder="https://..." class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none" />
+                             <input type="url" id="cli_link" placeholder="Link (Site/Instagram)" class="w-full p-3 rounded-lg" />
                         </div>
 
                         <!-- Dynamic Fields: Traffic -->
                         <div id="trafficFields" class="contents">
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Plataforma</label>
-                                <select id="cli_plataforma_traffic" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none">
-                                    <option value="Meta">Meta Ads</option>
-                                    <option value="Google">Google Ads</option>
-                                    <option value="Ambos">Ambos</option>
+                                <select id="cli_plataforma_traffic" class="w-full p-3 rounded-lg">
+                                    <option value="Meta">Plataforma: Meta</option>
+                                    <option value="Google">Plataforma: Google</option>
+                                    <option value="Ambos">Plataforma: Ambos</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Orçamento</label>
-                                <input type="number" step="0.01" id="cli_budget_value_traffic" placeholder="Valor R$" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none" />
+                                <input type="number" step="0.01" id="cli_budget_value_traffic" placeholder="Verba (R$)" class="w-full p-3 rounded-lg" />
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Tipo Ciclo</label>
-                                <select id="cli_budget_type_traffic" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none">
-                                    <option value="Diário">Diário</option>
-                                    <option value="Mensal">Mensal</option>
+                                <select id="cli_budget_type_traffic" class="w-full p-3 rounded-lg">
+                                    <option value="Diário">Ciclo: Diário</option>
+                                    <option value="Mensal">Ciclo: Mensal</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Objetivo</label>
-                                <select id="cli_conversion_goals_traffic" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none">
-                                    <option value="Mensagem">Mensagem</option>
-                                    <option value="Compras">Compras</option>
-                                    <option value="Ligue">Ligue</option>
+                                <select id="cli_conversion_goals_traffic" class="w-full p-3 rounded-lg">
+                                    <option value="Mensagem">Obj: Mensagem</option>
+                                    <option value="Compras">Obj: Compras</option>
+                                    <option value="Ligue">Obj: Leads</option>
                                 </select>
                             </div>
                         </div>
@@ -298,165 +351,152 @@
                         <!-- Dynamic Fields: Social Media -->
                         <div id="socialMediaFields" class="hidden contents">
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Fee Mensal</label>
-                                <input type="number" step="0.01" id="cli_sm_fee" placeholder="Valor R$" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none" />
+                                <input type="number" step="0.01" id="cli_sm_fee" placeholder="Fee Mensal (R$)" class="w-full p-3 rounded-lg" />
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Rede Social</label>
-                                <select id="cli_sm_platform" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none">
-                                    <option value="Instagram">Instagram</option>
-                                    <option value="LinkedIn">LinkedIn</option>
-                                    <option value="TikTok">TikTok</option>
+                                <select id="cli_sm_platform" class="w-full p-3 rounded-lg">
+                                    <option value="Instagram">Rede: Instagram</option>
+                                    <option value="LinkedIn">Rede: LinkedIn</option>
+                                    <option value="TikTok">Rede: TikTok</option>
                                 </select>
                             </div>
                             <div class="col-span-1 md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Principais Necessidades</label>
-                                <select id="cli_sm_needs" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none">
-                                    <option value="Conteudo">Conteúdo Completo</option>
-                                    <option value="Design">Apenas Design</option>
-                                    <option value="Copy">Apenas Copywriting</option>
+                                <select id="cli_sm_needs" class="w-full p-3 rounded-lg">
+                                    <option value="Conteudo">Escopo: Conteúdo</option>
+                                    <option value="Design">Escopo: Design</option>
+                                    <option value="Copy">Escopo: Copy</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="col-span-1 md:col-span-2">
-                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Notas Internas</label>
-                             <textarea id="cli_observacoes" placeholder="Observações..." class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white outline-none h-20"></textarea>
+                             <textarea id="cli_observacoes" placeholder="Notas internas..." class="w-full p-3 rounded-lg h-24 resize-none"></textarea>
                         </div>
                         
-                        <button type="submit" id="clientSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary text-white p-3 rounded-lg font-bold shadow-lg hover:bg-violet-700 transition transform hover:scale-[1.02]">Guardar Cliente</button>
+                        <button type="submit" id="clientSubmitButton" class="col-span-1 md:col-span-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-3 rounded-lg font-bold shadow-lg hover:shadow-neon transition-all">SALVAR REGISTRO</button>
                     </form>
                 </div>
 
-                <!-- Client List Block with Filter Tabs -->
-                <div class="mt-12">
-                    <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                        <h2 class="text-2xl font-bold text-white">Listagem de Clientes</h2>
-                        <div class="flex bg-slate-800 p-1 rounded-xl border border-gray-700">
-                            <button onclick="setListingCategory('traffic')" id="list_tab_traffic" class="px-6 py-2 rounded-lg text-sm font-bold bg-novan-primary text-white transition">🚀 Tráfego Pago</button>
-                            <button onclick="setListingCategory('social')" id="list_tab_social" class="px-6 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition">📱 Social Media</button>
-                        </div>
+                <!-- Client List Block -->
+                <div class="mt-8">
+                    <div class="flex justify-start space-x-4 mb-6 border-b border-slate-700 pb-2">
+                        <button onclick="setListingCategory('traffic')" id="list_tab_traffic" class="pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition">TRÁFEGO</button>
+                        <button onclick="setListingCategory('social')" id="list_tab_social" class="pb-2 text-sm font-bold text-gray-500 hover:text-white transition">SOCIAL</button>
                     </div>
                     
-                    <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Cards are rendered here -->
-                    </div>
-                    <p id="noClients" class="text-center text-gray-400 mt-12 hidden">Nenhum cliente encontrado nesta categoria.</p>
+                    <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    <p id="noClients" class="text-center text-slate-500 mt-12 hidden italic">Nenhum registro encontrado.</p>
                 </div>
             </section>
 
             <!-- Tab: Resultados -->
             <section id="resultados" class="tab-content">
-                <h1 class="text-4xl font-bold text-white mb-6">🧾 Resultados de Campanhas</h1>
-                
-                <div class="bg-slate-800 p-6 rounded-xl shadow-lg mb-8">
-                    <h2 class="text-xl font-semibold mb-4 text-novan-primary">Registro Diário de Performance</h2>
-                    <form id="campaignForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input type="hidden" id="res_id_edit" value=""> 
-                        <input type="date" id="res_data" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        <select id="res_cliente" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
-                            <option value="">Selecione o Cliente</option>
-                        </select>
-                        <select id="res_plataforma" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
-                            <option value="Meta">Meta Ads</option>
-                            <option value="Google">Google Ads</option>
-                            <option value="Outra">Outra</option>
-                        </select>
-                        <input type="number" step="0.01" id="res_investimento" placeholder="Gasto (R$)" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        
-                        <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        <input type="number" id="res_alcance" placeholder="Alcance" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        <input type="number" id="res_cliques" placeholder="Cliques no Site" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        <input type="number" step="0.01" id="res_vendas" placeholder="Faturamento (R$)" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        
-                        <div class="col-span-1 md:col-span-2 flex items-center space-x-2">
-                            <select id="res_conversion_type" required class="p-2 border border-gray-600 rounded-lg w-1/2 bg-gray-700 text-white">
-                                <option value="">Tipo Conversão</option>
-                                <option value="Ligue">Ligue</option>
-                                <option value="Mensagem">Mensagem</option>
-                                <option value="Compras">Compras</option>
-                                <option value="Formulario">Formulário</option>
-                                <option value="Visualizacao">Visualização</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                            <input type="number" id="res_conversion_count" placeholder="Qtde Conversões" required class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                        </div>
-                        <div class="col-span-1 md:col-span-2 flex items-center space-x-4">
-                            <div class="text-sm font-medium text-gray-300">CPA: R$ <span id="cpa_calc" class="font-bold text-red-500">0.00</span></div>
-                            <div class="text-sm font-medium text-gray-300">ROAS: <span id="roas_calc" class="font-bold text-green-500">0.00</span></div>
-                            <div class="text-sm font-medium text-gray-300">CPM: R$ <span id="cpm_calc" class="font-bold text-blue-500">0.00</span></div>
-                        </div>
-                        
-                        <textarea id="rawMetricsInput" placeholder="Cole a mensagem pronta aqui (opcional)" class="p-2 border border-gray-600 rounded-lg col-span-1 md:col-span-4 bg-gray-700 text-white h-16"></textarea>
-                        <button type="button" onclick="parseAndFillMetrics()" class="col-span-1 md:col-span-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg">🤖 Preencher com Mensagem Pronta</button>
-                        <textarea id="res_observacoes" placeholder="Observações do dia" class="p-2 border border-gray-600 rounded-lg col-span-1 md:col-span-4 bg-gray-700 text-white"></textarea>
-
-                        <button type="submit" id="resultsSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-violet-700 text-white font-semibold p-2 rounded-lg">Registrar Resultados</button>
-                        <div class="col-span-1 md:col-span-2 flex gap-2">
-                            <button type="button" onclick="generateDailySummary()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold p-2 rounded-lg">Resumo Diário</button>
-                            <button type="button" onclick="generateQuinzenalSummary()" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-2 rounded-lg">Resumo 15D</button>
-                        </div>
-                    </form>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-white tracking-wide"><span class="text-novan-primary">#</span> Performance</h1>
+                    <button onclick="toggleResultForm()" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+                        Novo Resultado
+                    </button>
                 </div>
 
-                <div class="bg-slate-800 p-4 rounded-xl shadow-lg mb-6 flex flex-wrap gap-4 items-end border border-gray-700">
-                    <h2 class="text-xl font-semibold text-white flex-grow">Filtrar Histórico:</h2>
-                    <select id="results_filter_cliente" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
-                        <option value="">Todos os Clientes</option>
-                    </select>
-                    <input type="date" id="results_filter_start_date" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                    <input type="date" id="results_filter_end_date" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                    <button onclick="renderResultsTable()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-2 rounded-lg px-4">Aplicar</button>
-                    
-                    <div class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-gray-700 w-full">
-                        <button onclick="filterResultsByPreset('today')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white py-1 px-3 rounded-lg transition">Hoje</button>
-                        <button onclick="filterResultsByPreset('7days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white py-1 px-3 rounded-lg transition">7 dias</button>
-                        <button onclick="filterResultsByPreset('30days')" class="text-xs bg-gray-700 hover:bg-novan-primary text-white py-1 px-3 rounded-lg transition">30 dias</button>
-                        <button onclick="generateStrategicAnalysis()" class="text-xs bg-pink-600 hover:bg-pink-700 text-white py-1 px-3 rounded-lg transition">✨ Análise Estratégica</button>
+                <!-- Modal de Resultados (Hidden by default) -->
+                <div id="resultFormContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all duration-300">
+                    <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl w-full max-w-4xl border border-cyan-500/30 relative overflow-y-auto max-h-[90vh]">
+                        <button onclick="toggleResultForm()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                        <h2 class="text-sm font-bold mb-6 text-cyan-400 uppercase tracking-widest border-b border-slate-700 pb-2">Input de Dados</h2>
+                        <form id="campaignForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <input type="hidden" id="res_id_edit" value=""> 
+                            <input type="date" id="res_data" required class="p-3 rounded-lg" />
+                            <select id="res_cliente" required class="p-3 rounded-lg">
+                                <option value="">Cliente</option>
+                            </select>
+                            <select id="res_plataforma" required class="p-3 rounded-lg">
+                                <option value="Meta">Meta</option>
+                                <option value="Google">Google</option>
+                            </select>
+                            <input type="number" step="0.01" id="res_investimento" placeholder="Gasto (R$)" required class="p-3 rounded-lg" />
+                            
+                            <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-3 rounded-lg" />
+                            <input type="number" id="res_alcance" placeholder="Alcance" required class="p-3 rounded-lg" />
+                            <input type="number" id="res_cliques" placeholder="Cliques" required class="p-3 rounded-lg" />
+                            <input type="number" step="0.01" id="res_vendas" placeholder="Retorno (R$)" required class="p-3 rounded-lg" />
+                            
+                            <div class="col-span-1 md:col-span-2 flex items-center space-x-2">
+                                <select id="res_conversion_type" required class="p-3 rounded-lg w-1/2">
+                                    <option value="">Conversão</option>
+                                    <option value="Ligue">Ligue</option>
+                                    <option value="Mensagem">Mensagem</option>
+                                    <option value="Compras">Compras</option>
+                                    <option value="Formulario">Formulário</option>
+                                </select>
+                                <input type="number" id="res_conversion_count" placeholder="Qtd" required class="p-3 rounded-lg flex-grow" />
+                            </div>
+                            <div class="col-span-1 md:col-span-2 flex items-center justify-around bg-slate-800 rounded-lg border border-slate-700">
+                                <div class="text-xs text-slate-400">ROAS: <span id="roas_calc" class="font-bold text-green-400 text-lg">0.00</span></div>
+                                <div class="text-xs text-slate-400">CPA: <span id="cpa_calc" class="font-bold text-red-400 text-lg">0.00</span></div>
+                            </div>
+                            
+                            <textarea id="rawMetricsInput" placeholder="Colar dados brutos (IA)..." class="p-3 rounded-lg col-span-1 md:col-span-4 h-12 text-xs font-mono"></textarea>
+                            <button type="button" onclick="parseAndFillMetrics()" class="col-span-1 md:col-span-4 text-cyan-400 text-xs hover:text-white text-right">PROCESSAR TEXTO ⚡</button>
+                            <textarea id="res_observacoes" placeholder="Observações..." class="p-3 rounded-lg col-span-1 md:col-span-4 h-16 resize-none"></textarea>
+
+                            <button type="submit" id="resultsSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-novan-hover text-white font-bold p-3 rounded-lg transition-colors">REGISTRAR</button>
+                            <div class="col-span-1 md:col-span-2 flex gap-2">
+                                <button type="button" onclick="generateDailySummary()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold p-3 rounded-lg text-xs">RESUMO DIA</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
-                <div id="kpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 text-white"></div>
-
-                <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-700">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Histórico das Métricas</h2>
-                    <div id="resultsListContainer" class="space-y-4"></div>
+                <div class="bg-slate-800 p-4 rounded-xl mb-6 flex flex-wrap gap-3 items-center border border-cyan-500/20 shadow-lg">
+                    <span class="text-xs font-bold text-cyan-400 uppercase mr-auto">Filtros</span>
+                    <select id="results_filter_cliente" class="p-2 rounded-lg text-sm bg-slate-900 border-slate-700 text-white">
+                        <option value="">Todos</option>
+                    </select>
+                    <input type="date" id="results_filter_start_date" class="p-2 rounded-lg text-sm bg-slate-900 border-slate-700 text-white" />
+                    <input type="date" id="results_filter_end_date" class="p-2 rounded-lg text-sm bg-slate-900 border-slate-700 text-white" />
+                    <button onclick="renderResultsTable()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-2 rounded-lg px-4 text-xs">FILTRAR</button>
                 </div>
+
+                <div id="kpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 text-white"></div>
+                <div id="resultsListContainer" class="space-y-3"></div>
             </section>
 
             <!-- Tab: Calendário -->
             <section id="calendario" class="tab-content">
-                <h1 class="text-4xl font-bold text-white mb-6">📅 Calendário</h1>
+                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Agenda</h1>
                 <div class="grid lg:grid-cols-4 gap-6">
-                    <div class="bg-slate-800 p-6 rounded-xl shadow-lg">
-                        <form id="taskForm" class="space-y-3">
-                            <select id="task_cliente" required class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"></select>
-                            <select id="task_tipo" required class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
+                    <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-700 h-fit">
+                        <form id="taskForm" class="space-y-4">
+                            <select id="task_cliente" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700"></select>
+                            <select id="task_tipo" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700">
                                 <option value="Campanha">Campanha</option>
                                 <option value="Post">Post</option>
                                 <option value="Reuniao">Reunião</option>
                             </select>
-                            <input type="datetime-local" id="task_data" required class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
-                            <select id="task_status" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
+                            <input type="datetime-local" id="task_data" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700" />
+                            <select id="task_status" class="w-full p-3 rounded-lg bg-slate-900 border-slate-700">
                                 <option value="Pendente">Pendente</option>
                                 <option value="Em Andamento">Em Andamento</option>
                             </select>
-                            <textarea id="task_observacoes" placeholder="Notas" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"></textarea>
-                            <button type="submit" class="w-full bg-novan-primary text-white p-2 rounded-lg font-bold">Salvar Tarefa</button>
+                            <textarea id="task_observacoes" placeholder="Descrição..." class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 h-24 resize-none"></textarea>
+                            <button type="submit" class="w-full bg-novan-primary hover:bg-novan-hover text-white p-3 rounded-lg font-bold shadow-neon transition">AGENDAR</button>
                         </form>
                     </div>
-                    <div class="lg:col-span-3 bg-novan-secondary p-6 rounded-xl">
-                        <div class="flex justify-between items-center mb-4 text-white">
-                            <div class="flex gap-4">
-                                <button onclick="changeMonth(-1)" class="bg-gray-700 p-2 rounded-lg">&lt;</button>
-                                <h2 id="currentMonthYear" class="text-2xl font-bold"></h2>
-                                <button onclick="changeMonth(1)" class="bg-gray-700 p-2 rounded-lg">&gt;</button>
+                    <div class="lg:col-span-3 bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                        <div class="flex justify-between items-center mb-6 text-white">
+                            <div class="flex items-center gap-4">
+                                <button onclick="changeMonth(-1)" class="bg-slate-700 hover:bg-novan-primary p-2 rounded-lg transition">◀</button>
+                                <h2 id="currentMonthYear" class="text-2xl font-bold tracking-tight"></h2>
+                                <button onclick="changeMonth(1)" class="bg-slate-700 hover:bg-novan-primary p-2 rounded-lg transition">▶</button>
                             </div>
-                            <select id="filterClient" class="p-2 rounded bg-gray-700 text-white" onchange="renderCalendar()">
-                                <option value="">Todos os Clientes</option>
+                            <select id="filterClient" class="p-2 rounded bg-slate-700 text-white text-sm border-none" onchange="renderCalendar()">
+                                <option value="">Todos</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-7 text-center text-novan-primary font-bold mb-2">
+                        <div class="grid grid-cols-7 text-center text-cyan-400 font-bold mb-2 text-sm uppercase">
                             <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
                         </div>
                         <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
@@ -466,61 +506,49 @@
 
             <!-- Tab: Gestão -->
             <section id="gestao" class="tab-content">
-                <h1 class="text-4xl font-bold text-white mb-6">✅ Gestão de Tarefas</h1>
+                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Kanban</h1>
                 <div id="taskManagementBoard" class="grid md:grid-cols-3 gap-6"></div>
             </section>
 
             <!-- Tab: Insights -->
             <section id="relatorios" class="tab-content">
-                <h1 class="text-4xl font-bold text-white mb-6">📊 Insights & Performance</h1>
+                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Insights</h1>
                 
-                <div class="bg-slate-800 p-6 rounded-xl mb-8 border border-gray-700">
-                    <div class="flex flex-wrap gap-4 items-end mb-6">
+                <div class="bg-slate-800/60 p-6 rounded-xl mb-8 border border-slate-700">
+                    <div class="flex flex-wrap gap-4 items-end">
                         <div class="flex-grow min-w-[200px]">
-                            <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Selecionar Cliente</label>
-                            <select id="report_cliente" class="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white">
-                                <option value="">Todos os Clientes</option>
+                            <label class="text-xs font-bold text-cyan-400 mb-1 block uppercase">Cliente</label>
+                            <select id="report_cliente" class="w-full p-2 rounded-lg bg-slate-900 border-slate-700">
+                                <option value="">Todos</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Data Início</label>
-                            <input type="date" id="report_start_date" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
+                            <label class="text-xs font-bold text-cyan-400 mb-1 block uppercase">Início</label>
+                            <input type="date" id="report_start_date" class="p-2 rounded-lg bg-slate-900 border-slate-700" />
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Data Fim</label>
-                            <input type="date" id="report_end_date" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
+                            <label class="text-xs font-bold text-cyan-400 mb-1 block uppercase">Fim</label>
+                            <input type="date" id="report_end_date" class="p-2 rounded-lg bg-slate-900 border-slate-700" />
                         </div>
-                        <div class="flex gap-2">
-                             <button onclick="generateReport()" class="bg-novan-primary text-white p-2 rounded-lg px-6 font-bold hover:bg-violet-700 transition">Gerar Insights</button>
-                             <button onclick="exportReportToPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-lg px-6 font-bold transition flex items-center"><span class="mr-2">📸</span> Exportar PNG (HD)</button>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 border-t border-gray-700 pt-4">
-                        <button onclick="setReportPreset('today')" class="text-xs bg-gray-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg font-medium transition">Hoje</button>
-                        <button onclick="setReportPreset('yesterday')" class="text-xs bg-gray-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg font-medium transition">Ontem</button>
-                        <button onclick="setReportPreset('last7')" class="text-xs bg-gray-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg font-medium transition">Últimos 7 Dias</button>
-                        <button onclick="setReportPreset('last15')" class="text-xs bg-gray-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg font-medium transition">Últimos 15 Dias</button>
-                        <button onclick="setReportPreset('last30')" class="text-xs bg-gray-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg font-medium transition">Últimos 30 Dias</button>
-                        <button onclick="setReportPreset('last90')" class="text-xs bg-gray-700 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg font-medium transition">Últimos 90 Dias</button>
+                        <button onclick="generateReport()" class="bg-novan-primary text-white p-2 rounded-lg px-6 font-bold hover:shadow-neon transition">GERAR</button>
                     </div>
                 </div>
 
-                <!-- Report Container Wrapper for Capture -->
-                <div id="report-export-container" class="bg-novan-secondary p-4 rounded-xl">
+                <!-- Report Container -->
+                <div id="report-export-container" class="bg-[#0b1120] p-6 rounded-xl border border-slate-800">
                     <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8 text-white"></div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800">
-                            <h3 class="text-lg font-bold text-white mb-4">Gasto vs Faturamento (R$)</h3>
+                        <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
+                            <h3 class="text-sm font-bold text-gray-300 mb-4 uppercase">Financeiro</h3>
                             <div class="chart-container"><canvas id="spendRevenueChart"></canvas></div>
                         </div>
-                        <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800">
-                            <h3 class="text-lg font-bold text-white mb-4">Impressões vs Cliques</h3>
+                        <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
+                            <h3 class="text-sm font-bold text-gray-300 mb-4 uppercase">Tráfego</h3>
                             <div class="chart-container"><canvas id="impressionsClicksChart"></canvas></div>
                         </div>
-                        <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800 lg:col-span-2">
-                            <h3 class="text-lg font-bold text-white mb-4">ROAS Médio Diário (Retorno)</h3>
+                        <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800 lg:col-span-2">
+                            <h3 class="text-sm font-bold text-gray-300 mb-4 uppercase">Evolução do ROAS</h3>
                             <div class="chart-container" style="height: 300px;"><canvas id="roasDailyChart"></canvas></div>
                         </div>
                     </div>
@@ -530,11 +558,11 @@
     </div>
 
     <!-- Modais -->
-    <div id="summaryModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 p-8 rounded-2xl w-full max-w-2xl animate-in zoom-in duration-300">
-            <h3 id="summaryTitle" class="text-2xl font-bold mb-4 text-novan-primary"></h3>
-            <div id="summaryContent" class="text-gray-300 max-h-[60vh] overflow-y-auto mb-6"></div>
-            <button onclick="closeSummaryModal()" class="w-full bg-red-600 text-white p-2 rounded-lg">Fechar</button>
+    <div id="summaryModal" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-slate-900 p-8 rounded-2xl w-full max-w-2xl border border-cyan-500/30 shadow-neon">
+            <h3 id="summaryTitle" class="text-2xl font-bold mb-4 text-white"></h3>
+            <div id="summaryContent" class="text-gray-300 max-h-[60vh] overflow-y-auto mb-6 custom-scrollbar"></div>
+            <button onclick="closeSummaryModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-lg font-bold border border-slate-700">FECHAR</button>
         </div>
     </div>
 
@@ -566,11 +594,41 @@
         
         // Tab State
         let currentListingTab = 'traffic';
+        let matrixInterval;
+
+        function startMatrix() {
+            const canvas = document.getElementById('matrixCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            // Cyan colored matrix
+            const drops = Array(Math.floor(canvas.width/20)).fill(1);
+            
+            if(matrixInterval) clearInterval(matrixInterval);
+            
+            matrixInterval = setInterval(() => {
+                ctx.fillStyle = 'rgba(2, 6, 23, 0.1)'; // Fade out with dark blue
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#06b6d4'; // Cyan text
+                ctx.font = '14px monospace';
+                drops.forEach((y, i) => { 
+                    const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                    ctx.fillText(text, i * 20, y * 20); 
+                    if (y * 20 > canvas.height && Math.random() > 0.98) drops[i] = 0; 
+                    drops[i]++; 
+                });
+            }, 50);
+        }
+
+        function stopMatrix() {
+            if(matrixInterval) clearInterval(matrixInterval);
+        }
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
+                stopMatrix();
                 await initAppContent();
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('dashboard-container').classList.remove('hidden');
@@ -578,6 +636,7 @@
             } else {
                 document.getElementById('dashboard-container').classList.add('hidden');
                 document.getElementById('login-page').classList.remove('hidden');
+                startMatrix();
             }
         });
 
@@ -585,12 +644,17 @@
             e.preventDefault();
             const email = document.getElementById('login_email').value;
             const password = document.getElementById('login_password').value;
+            const btn = document.getElementById('loginButton');
+            const originalText = btn.innerText;
+            btn.innerText = "ACCESSING...";
             try {
                 await setPersistence(auth, browserLocalPersistence);
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (err) {
-                document.getElementById('authError').textContent = "Erro no login: Usuário ou senha inválidos.";
-                document.getElementById('authError').classList.remove('hidden');
+                const errBox = document.getElementById('authError');
+                errBox.textContent = "Acesso negado. Credenciais inválidas.";
+                errBox.classList.remove('hidden');
+                btn.innerText = originalText;
             }
         }
         document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -602,10 +666,8 @@
             const icon = document.getElementById('togglePasswordIcon');
             if (pwd.type === 'password') {
                 pwd.type = 'text';
-                icon.innerHTML = '<path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>';
             } else {
                 pwd.type = 'password';
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
             }
         };
 
@@ -618,9 +680,9 @@
         }
         function showMessage(t, e = false) {
             const b = document.getElementById('messageBox');
-            b.textContent = t;
-            b.className = `fixed top-4 right-4 text-white p-3 rounded-lg shadow-xl z-50 transition-all ${e ? 'bg-red-500' : 'bg-novan-primary'}`;
+            b.innerHTML = `<span class="${e ? 'text-red-400' : 'text-green-400'} mr-2">●</span> ${t}`;
             b.classList.remove('hidden');
+            b.classList.add(e ? 'bg-red-900/80' : 'bg-slate-800');
             setTimeout(() => b.classList.add('hidden'), 3000);
         }
 
@@ -669,13 +731,13 @@
             hiddenType.value = type;
             
             if(type === 'traffic') {
-                btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white border border-novan-primary transition";
-                btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-gray-700 text-gray-300 border border-gray-600 transition";
+                btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition";
+                btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition";
                 trafficFields.classList.remove('hidden');
                 socialFields.classList.add('hidden');
             } else {
-                btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white border border-novan-primary transition";
-                btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-gray-700 text-gray-300 border border-gray-600 transition";
+                btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition";
+                btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition";
                 socialFields.classList.remove('hidden');
                 trafficFields.classList.add('hidden');
             }
@@ -692,11 +754,11 @@
             const tabSocial = document.getElementById('list_tab_social');
 
             if(type === 'traffic') {
-                tabTraffic.className = "px-6 py-2 rounded-lg text-sm font-bold bg-novan-primary text-white transition";
-                tabSocial.className = "px-6 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition";
+                tabTraffic.className = "pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition";
+                tabSocial.className = "pb-2 text-sm font-bold text-gray-500 hover:text-white transition";
             } else {
-                tabSocial.className = "px-6 py-2 rounded-lg text-sm font-bold bg-novan-primary text-white transition";
-                tabTraffic.className = "px-6 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition";
+                tabSocial.className = "pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition";
+                tabTraffic.className = "pb-2 text-sm font-bold text-gray-500 hover:text-white transition";
             }
             renderClientList();
         };
@@ -716,25 +778,21 @@
 
             filteredClients.forEach(c => {
                 const isActive = c.active !== false; 
-                const cardColor = isActive ? c.color : '#64748b';
+                const cardColor = isActive ? (c.color || '#06b6d4') : '#334155';
                 
-                // Tooltip removed per request
-
                 container.innerHTML += `
-                    <div class="group relative bg-slate-800 p-5 rounded-xl border-t-4 transition-all hover:shadow-2xl overflow-hidden ${!isActive ? 'opacity-75 grayscale-[0.8]' : ''}" style="border-top-color: ${cardColor}">
+                    <div class="group relative bg-slate-800/80 p-5 rounded-xl border-t-2 border-b border-r border-l border-slate-700/50 hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-cyan-900/20 overflow-hidden ${!isActive ? 'opacity-60 grayscale' : ''}" style="border-top-color: ${cardColor}">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-lg text-white">${c.nome}</h4>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${isActive ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-400'}">
-                                ${isActive ? 'Ativo' : 'Inativo'}
-                            </span>
+                            <h4 class="font-bold text-lg text-white group-hover:text-cyan-400 transition">${c.nome}</h4>
+                            <span class="w-2 h-2 rounded-full ${isActive ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500'}"></span>
                         </div>
-                        <p class="text-xs text-gray-400 mb-4">${c.serviceType === 'traffic' ? '🚀 Tráfego Pago' : '📱 Social Media'}</p>
+                        <p class="text-xs text-gray-400 mb-4 font-mono tracking-tight">${c.serviceType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</p>
                         
-                        <div class="grid grid-cols-2 gap-2 mt-4 relative z-10">
-                             <button onclick="viewClientDetails('${c.id}')" class="bg-gray-700 hover:bg-gray-600 text-white text-xs py-2 rounded-lg font-medium transition">Ver</button>
-                             <button onclick="toggleClientStatus('${c.id}', ${isActive})" class="bg-novan-primary/10 text-novan-primary hover:bg-novan-primary/20 text-xs py-2 rounded-lg font-medium transition">Status</button>
-                             <button onclick="editClient('${c.id}')" class="bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 text-xs py-2 rounded-lg font-medium transition font-bold">Editar</button>
-                             <button onclick="deleteClient('${c.id}')" class="bg-red-500/10 text-red-500 hover:bg-red-500/20 text-xs py-2 rounded-lg font-medium transition">Apagar</button>
+                        <div class="grid grid-cols-2 gap-2 mt-4 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity">
+                             <button onclick="viewClientDetails('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] uppercase font-bold py-2 rounded transition">Ver</button>
+                             <button onclick="toggleClientStatus('${c.id}', ${isActive})" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-[10px] uppercase font-bold py-2 rounded transition">Status</button>
+                             <button onclick="editClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-400 text-[10px] uppercase font-bold py-2 rounded transition">Edit</button>
+                             <button onclick="deleteClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-red-400 text-[10px] uppercase font-bold py-2 rounded transition">Del</button>
                         </div>
                     </div>
                 `;
@@ -750,15 +808,11 @@
             document.getElementById('cli_telefone').value = c.telefone;
             document.getElementById('cli_link').value = c.link || "";
             document.getElementById('cli_observacoes').value = c.observacoes || "";
-            
             toggleFormCategory(c.serviceType);
-
-            // Open the form if it's hidden so user can edit
             const formContainer = document.getElementById('clientRegistrationContainer');
             if(formContainer && formContainer.classList.contains('hidden')) {
                 formContainer.classList.remove('hidden');
             }
-
             if(c.serviceType === 'traffic') {
                 document.getElementById('cli_plataforma_traffic').value = c.plataformaTraffic || "Meta";
                 document.getElementById('cli_budget_value_traffic').value = c.budgetValueTraffic || "";
@@ -774,19 +828,19 @@
 
         window.toggleClientStatus = async (id, current) => {
             await updateDoc(doc(db, 'users', userId, 'clients', id), { active: !current });
-            showMessage(`Cliente ${!current ? 'ativado' : 'desativado'}!`);
+            showMessage(`Status alterado!`);
         };
 
         window.viewClientDetails = (id) => {
             const c = clients.find(item => item.id === id);
             if(!c) return;
-            const content = `<div class="p-4 bg-slate-900 rounded-xl space-y-2 text-sm text-gray-300">
-                <p><strong>Responsável:</strong> ${c.responsavel}</p>
-                <p><strong>WhatsApp:</strong> ${c.telefone}</p>
+            const content = `<div class="p-4 bg-slate-950 rounded-lg space-y-3 text-sm text-gray-300 border border-slate-800">
+                <p><strong>Responsável:</strong> <span class="text-white">${c.responsavel}</span></p>
+                <p><strong>Contato:</strong> ${c.telefone}</p>
                 <p><strong>Plataforma:</strong> ${c.plataformaTraffic || c.smPlatform}</p>
-                <p><strong>${c.serviceType === 'traffic' ? 'Orçamento' : 'Fee'}:</strong> ${formatCurrency(c.budgetValueTraffic || c.smFee)}</p>
-                <p><strong>Link:</strong> <a href="${c.link}" target="_blank" class="text-indigo-400 underline break-all">${c.link || '-'}</a></p>
-                <p><strong>Observações:</strong> ${c.observacoes || '-'}</p>
+                <p><strong>Investimento:</strong> ${formatCurrency(c.budgetValueTraffic || c.smFee)}</p>
+                <p><strong>Link:</strong> <a href="${c.link}" target="_blank" class="text-cyan-400 hover:text-white transition underline">${c.link || '-'}</a></p>
+                <p class="border-t border-slate-800 pt-2 italic text-xs">"${c.observacoes || 'Sem notas'}"</p>
             </div>`;
             document.getElementById('summaryModal').classList.remove('hidden');
             document.getElementById('summaryModal').classList.add('flex');
@@ -794,21 +848,12 @@
             document.getElementById('summaryContent').innerHTML = content;
         };
 
-        window.deleteClient = async (id) => { if(confirm("Apagar cliente?")) await deleteDoc(doc(db, 'users', userId, 'clients', id)); };
+        window.deleteClient = async (id) => { if(confirm("Ação irreversível. Deletar?")) await deleteDoc(doc(db, 'users', userId, 'clients', id)); };
 
         // --- RESULTS ---
-        window.filterResultsByPreset = (p) => {
-            const today = new Date();
-            const startInput = document.getElementById('results_filter_start_date');
-            const endInput = document.getElementById('results_filter_end_date');
-            const fmt = d => d.toISOString().split('T')[0];
-            
-            endInput.value = fmt(today);
-            let s = new Date();
-            if (p === '7days') s.setDate(today.getDate() - 7);
-            else if (p === '30days') s.setDate(today.getDate() - 30);
-            startInput.value = fmt(s);
-            renderResultsTable();
+        window.toggleResultForm = () => {
+             const f = document.getElementById('resultFormContainer');
+             f.classList.toggle('hidden');
         };
 
         window.renderResultsTable = function() {
@@ -837,27 +882,34 @@
             const cpa = summary.conv > 0 ? summary.gasto / summary.conv : 0;
 
             document.getElementById('kpiCardsContainer').innerHTML = `
-                <div class="bg-slate-800 p-4 rounded-xl border-l-4 border-red-500"><p class="text-[10px] text-gray-400 uppercase font-bold">Investido</p><p class="text-xl font-bold text-red-500">${formatCurrency(summary.gasto)}</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-l-4 border-green-500"><p class="text-[10px] text-gray-400 uppercase font-bold">Faturado</p><p class="text-xl font-bold text-green-500">${formatCurrency(summary.vendas)}</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-l-4 border-yellow-500"><p class="text-[10px] text-gray-400 uppercase font-bold">ROAS</p><p class="text-xl font-bold text-yellow-500">${roas.toFixed(2)}X</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-l-4 border-indigo-500"><p class="text-[10px] text-gray-400 uppercase font-bold">CPA</p><p class="text-xl font-bold text-indigo-500">${formatCurrency(cpa)}</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-l-4 border-blue-500"><p class="text-[10px] text-gray-400 uppercase font-bold">Impr.</p><p class="text-xl font-bold text-blue-500">${formatCompact(summary.imp)}</p></div>
+                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-red-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Investimento</p><p class="text-xl font-bold text-white">${formatCurrency(summary.gasto)}</p></div>
+                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-green-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Retorno</p><p class="text-xl font-bold text-emerald-400">${formatCurrency(summary.vendas)}</p></div>
+                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-yellow-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">ROAS</p><p class="text-xl font-bold text-yellow-400">${roas.toFixed(2)}x</p></div>
+                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-indigo-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">CPA</p><p class="text-xl font-bold text-indigo-400">${formatCurrency(cpa)}</p></div>
+                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-blue-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Impr.</p><p class="text-xl font-bold text-blue-400">${formatCompact(summary.imp)}</p></div>
             `;
 
             list.innerHTML = '';
             filtered.forEach(res => {
                 const client = clients.find(c => c.id === res.clientId);
-                const color = client?.color || '#6D28D9';
+                const color = client?.color || '#06b6d4';
                 const date = new Date(res.data + 'T12:00:00').toLocaleDateString('pt-BR');
 
                 list.innerHTML += `
-                    <div class="bg-slate-800 p-4 rounded-xl border-l-8" style="border-left-color: ${color}">
-                        <div class="flex justify-between mb-1"><span class="font-bold text-white text-sm">${client?.nome || 'Cliente'}</span><span class="text-[10px] text-gray-400 uppercase font-bold">${date}</span></div>
-                        <div class="grid grid-cols-4 gap-2 text-[11px] text-gray-300">
-                            <div>Gasto: <span class="text-red-400 font-bold">${formatCurrency(res.investimento)}</span></div>
-                            <div>Fato.: <span class="text-green-400 font-bold">${formatCurrency(res.vendas)}</span></div>
-                            <div>ROAS: <span class="text-yellow-400 font-bold">${(res.roas || 0).toFixed(1)}x</span></div>
-                            <div>Conv: <span class="text-indigo-400 font-bold">${res.conversionCount}</span></div>
+                    <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all flex justify-between items-center group" style="border-left-color: ${color}">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span>
+                                <span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700">${date}</span>
+                            </div>
+                            <div class="flex gap-4 mt-1 text-xs text-gray-300">
+                                <span>Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></span>
+                                <span>Ret: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span>
+                            <span class="text-[9px] uppercase text-gray-500">ROAS</span>
                         </div>
                     </div>
                 `;
@@ -867,10 +919,10 @@
         window.generateDailySummary = async () => {
             const today = new Date().toISOString().split('T')[0];
             const filtered = results.filter(r => r.data === today);
-            if(!filtered.length) return showMessage("Sem dados hoje.", true);
+            if(!filtered.length) return showMessage("Sem dados para hoje.", true);
             const content = filtered.map(r => {
                 const cli = clients.find(c => c.id === r.clientId);
-                return `<p><strong>${cli?.nome || 'Geral'}:</strong> Investido ${formatCurrency(r.investimento)} | Vendas ${formatCurrency(r.vendas)} | ROAS ${r.roas.toFixed(2)}</p>`;
+                return `<div class="mb-2 pb-2 border-b border-gray-800 last:border-0"><span class="text-cyan-400 font-bold">${cli?.nome || 'Geral'}</span>: Gasto ${formatCurrency(r.investimento)} ➔ Retorno ${formatCurrency(r.vendas)} (${r.roas.toFixed(2)}x)</div>`;
             }).join('');
             document.getElementById('summaryModal').classList.remove('hidden');
             document.getElementById('summaryModal').classList.add('flex');
@@ -878,43 +930,7 @@
             document.getElementById('summaryContent').innerHTML = content;
         };
 
-        window.generateQuinzenalSummary = async () => {
-             document.getElementById('summaryModal').classList.remove('hidden');
-             document.getElementById('summaryModal').classList.add('flex');
-             document.getElementById('summaryTitle').textContent = "Resumo 15 Dias";
-             document.getElementById('summaryContent').innerHTML = "<p>Processando resumo dos últimos 15 dias...</p>";
-        };
-
-        window.generateStrategicAnalysis = async () => {
-             document.getElementById('summaryModal').classList.remove('hidden');
-             document.getElementById('summaryModal').classList.add('flex');
-             document.getElementById('summaryTitle').textContent = "Análise Estratégica";
-             document.getElementById('summaryContent').innerHTML = "<p>IA processando análise de estratégia de campanhas...</p>";
-        };
-
         // --- INSIGHTS ---
-        window.setReportPreset = (preset) => {
-            const startInput = document.getElementById('report_start_date');
-            const endInput = document.getElementById('report_end_date');
-            const today = new Date();
-            const format = (d) => d.toISOString().split('T')[0];
-            endInput.value = format(today);
-            let startDate = new Date();
-            switch(preset) {
-                case 'today': break;
-                case 'yesterday': 
-                    startDate.setDate(today.getDate() - 1); 
-                    endInput.value = format(startDate);
-                    break;
-                case 'last7': startDate.setDate(today.getDate() - 7); break;
-                case 'last15': startDate.setDate(today.getDate() - 15); break;
-                case 'last30': startDate.setDate(today.getDate() - 30); break;
-                case 'last90': startDate.setDate(today.getDate() - 90); break;
-            }
-            startInput.value = format(startDate);
-            generateReport();
-        };
-
         window.generateReport = () => {
             const cid = document.getElementById('report_cliente').value;
             const start = document.getElementById('report_start_date').value;
@@ -936,13 +952,13 @@
             const cpa = stats.conv > 0 ? stats.gasto / stats.conv : 0;
             const cpm = stats.imp > 0 ? (stats.gasto / stats.imp) * 1000 : 0;
             document.getElementById('reportSummaryAggregated').innerHTML = `
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-red-500"><p class="text-[9px] text-gray-400 font-bold uppercase">Gasto Total</p><p class="text-sm font-bold text-white">${formatCurrency(stats.gasto)}</p></div>
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-green-500"><p class="text-[9px] text-gray-400 font-bold uppercase">Faturamento</p><p class="text-sm font-bold text-white">${formatCurrency(stats.vendas)}</p></div>
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-yellow-500"><p class="text-[9px] text-gray-400 font-bold uppercase">ROAS Médio</p><p class="text-sm font-bold text-white">${roas.toFixed(2)}x</p></div>
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-indigo-500"><p class="text-[9px] text-gray-400 font-bold uppercase">CPA Médio</p><p class="text-sm font-bold text-white">${formatCurrency(cpa)}</p></div>
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-blue-400"><p class="text-[9px] text-gray-400 font-bold uppercase">CPM Médio</p><p class="text-sm font-bold text-white">${formatCurrency(cpm)}</p></div>
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-pink-500"><p class="text-[9px] text-gray-400 font-bold uppercase">Impressões</p><p class="text-sm font-bold text-white">${formatCompact(stats.imp)}</p></div>
-                <div class="bg-slate-800 p-3 rounded-xl border-b-4 border-orange-500"><p class="text-[9px] text-gray-400 font-bold uppercase">Alcance</p><p class="text-sm font-bold text-white">${formatCompact(stats.alcance)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Gasto Total</p><p class="text-sm font-bold text-white">${formatCurrency(stats.gasto)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Faturamento</p><p class="text-sm font-bold text-emerald-400">${formatCurrency(stats.vendas)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">ROAS Médio</p><p class="text-sm font-bold text-yellow-400">${roas.toFixed(2)}x</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPA Médio</p><p class="text-sm font-bold text-indigo-400">${formatCurrency(cpa)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPM Médio</p><p class="text-sm font-bold text-blue-400">${formatCurrency(cpm)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Impr.</p><p class="text-sm font-bold text-white">${formatCompact(stats.imp)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Alcance</p><p class="text-sm font-bold text-white">${formatCompact(stats.alcance)}</p></div>
             `;
             const labels = filtered.map(r => new Date(r.data + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
             const dataGasto = filtered.map(r => r.investimento);
@@ -952,44 +968,26 @@
             const dataRoas = filtered.map(r => (r.vendas / (r.investimento || 1)).toFixed(2));
             if(reportCharts.spend) reportCharts.spend.destroy();
             const ctxSpend = document.getElementById('spendRevenueChart').getContext('2d');
-            reportCharts.spend = new Chart(ctxSpend, { type: 'line', data: { labels, datasets: [ { label: 'Gasto', data: dataGasto, borderColor: '#EF4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.3 }, { label: 'Faturamento', data: dataVendas, borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } } });
+            reportCharts.spend = new Chart(ctxSpend, { type: 'line', data: { labels, datasets: [ { label: 'Gasto', data: dataGasto, borderColor: '#EF4444', backgroundColor: 'rgba(239, 68, 68, 0.05)', fill: true, tension: 0.4 }, { label: 'Faturamento', data: dataVendas, borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.05)', fill: true, tension: 0.4 } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } } } } });
             if(reportCharts.metrics) reportCharts.metrics.destroy();
             const ctxMetrics = document.getElementById('impressionsClicksChart').getContext('2d');
-            reportCharts.metrics = new Chart(ctxMetrics, { type: 'bar', data: { labels, datasets: [ { label: 'Impressões', data: dataImps, backgroundColor: '#3B82F6', yAxisID: 'y' }, { label: 'Cliques', data: dataCliques, type: 'line', borderColor: '#EC4899', borderWidth: 3, pointBackgroundColor: '#EC4899', yAxisID: 'y1', tension: 0.3 } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { position: 'left', ticks: { color: '#3B82F6' } }, y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#EC4899' } }, x: { ticks: { color: '#94a3b8' } } } } });
+            reportCharts.metrics = new Chart(ctxMetrics, { type: 'bar', data: { labels, datasets: [ { label: 'Impressões', data: dataImps, backgroundColor: '#06b6d4', yAxisID: 'y' }, { label: 'Cliques', data: dataCliques, type: 'line', borderColor: '#f472b6', borderWidth: 2, pointBackgroundColor: '#f472b6', yAxisID: 'y1', tension: 0.4 } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { position: 'left', grid: { color: '#1e293b' }, ticks: { color: '#06b6d4' } }, y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#f472b6' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } } });
             if(reportCharts.roas) reportCharts.roas.destroy();
             const ctxRoas = document.getElementById('roasDailyChart').getContext('2d');
-            reportCharts.roas = new Chart(ctxRoas, { type: 'line', data: { labels, datasets: [{ label: 'ROAS Diário', data: dataRoas, borderColor: '#F59E0B', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.1, pointRadius: 5 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } } });
-            showMessage("Dados carregados!");
+            reportCharts.roas = new Chart(ctxRoas, { type: 'line', data: { labels, datasets: [{ label: 'ROAS', data: dataRoas, borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.05)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#fbbf24' }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } } });
+            showMessage("Relatório gerado!");
         };
 
-        // --- EXPORT TO PNG ---
         window.exportReportToPNG = () => {
             const element = document.getElementById('report-export-container');
             if(!element) return;
-            showMessage("Gerando imagem em HD...");
-            
-            html2canvas(element, {
-                scale: 2, // 2x scale for better "HD" quality on standard screens
-                useCORS: true,
-                backgroundColor: '#0F172A',
-                logging: false,
-                onclone: (clonedDoc) => {
-                    // Optional: adjustments to cloned element if needed before capture
-                    const clonedElement = clonedDoc.getElementById('report-export-container');
-                    if(clonedElement) {
-                        clonedElement.style.padding = '20px';
-                        // We could force width here to try to hit 1920, but simply scaling is safer for layout
-                    }
-                }
-            }).then(canvas => {
+            showMessage("Processando imagem...");
+            html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#020617', logging: false }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `relatorio-performance-${new Date().toISOString().split('T')[0]}.png`;
+                link.download = `report_${new Date().toISOString().split('T')[0]}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                showMessage("Relatório exportado!");
-            }).catch(err => {
-                console.error(err);
-                showMessage("Erro na exportação.", true);
+                showMessage("Download iniciado!");
             });
         };
 
@@ -1005,12 +1003,12 @@
             const first = new Date(myYear, myMonth, 1).getDay();
             const last = new Date(myYear, myMonth + 1, 0).getDate();
             const filter = document.getElementById('filterClient').value;
-            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20"></div>';
+            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20 border-none bg-transparent"></div>';
             for (let d = 1; d <= last; d++) {
                 const dateStr = `${myYear}-${String(myMonth+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 let dayTasks = tasks.filter(t => t.date.startsWith(dateStr));
                 if(filter) dayTasks = dayTasks.filter(t => t.clientId === filter);
-                grid.innerHTML += `<div class="calendar-day p-1 text-xs"><span class="font-bold">${d}</span><div class="space-y-0.5">${dayTasks.map(t => `<div class="bg-novan-primary text-[8px] truncate px-1 text-white">${t.type}</div>`).join('')}</div></div>`;
+                grid.innerHTML += `<div class="calendar-day p-1 text-xs relative group"><span class="font-bold absolute top-1 right-2 text-slate-600 group-hover:text-cyan-400">${d}</span><div class="mt-4 space-y-1">${dayTasks.map(t => `<div class="bg-cyan-900/50 border border-cyan-500/30 text-[9px] truncate px-1 text-cyan-200 rounded-sm">${t.type}</div>`).join('')}</div></div>`;
             }
         };
 
@@ -1020,18 +1018,20 @@
             board.innerHTML = '';
             ['Pendente', 'Em Andamento', 'Concluido'].forEach(status => {
                 const columnTasks = tasks.filter(t => t.status === status);
-                board.innerHTML += `<div class="bg-novan-secondary p-4 rounded-xl min-h-[400px]">
-                    <h3 class="text-lg font-bold text-white mb-4 flex justify-between">${status} <span class="bg-gray-700 text-xs px-2 py-1 rounded-full">${columnTasks.length}</span></h3>
+                const borderColor = status === 'Pendente' ? 'border-red-500' : status === 'Em Andamento' ? 'border-yellow-500' : 'border-green-500';
+                board.innerHTML += `<div class="bg-slate-800/50 p-4 rounded-xl min-h-[400px] border-t-2 ${borderColor}">
+                    <h3 class="text-sm font-bold text-gray-400 mb-4 flex justify-between uppercase tracking-wider">${status.replace('_',' ')} <span class="bg-slate-900 px-2 py-0.5 rounded text-white">${columnTasks.length}</span></h3>
                     <div class="space-y-3">${columnTasks.map(t => {
                         const cli = clients.find(c => c.id === t.clientId);
-                        return `<div class="bg-slate-800 p-3 rounded-lg border-l-4" style="border-left-color: ${cli?.color || '#333'}">
-                            <div class="text-xs text-novan-primary font-bold">${cli?.nome || 'Geral'}</div>
-                            <div class="text-sm text-white font-medium my-1 font-bold">${t.type}</div>
-                            <div class="flex justify-between items-center mt-2">
-                                <select onchange="updateTaskStatus('${t.id}', this.value)" class="text-[10px] bg-gray-700 text-white rounded p-1">
+                        return `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 shadow-lg hover:border-cyan-500/50 transition relative group">
+                            <div class="text-[10px] text-cyan-400 font-bold uppercase tracking-wide mb-1">${cli?.nome || 'Geral'}</div>
+                            <div class="text-sm text-white font-medium mb-2">${t.type}</div>
+                            <div class="flex justify-between items-center mt-2 border-t border-slate-700 pt-2">
+                                <span class="text-[10px] text-gray-500">${new Date(t.date).toLocaleDateString()}</span>
+                                <select onchange="updateTaskStatus('${t.id}', this.value)" class="text-[9px] bg-slate-900 text-gray-300 rounded p-1 border-none focus:ring-0 w-20">
                                     <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                                    <option value="Em Andamento" ${status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
-                                    <option value="Concluido" ${status === 'Concluido' ? 'selected' : ''}>Concluido</option>
+                                    <option value="Em Andamento" ${status === 'Em Andamento' ? 'selected' : ''}>Andamento</option>
+                                    <option value="Concluido" ${status === 'Concluido' ? 'selected' : ''}>Feito</option>
                                 </select>
                             </div>
                         </div>`;
@@ -1046,7 +1046,7 @@
             ['res_cliente', 'task_cliente', 'filterClient', 'report_cliente', 'results_filter_cliente'].forEach(id => {
                 const s = document.getElementById(id); if (!s) return;
                 const current = s.value;
-                s.innerHTML = id.includes('filter') || id.includes('report') ? '<option value="">Todos os Clientes</option>' : '<option value="">Selecione o Cliente</option>';
+                s.innerHTML = id.includes('filter') || id.includes('report') ? '<option value="">Todos</option>' : '<option value="">Selecione...</option>';
                 clients.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nome; if (c.id === current) o.selected = true; s.appendChild(o); });
             });
         };
@@ -1086,10 +1086,10 @@
             }
             if(id) await updateDoc(doc(db, 'users', userId, 'clients', id), data);
             else { data.color = `hsl(${Math.random() * 360}, 70%, 50%)`; await addDoc(clientsCollection, data); }
-            showMessage("Cliente guardado!");
+            showMessage("Salvo com sucesso!");
             e.target.reset();
             document.getElementById('cli_id_edit').value = "";
-            toggleFormCategory('traffic'); // Reset form category
+            toggleFormCategory('traffic'); 
         });
 
         document.getElementById('campaignForm').addEventListener('submit', async (e) => {
@@ -1115,7 +1115,7 @@
             };
             if(id) await updateDoc(doc(db, 'users', userId, 'results', id), data);
             else await addDoc(resultsCollection, data);
-            showMessage("Resultado guardado!");
+            showMessage("Dados salvos!");
             e.target.reset();
             document.getElementById('res_id_edit').value = "";
         });
@@ -1130,22 +1130,12 @@
                 notes: document.getElementById('task_observacoes').value
             };
             await addDoc(tasksCollection, data);
-            showMessage("Tarefa agendada!");
+            showMessage("Tarefa criada!");
             e.target.reset();
         });
 
-        // Matrix Effect
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const drops = Array(Math.floor(canvas.width/16)).fill(1);
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(14, 27, 49, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#6D28D9'; ctx.font = '15px monospace';
-            drops.forEach((y, i) => { ctx.fillText(Math.random() > 0.5 ? "0" : "1", i * 16, y * 16); if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; });
-            requestAnimationFrame(drawMatrix);
-        }
-        drawMatrix();
+        // Matrix Effect Start on Load
+        startMatrix();
 
     </script>
 </body>
