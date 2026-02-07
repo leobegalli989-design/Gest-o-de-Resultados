@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carrega Chart.js para geração de gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <!-- Carrega html2canvas para exportação de imagens -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
         setTimeout(() => {
@@ -188,7 +190,7 @@
                     Gestão de Clientes
                 </div>
                 <div id="nav-resultados" class="sidebar-item p-3 rounded-lg flex items-center mb-2" onclick="switchTab('resultados')" data-tab="resultados">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2v14a2 2 0 002 2z" /></svg>
                     Resultados de Campanhas
                 </div>
                 <div id="nav-calendario" class="sidebar-item p-3 rounded-lg flex items-center mb-2" onclick="switchTab('calendario')" data-tab="calendario">
@@ -217,8 +219,15 @@
             <section id="clientes" class="tab-content">
                 <h1 class="text-4xl font-bold text-white mb-6">👥 Cadastro & Gestão de Clientes</h1>
                 
+                <button onclick="toggleClientForm()" class="w-full md:w-auto mb-6 bg-novan-primary hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Novo Cadastro
+                </button>
+
                 <!-- Registration Form Block -->
-                <div class="bg-slate-800 p-6 rounded-xl shadow-lg mb-8 max-w-2xl mx-auto border border-gray-700">
+                <div id="clientRegistrationContainer" class="hidden bg-slate-800 p-6 rounded-xl shadow-lg mb-8 max-w-2xl mx-auto border border-gray-700 transition-all duration-300">
                     <h2 class="text-xl font-semibold mb-4 text-novan-primary border-b border-gray-700 pb-2">Registo de Novo Cliente</h2>
                     <form id="clientForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="hidden" id="cli_id_edit" value="">
@@ -481,7 +490,10 @@
                             <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Data Fim</label>
                             <input type="date" id="report_end_date" class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white" />
                         </div>
-                        <button onclick="generateReport()" class="bg-novan-primary text-white p-2 rounded-lg px-8 font-bold hover:bg-violet-700 transition">Gerar Insights</button>
+                        <div class="flex gap-2">
+                             <button onclick="generateReport()" class="bg-novan-primary text-white p-2 rounded-lg px-6 font-bold hover:bg-violet-700 transition">Gerar Insights</button>
+                             <button onclick="exportReportToPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-lg px-6 font-bold transition flex items-center"><span class="mr-2">📸</span> Exportar PNG (HD)</button>
+                        </div>
                     </div>
 
                     <div class="flex flex-wrap gap-2 border-t border-gray-700 pt-4">
@@ -494,20 +506,23 @@
                     </div>
                 </div>
 
-                <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8 text-white"></div>
+                <!-- Report Container Wrapper for Capture -->
+                <div id="report-export-container" class="bg-novan-secondary p-4 rounded-xl">
+                    <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8 text-white"></div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800">
-                        <h3 class="text-lg font-bold text-white mb-4">Gasto vs Faturamento (R$)</h3>
-                        <div class="chart-container"><canvas id="spendRevenueChart"></canvas></div>
-                    </div>
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800">
-                        <h3 class="text-lg font-bold text-white mb-4">Impressões vs Cliques</h3>
-                        <div class="chart-container"><canvas id="impressionsClicksChart"></canvas></div>
-                    </div>
-                    <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800 lg:col-span-2">
-                        <h3 class="text-lg font-bold text-white mb-4">ROAS Médio Diário (Retorno)</h3>
-                        <div class="chart-container" style="height: 300px;"><canvas id="roasDailyChart"></canvas></div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800">
+                            <h3 class="text-lg font-bold text-white mb-4">Gasto vs Faturamento (R$)</h3>
+                            <div class="chart-container"><canvas id="spendRevenueChart"></canvas></div>
+                        </div>
+                        <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800">
+                            <h3 class="text-lg font-bold text-white mb-4">Impressões vs Cliques</h3>
+                            <div class="chart-container"><canvas id="impressionsClicksChart"></canvas></div>
+                        </div>
+                        <div class="bg-novan-secondary p-6 rounded-xl shadow-lg border border-gray-800 lg:col-span-2">
+                            <h3 class="text-lg font-bold text-white mb-4">ROAS Médio Diário (Retorno)</h3>
+                            <div class="chart-container" style="height: 300px;"><canvas id="roasDailyChart"></canvas></div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -666,6 +681,11 @@
             }
         };
 
+        window.toggleClientForm = () => {
+            const form = document.getElementById('clientRegistrationContainer');
+            form.classList.toggle('hidden');
+        };
+
         window.setListingCategory = (type) => {
             currentListingTab = type;
             const tabTraffic = document.getElementById('list_tab_traffic');
@@ -698,23 +718,10 @@
                 const isActive = c.active !== false; 
                 const cardColor = isActive ? c.color : '#64748b';
                 
-                const tooltipHtml = `
-                    <div class="absolute inset-0 z-20 hidden group-hover:flex items-center justify-center bg-novan-secondary/95 backdrop-blur-sm p-4 rounded-xl text-center border-2" style="border-color: ${cardColor}">
-                        <div class="space-y-2">
-                            <p class="text-xs font-bold uppercase text-novan-primary">Resumo Rápido</p>
-                            <p class="text-sm text-white font-medium">${c.responsavel}</p>
-                            <p class="text-xs text-gray-400 font-bold">${c.telefone}</p>
-                            ${c.serviceType === 'traffic' ? 
-                                `<p class="text-[10px] text-green-400 font-bold">${formatCurrency(c.budgetValueTraffic)} / ${c.budgetTypeTraffic}</p>` : 
-                                `<p class="text-[10px] text-indigo-400 font-bold">Fee: ${formatCurrency(c.smFee)}</p>`
-                            }
-                        </div>
-                    </div>
-                `;
+                // Tooltip removed per request
 
                 container.innerHTML += `
                     <div class="group relative bg-slate-800 p-5 rounded-xl border-t-4 transition-all hover:shadow-2xl overflow-hidden ${!isActive ? 'opacity-75 grayscale-[0.8]' : ''}" style="border-top-color: ${cardColor}">
-                        ${tooltipHtml}
                         <div class="flex justify-between items-start mb-2">
                             <h4 class="font-bold text-lg text-white">${c.nome}</h4>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${isActive ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-400'}">
@@ -745,6 +752,12 @@
             document.getElementById('cli_observacoes').value = c.observacoes || "";
             
             toggleFormCategory(c.serviceType);
+
+            // Open the form if it's hidden so user can edit
+            const formContainer = document.getElementById('clientRegistrationContainer');
+            if(formContainer && formContainer.classList.contains('hidden')) {
+                formContainer.classList.remove('hidden');
+            }
 
             if(c.serviceType === 'traffic') {
                 document.getElementById('cli_plataforma_traffic').value = c.plataformaTraffic || "Meta";
@@ -947,6 +960,37 @@
             const ctxRoas = document.getElementById('roasDailyChart').getContext('2d');
             reportCharts.roas = new Chart(ctxRoas, { type: 'line', data: { labels, datasets: [{ label: 'ROAS Diário', data: dataRoas, borderColor: '#F59E0B', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.1, pointRadius: 5 }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } } });
             showMessage("Dados carregados!");
+        };
+
+        // --- EXPORT TO PNG ---
+        window.exportReportToPNG = () => {
+            const element = document.getElementById('report-export-container');
+            if(!element) return;
+            showMessage("Gerando imagem em HD...");
+            
+            html2canvas(element, {
+                scale: 2, // 2x scale for better "HD" quality on standard screens
+                useCORS: true,
+                backgroundColor: '#0F172A',
+                logging: false,
+                onclone: (clonedDoc) => {
+                    // Optional: adjustments to cloned element if needed before capture
+                    const clonedElement = clonedDoc.getElementById('report-export-container');
+                    if(clonedElement) {
+                        clonedElement.style.padding = '20px';
+                        // We could force width here to try to hit 1920, but simply scaling is safer for layout
+                    }
+                }
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `relatorio-performance-${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showMessage("Relatório exportado!");
+            }).catch(err => {
+                console.error(err);
+                showMessage("Erro na exportação.", true);
+            });
         };
 
         // --- CALENDAR & OTHERS ---
