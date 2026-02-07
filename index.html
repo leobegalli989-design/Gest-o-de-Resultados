@@ -531,7 +531,15 @@
 
             <!-- Tab: Insights -->
             <section id="relatorios" class="tab-content">
-                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Insights</h1>
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-white"><span class="text-novan-primary">#</span> Insights</h1>
+                    <button onclick="exportReportToPNG1080p()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Exportar PNG (1920x1080)
+                    </button>
+                </div>
                 
                 <div class="bg-slate-800/60 p-6 rounded-xl mb-8 border border-slate-700">
                     <div class="flex flex-wrap gap-4 items-end">
@@ -1147,16 +1155,37 @@
             showMessage("Relatório gerado!");
         };
 
-        window.exportReportToPNG = () => {
+        window.exportReportToPNG1080p = () => {
             const element = document.getElementById('report-export-container');
             if(!element) return;
-            showMessage("Processando imagem...");
-            html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#020617', logging: false }).then(canvas => {
+            showMessage("Preparando exportação 1080p...");
+            
+            const originalStyle = element.getAttribute('style') || "";
+
+            // Forçar 1920x1080 para a captura (estilo temporário)
+            element.style.width = '1920px';
+            element.style.height = '1080px';
+            element.style.maxWidth = 'none';
+
+            html2canvas(element, { 
+                width: 1920,
+                height: 1080,
+                scale: 1, 
+                useCORS: true, 
+                backgroundColor: '#0b1120' 
+            }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `report_${new Date().toISOString().split('T')[0]}.png`;
+                link.download = `relatorio_novan_1080p_${new Date().toISOString().split('T')[0]}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                showMessage("Download iniciado!");
+                
+                // Restaurar estilo original
+                element.setAttribute('style', originalStyle);
+                showMessage("Exportação 1080p concluída!");
+            }).catch(err => {
+                console.error(err);
+                showMessage("Erro ao exportar imagem.", true);
+                element.setAttribute('style', originalStyle);
             });
         };
 
