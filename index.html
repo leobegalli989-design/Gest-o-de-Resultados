@@ -433,9 +433,15 @@
                                 </select>
                                 <input type="number" id="res_conversion_count" placeholder="Qtd" required class="p-3 rounded-lg flex-grow" />
                             </div>
-                            <div class="col-span-1 md:col-span-2 flex items-center justify-around bg-slate-800 rounded-lg border border-slate-700">
-                                <div class="text-xs text-slate-400">ROAS: <span id="roas_calc" class="font-bold text-green-400 text-lg">0.00</span></div>
-                                <div class="text-xs text-slate-400">CPA: <span id="cpa_calc" class="font-bold text-red-400 text-lg">0.00</span></div>
+                            
+                            <!-- Nova Área de Métricas Calculadas -->
+                            <div class="col-span-1 md:col-span-4 grid grid-cols-2 md:grid-cols-6 gap-2 bg-slate-800 rounded-lg border border-slate-700 p-2">
+                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">ROAS</p><p id="roas_calc" class="font-bold text-green-400 text-sm">0.00x</p></div>
+                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CPA</p><p id="cpa_calc" class="font-bold text-red-400 text-sm">R$ 0.00</p></div>
+                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CPC</p><p id="cpc_calc" class="font-bold text-cyan-400 text-sm">R$ 0.00</p></div>
+                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CTR</p><p id="ctr_calc" class="font-bold text-yellow-400 text-sm">0.00%</p></div>
+                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">FREQ</p><p id="freq_calc" class="font-bold text-blue-400 text-sm">0.00</p></div>
+                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CONV %</p><p id="tx_conv_calc" class="font-bold text-purple-400 text-sm">0.00%</p></div>
                             </div>
                             
                             <textarea id="rawMetricsInput" placeholder="Colar dados brutos (IA)..." class="p-3 rounded-lg col-span-1 md:col-span-4 h-12 text-xs font-mono"></textarea>
@@ -460,7 +466,7 @@
                     <button onclick="renderResultsTable()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-2 rounded-lg px-4 text-xs">FILTRAR</button>
                 </div>
 
-                <div id="kpiCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 text-white"></div>
+                <div id="kpiCardsContainer" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8 text-white"></div>
                 <div id="resultsListContainer" class="space-y-3"></div>
             </section>
 
@@ -519,7 +525,7 @@
 
             <!-- Tab: Gestão -->
             <section id="gestao" class="tab-content">
-                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Kanban</h1>
+                <h1 class="text-3xl font-bold text-white mb-6"><span class="text-novan-primary">#</span> Tarefas</h1>
                 <div id="taskManagementBoard" class="grid md:grid-cols-3 gap-6"></div>
             </section>
 
@@ -549,7 +555,8 @@
 
                 <!-- Report Container -->
                 <div id="report-export-container" class="bg-[#0b1120] p-6 rounded-xl border border-slate-800">
-                    <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8 text-white"></div>
+                    <!-- Adjusted grid to handle more items -->
+                    <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8 text-white"></div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
@@ -740,7 +747,41 @@
             });
 
             switchTab('clientes');
+            
+            // Attach live calculations listener
+            attachCalculationListeners();
         }
+
+        window.attachCalculationListeners = () => {
+            const inputs = ['res_investimento', 'res_impressoes', 'res_cliques', 'res_alcance', 'res_vendas', 'res_conversion_count'];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('input', calculateLiveMetrics);
+            });
+        };
+
+        window.calculateLiveMetrics = () => {
+            const inv = parseFloat(document.getElementById('res_investimento').value) || 0;
+            const imps = parseFloat(document.getElementById('res_impressoes').value) || 0;
+            const clicks = parseFloat(document.getElementById('res_cliques').value) || 0;
+            const reach = parseFloat(document.getElementById('res_alcance').value) || 0;
+            const sales = parseFloat(document.getElementById('res_vendas').value) || 0;
+            const conv = parseFloat(document.getElementById('res_conversion_count').value) || 0;
+
+            const roas = inv > 0 ? sales / inv : 0;
+            const cpa = conv > 0 ? inv / conv : 0;
+            const cpc = clicks > 0 ? inv / clicks : 0;
+            const ctr = imps > 0 ? (clicks / imps) * 100 : 0;
+            const freq = reach > 0 ? imps / reach : 0;
+            const convRate = clicks > 0 ? (conv / clicks) * 100 : 0;
+
+            document.getElementById('roas_calc').textContent = roas.toFixed(2) + 'x';
+            document.getElementById('cpa_calc').textContent = formatCurrency(cpa);
+            document.getElementById('cpc_calc').textContent = formatCurrency(cpc);
+            document.getElementById('ctr_calc').textContent = ctr.toFixed(2) + '%';
+            document.getElementById('freq_calc').textContent = freq.toFixed(2);
+            document.getElementById('tx_conv_calc').textContent = convRate.toFixed(2) + '%';
+        };
 
         window.switchTab = (id) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -884,6 +925,9 @@
         window.toggleResultForm = () => {
              const f = document.getElementById('resultFormContainer');
              f.classList.toggle('hidden');
+             if(!f.classList.contains('hidden')) {
+                 calculateLiveMetrics(); // Init calc on open
+             }
         };
 
         window.renderResultsTable = function() {
@@ -905,18 +949,31 @@
                 acc.vendas += r.vendas;
                 acc.conv += r.conversionCount || 0;
                 acc.imp += r.impressoes;
+                acc.cliques += r.cliques || 0;
+                acc.alcance += r.alcance || 0;
                 return acc;
-            }, { gasto: 0, vendas: 0, conv: 0, imp: 0 });
+            }, { gasto: 0, vendas: 0, conv: 0, imp: 0, cliques: 0, alcance: 0 });
 
             const roas = summary.gasto > 0 ? summary.vendas / summary.gasto : 0;
             const cpa = summary.conv > 0 ? summary.gasto / summary.conv : 0;
+            const cpc = summary.cliques > 0 ? summary.gasto / summary.cliques : 0;
+            const ctr = summary.imp > 0 ? (summary.cliques / summary.imp) * 100 : 0;
+            // Weighted average frequency calculation not perfect with sums but acceptable for summary
+            // Technically avg freq = total imps / total unique reach (but unique reach isn't additive). 
+            // We'll use sum of reach as proxy for now or skip. Let's show avg based on sum.
+            const freq = summary.alcance > 0 ? summary.imp / summary.alcance : 0; 
+            const convRate = summary.cliques > 0 ? (summary.conv / summary.cliques) * 100 : 0;
 
             document.getElementById('kpiCardsContainer').innerHTML = `
-                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-red-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Investimento</p><p class="text-xl font-bold text-white">${formatCurrency(summary.gasto)}</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-green-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Retorno</p><p class="text-xl font-bold text-emerald-400">${formatCurrency(summary.vendas)}</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-yellow-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">ROAS</p><p class="text-xl font-bold text-yellow-400">${roas.toFixed(2)}x</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-indigo-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">CPA</p><p class="text-xl font-bold text-indigo-400">${formatCurrency(cpa)}</p></div>
-                <div class="bg-slate-800 p-4 rounded-xl border-t-2 border-blue-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Impr.</p><p class="text-xl font-bold text-blue-400">${formatCompact(summary.imp)}</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-red-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Investimento</p><p class="text-lg font-bold text-white">${formatCurrency(summary.gasto)}</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-green-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Retorno</p><p class="text-lg font-bold text-emerald-400">${formatCurrency(summary.vendas)}</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-yellow-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">ROAS</p><p class="text-lg font-bold text-yellow-400">${roas.toFixed(2)}x</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-indigo-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">CPA</p><p class="text-lg font-bold text-indigo-400">${formatCurrency(cpa)}</p></div>
+                
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-cyan-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">CPC Médio</p><p class="text-lg font-bold text-cyan-400">${formatCurrency(cpc)}</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-purple-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">CTR Médio</p><p class="text-lg font-bold text-purple-400">${ctr.toFixed(2)}%</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-pink-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Tx. Conv.</p><p class="text-lg font-bold text-pink-400">${convRate.toFixed(2)}%</p></div>
+                <div class="bg-slate-800 p-3 rounded-xl border-t-2 border-blue-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Freq. Méd</p><p class="text-lg font-bold text-blue-400">${freq.toFixed(2)}</p></div>
             `;
 
             list.innerHTML = '';
@@ -925,28 +982,45 @@
                 const color = client?.color || '#06b6d4';
                 const date = new Date(res.data + 'T12:00:00').toLocaleDateString('pt-BR');
 
+                // Fallback for old records without calculated fields
+                const r_cpc = res.cpc || (res.cliques > 0 ? res.investimento / res.cliques : 0);
+                const r_ctr = res.ctr || (res.impressoes > 0 ? (res.cliques / res.impressoes) * 100 : 0);
+                const r_freq = res.frequency || (res.alcance > 0 ? res.impressoes / res.alcance : 0);
+
                 list.innerHTML += `
-                    <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all flex justify-between items-center group" style="border-left-color: ${color}">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span>
-                                <span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700">${date}</span>
+                    <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}">
+                        <div class="flex justify-between items-center mb-2">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span>
+                                    <span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700">${date}</span>
+                                </div>
                             </div>
-                            <div class="flex gap-4 mt-1 text-xs text-gray-300">
-                                <span>Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></span>
-                                <span>Ret: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></span>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span>
+                                    <span class="text-[9px] uppercase text-gray-500">ROAS</span>
+                                </div>
+                                <button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir Resultado">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right">
-                                <span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span>
-                                <span class="text-[9px] uppercase text-gray-500">ROAS</span>
-                            </div>
-                            <button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir Resultado">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
+                        
+                        <!-- Grid de Detalhes -->
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs">
+                             <div class="text-gray-400">Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></div>
+                             <div class="text-gray-400">Retorno: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></div>
+                             <div class="text-gray-400 hidden md:block">CPC: <span class="text-cyan-400">${formatCurrency(r_cpc)}</span></div>
+                             <div class="text-gray-400 hidden md:block">CTR: <span class="text-yellow-400">${r_ctr.toFixed(2)}%</span></div>
+                             <div class="text-gray-400 hidden md:block">Freq: <span class="text-blue-400">${r_freq.toFixed(2)}</span></div>
+                        </div>
+                        <div class="md:hidden grid grid-cols-3 gap-2 mt-1 text-[10px] text-gray-500">
+                             <div>CPC: ${formatCurrency(r_cpc)}</div>
+                             <div>CTR: ${r_ctr.toFixed(2)}%</div>
+                             <div>Freq: ${r_freq.toFixed(2)}</div>
                         </div>
                     </div>
                 `;
@@ -1030,17 +1104,28 @@
                 acc.conv += r.conversionCount || 0;
                 acc.imp += r.impressoes || 0;
                 acc.alcance += r.alcance || 0;
+                acc.cliques += r.cliques || 0; // Added sum of clicks
                 return acc;
-            }, { gasto: 0, vendas: 0, conv: 0, imp: 0, alcance: 0 });
+            }, { gasto: 0, vendas: 0, conv: 0, imp: 0, alcance: 0, cliques: 0 });
+            
             const roas = stats.gasto > 0 ? stats.vendas / stats.gasto : 0;
             const cpa = stats.conv > 0 ? stats.gasto / stats.conv : 0;
             const cpm = stats.imp > 0 ? (stats.gasto / stats.imp) * 1000 : 0;
+            const cpc = stats.cliques > 0 ? stats.gasto / stats.cliques : 0;
+            const ctr = stats.imp > 0 ? (stats.cliques / stats.imp) * 100 : 0;
+            const freq = stats.alcance > 0 ? stats.imp / stats.alcance : 0;
+            const convRate = stats.cliques > 0 ? (stats.conv / stats.cliques) * 100 : 0;
+
             document.getElementById('reportSummaryAggregated').innerHTML = `
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Gasto Total</p><p class="text-sm font-bold text-white">${formatCurrency(stats.gasto)}</p></div>
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Faturamento</p><p class="text-sm font-bold text-emerald-400">${formatCurrency(stats.vendas)}</p></div>
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">ROAS Médio</p><p class="text-sm font-bold text-yellow-400">${roas.toFixed(2)}x</p></div>
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPA Médio</p><p class="text-sm font-bold text-indigo-400">${formatCurrency(cpa)}</p></div>
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPM Médio</p><p class="text-sm font-bold text-blue-400">${formatCurrency(cpm)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPC Médio</p><p class="text-sm font-bold text-cyan-400">${formatCurrency(cpc)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CTR Médio</p><p class="text-sm font-bold text-purple-400">${ctr.toFixed(2)}%</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Freq. Médio</p><p class="text-sm font-bold text-orange-400">${freq.toFixed(2)}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Taxa Conv.</p><p class="text-sm font-bold text-pink-400">${convRate.toFixed(2)}%</p></div>
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Impr.</p><p class="text-sm font-bold text-white">${formatCompact(stats.imp)}</p></div>
                 <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Alcance</p><p class="text-sm font-bold text-white">${formatCompact(stats.alcance)}</p></div>
             `;
@@ -1184,24 +1269,33 @@
         document.getElementById('campaignForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('res_id_edit').value;
-            const inv = parseFloat(document.getElementById('res_investimento').value);
-            const fat = parseFloat(document.getElementById('res_vendas').value);
-            const conv = parseInt(document.getElementById('res_conversion_count').value) || 1;
+            const inv = parseFloat(document.getElementById('res_investimento').value) || 0;
+            const fat = parseFloat(document.getElementById('res_vendas').value) || 0;
+            const conv = parseInt(document.getElementById('res_conversion_count').value) || 0;
+            const imps = parseInt(document.getElementById('res_impressoes').value) || 0;
+            const reach = parseInt(document.getElementById('res_alcance').value) || 0;
+            const clicks = parseInt(document.getElementById('res_cliques').value) || 0;
+            
             const data = {
                 data: document.getElementById('res_data').value,
                 clientId: document.getElementById('res_cliente').value,
                 plataforma: document.getElementById('res_plataforma').value,
                 investimento: inv,
                 vendas: fat,
-                impressoes: parseInt(document.getElementById('res_impressoes').value),
-                alcance: parseInt(document.getElementById('res_alcance').value),
-                cliques: parseInt(document.getElementById('res_cliques').value),
-                conversionCount: parseInt(document.getElementById('res_conversion_count').value),
+                impressoes: imps,
+                alcance: reach,
+                cliques: clicks,
+                conversionCount: conv,
                 conversionType: document.getElementById('res_conversion_type').value,
                 observacoes: document.getElementById('res_observacoes').value,
-                roas: fat / (inv || 1),
-                cpa: inv / conv
+                roas: inv > 0 ? fat / inv : 0,
+                cpa: conv > 0 ? inv / conv : 0,
+                cpc: clicks > 0 ? inv / clicks : 0,
+                ctr: imps > 0 ? (clicks / imps) * 100 : 0,
+                frequency: reach > 0 ? imps / reach : 0,
+                conversionRate: clicks > 0 ? (conv / clicks) * 100 : 0
             };
+
             if(id) await updateDoc(doc(db, 'users', userId, 'results', id), data);
             else await addDoc(resultsCollection, data);
             showMessage("Dados salvos!");
