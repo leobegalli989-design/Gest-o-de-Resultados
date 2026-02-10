@@ -664,6 +664,27 @@
                                 <option value="">Todos</option>
                             </select>
                         </div>
+                        
+                        <!-- Novo Seletor de Período Tráfego -->
+                        <div class="min-w-[180px]">
+                            <label class="text-xs font-bold text-cyan-400 mb-1 block uppercase">Período</label>
+                            <select id="report_range" onchange="applyDateRange('report', this.value)" class="w-full p-2 rounded-lg bg-slate-900 border-slate-700">
+                                <option value="custom">Personalizado</option>
+                                <option value="today">Hoje</option>
+                                <option value="yesterday">Ontem</option>
+                                <option value="today_yesterday">Hoje e Ontem</option>
+                                <option value="last_7">Últimos 7 dias</option>
+                                <option value="last_14">Últimos 14 dias</option>
+                                <option value="last_28">Últimos 28 dias</option>
+                                <option value="last_30">Últimos 30 dias</option>
+                                <option value="this_week">Esta Semana</option>
+                                <option value="last_week">Semana Passada</option>
+                                <option value="this_month">Este Mês</option>
+                                <option value="last_month">Mês Passado</option>
+                                <option value="all">Sempre</option>
+                            </select>
+                        </div>
+
                         <div>
                             <label class="text-xs font-bold text-cyan-400 mb-1 block uppercase">Início</label>
                             <input type="date" id="report_start_date" class="p-2 rounded-lg bg-slate-900 border-slate-700" />
@@ -718,6 +739,27 @@
                                 <option value="">Todos</option>
                             </select>
                         </div>
+
+                        <!-- Novo Seletor de Período Social -->
+                        <div class="min-w-[180px]">
+                            <label class="text-xs font-bold text-pink-400 mb-1 block uppercase">Período</label>
+                            <select id="report_social_range" onchange="applyDateRange('report_social', this.value)" class="w-full p-2 rounded-lg bg-slate-900 border-slate-700">
+                                <option value="custom">Personalizado</option>
+                                <option value="today">Hoje</option>
+                                <option value="yesterday">Ontem</option>
+                                <option value="today_yesterday">Hoje e Ontem</option>
+                                <option value="last_7">Últimos 7 dias</option>
+                                <option value="last_14">Últimos 14 dias</option>
+                                <option value="last_28">Últimos 28 dias</option>
+                                <option value="last_30">Últimos 30 dias</option>
+                                <option value="this_week">Esta Semana</option>
+                                <option value="last_week">Semana Passada</option>
+                                <option value="this_month">Este Mês</option>
+                                <option value="last_month">Mês Passado</option>
+                                <option value="all">Sempre</option>
+                            </select>
+                        </div>
+
                         <div>
                             <label class="text-xs font-bold text-pink-400 mb-1 block uppercase">Início</label>
                             <input type="date" id="report_social_start_date" class="p-2 rounded-lg bg-slate-900 border-slate-700" />
@@ -896,6 +938,75 @@
             b.classList.add(e ? 'bg-red-900/80' : 'bg-slate-800');
             setTimeout(() => b.classList.add('hidden'), 3000);
         }
+
+        // --- DATE RANGE HELPER ---
+        window.applyDateRange = (prefix, option) => {
+            const startEl = document.getElementById(`${prefix}_start_date`);
+            const endEl = document.getElementById(`${prefix}_end_date`);
+            
+            const today = new Date();
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            
+            let start = new Date();
+            let end = new Date();
+            
+            switch(option) {
+                case 'today':
+                    // start/end = today
+                    break;
+                case 'yesterday':
+                    start.setDate(today.getDate() - 1);
+                    end.setDate(today.getDate() - 1);
+                    break;
+                case 'today_yesterday':
+                    start.setDate(today.getDate() - 1);
+                    // end is today
+                    break;
+                case 'last_7':
+                    start.setDate(today.getDate() - 6);
+                    break;
+                case 'last_14':
+                    start.setDate(today.getDate() - 13);
+                    break;
+                case 'last_28':
+                    start.setDate(today.getDate() - 27);
+                    break;
+                case 'last_30':
+                    start.setDate(today.getDate() - 29);
+                    break;
+                case 'this_week':
+                    // Sunday as start
+                    const day = today.getDay(); 
+                    start.setDate(today.getDate() - day);
+                    break;
+                case 'last_week':
+                     // Last week Sunday to Saturday
+                     const day2 = today.getDay();
+                     const diffToLastSunday = day2 + 7;
+                     start.setDate(today.getDate() - diffToLastSunday);
+                     end = new Date(start);
+                     end.setDate(start.getDate() + 6);
+                     break;
+                case 'this_month':
+                     start = new Date(today.getFullYear(), today.getMonth(), 1);
+                     break;
+                case 'last_month':
+                     start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                     end = new Date(today.getFullYear(), today.getMonth(), 0);
+                     break;
+                case 'all':
+                     startEl.value = '';
+                     endEl.value = '';
+                     return;
+                case 'custom':
+                     return;
+            }
+            
+            if (option !== 'all' && option !== 'custom') {
+                startEl.value = formatDate(start);
+                endEl.value = formatDate(end);
+            }
+        };
 
         // --- CORE LOGIC ---
         async function initAppContent() {
