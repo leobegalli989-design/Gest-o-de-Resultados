@@ -495,7 +495,15 @@
                         <h2 class="text-sm font-bold mb-6 text-pink-400 uppercase tracking-widest border-b border-slate-700 pb-2">Input Social Media</h2>
                         <form id="socialResultForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="hidden" id="soc_id_edit" value=""> 
-                            <input type="date" id="soc_data" required class="p-3 rounded-lg" />
+                            
+                            <div class="col-span-1 md:col-span-2">
+                                <label class="text-xs text-gray-400 uppercase font-bold mb-1 block">Período de Análise</label>
+                                <div class="flex gap-2">
+                                    <input type="date" id="soc_data_inicio" required class="w-full p-3 rounded-lg" title="Data Início" />
+                                    <input type="date" id="soc_data_fim" required class="w-full p-3 rounded-lg" title="Data Fim" />
+                                </div>
+                            </div>
+
                             <select id="soc_cliente" required class="p-3 rounded-lg">
                                 <option value="">Cliente</option>
                             </select>
@@ -1156,7 +1164,12 @@
             let filtered = [...socialResults];
             if (filterClient) filtered = filtered.filter(r => r.clientId === filterClient);
 
-            filtered.sort((a, b) => new Date(b.data) - new Date(a.data));
+            // Sort by dataFim (or data for backwards compatibility)
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.dataFim || a.data);
+                const dateB = new Date(b.dataFim || b.data);
+                return dateB - dateA;
+            });
 
             list.innerHTML = '';
             if (filtered.length === 0) {
@@ -1167,7 +1180,17 @@
             filtered.forEach(res => {
                 const client = clients.find(c => c.id === res.clientId);
                 const color = client?.color || '#ec4899'; // Default Pink
-                const date = new Date(res.data + 'T12:00:00').toLocaleDateString('pt-BR');
+                
+                // Date Formatting Logic
+                let dateDisplay;
+                if (res.dataInicio && res.dataFim) {
+                    const dInicio = new Date(res.dataInicio + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+                    const dFim = new Date(res.dataFim + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+                    dateDisplay = `${dInicio} à ${dFim}`;
+                } else {
+                    dateDisplay = new Date(res.data + 'T12:00:00').toLocaleDateString('pt-BR');
+                }
+
                 const engagementRate = res.engagementRate || 0;
 
                 list.innerHTML += `
@@ -1177,7 +1200,10 @@
                                 <div class="flex items-center gap-2">
                                     <span class="font-bold text-white text-sm group-hover:text-pink-400 transition">${client?.nome || 'Cliente'}</span>
                                     <span class="text-[10px] text-pink-200 font-mono bg-pink-900/40 px-1 rounded border border-pink-500/30">${res.plataforma}</span>
-                                    <span class="text-[10px] text-gray-500 font-mono">${date}</span>
+                                    <span class="text-[10px] text-gray-500 font-mono flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        ${dateDisplay}
+                                    </span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
@@ -1185,11 +1211,14 @@
                                     <span class="block text-lg font-bold text-pink-400">${engagementRate.toFixed(2)}%</span>
                                     <span class="text-[9px] uppercase text-gray-500">Engajamento</span>
                                 </div>
-                                <button onclick="deleteSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir Resultado">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
+                                <div class="flex gap-1">
+                                    <button onclick="editSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50" title="Editar Resultado">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    </button>
+                                    <button onclick="deleteSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir Resultado">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -1203,6 +1232,37 @@
                     </div>
                 `;
             });
+        };
+
+        window.editSocialResult = (id) => {
+            const res = socialResults.find(r => r.id === id);
+            if (!res) return;
+
+            document.getElementById('soc_id_edit').value = res.id;
+            
+            // Set date fields (handle legacy single date vs new range)
+            if (res.dataInicio && res.dataFim) {
+                document.getElementById('soc_data_inicio').value = res.dataInicio;
+                document.getElementById('soc_data_fim').value = res.dataFim;
+            } else {
+                // Fallback for old records
+                document.getElementById('soc_data_inicio').value = res.data;
+                document.getElementById('soc_data_fim').value = res.data;
+            }
+
+            document.getElementById('soc_cliente').value = res.clientId;
+            document.getElementById('soc_plataforma').value = res.plataforma;
+            document.getElementById('soc_seguidores').value = res.seguidores;
+            document.getElementById('soc_novos_seguidores').value = res.novosSeguidores;
+            document.getElementById('soc_alcance').value = res.alcance;
+            document.getElementById('soc_impressoes').value = res.impressoes;
+            document.getElementById('soc_interacoes').value = res.interacoes;
+            document.getElementById('soc_posts').value = res.posts;
+            document.getElementById('soc_stories_views').value = res.storiesViews || "";
+            document.getElementById('soc_reels_views').value = res.reelsViews || "";
+            document.getElementById('soc_observacoes').value = res.observacoes || "";
+
+            toggleSocialResultForm();
         };
 
         // --- DELETE LOGIC (UPDATED) ---
@@ -1513,9 +1573,14 @@
             const alcance = parseInt(document.getElementById('soc_alcance').value) || 0;
             const interacoes = parseInt(document.getElementById('soc_interacoes').value) || 0;
             const engagementRate = alcance > 0 ? (interacoes / alcance) * 100 : 0;
+            
+            const dataInicio = document.getElementById('soc_data_inicio').value;
+            const dataFim = document.getElementById('soc_data_fim').value;
 
             const data = {
-                data: document.getElementById('soc_data').value,
+                dataInicio: dataInicio,
+                dataFim: dataFim,
+                data: dataFim, // Mantém compatibilidade
                 clientId: document.getElementById('soc_cliente').value,
                 plataforma: document.getElementById('soc_plataforma').value,
                 seguidores: parseInt(document.getElementById('soc_seguidores').value) || 0,
