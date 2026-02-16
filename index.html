@@ -1011,7 +1011,42 @@
             
             if(reportCharts.spend) reportCharts.spend.destroy(); 
             const ctxSpend = document.getElementById('spendRevenueChart').getContext('2d'); 
-            reportCharts.spend = new Chart(ctxSpend, { type: 'line', data: { labels, datasets: [ { label: 'Gasto', data: dataGasto, borderColor: '#EF4444', backgroundColor: 'rgba(239, 68, 68, 0.05)', fill: true, tension: 0.4 }, { label: 'Faturamento', data: dataVendas, borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.05)', fill: true, tension: 0.4 } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } } } } });
+            reportCharts.spend = new Chart(ctxSpend, { 
+                type: 'bar', // Tipo barra
+                data: { 
+                    labels, 
+                    datasets: [ 
+                        { 
+                            label: 'Gasto', 
+                            data: dataGasto, 
+                            backgroundColor: '#EF4444', 
+                            borderColor: '#EF4444', 
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        }, 
+                        { 
+                            label: 'Faturamento', 
+                            data: dataVendas, 
+                            backgroundColor: '#10B981', 
+                            borderColor: '#10B981', 
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        } 
+                    ] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { labels: { color: '#94a3b8' } } }, 
+                    scales: { 
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, 
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } } 
+                    } 
+                } 
+            });
             
             if(reportCharts.metrics) reportCharts.metrics.destroy(); 
             const ctxMetrics = document.getElementById('impressionsClicksChart').getContext('2d'); 
@@ -1019,7 +1054,29 @@
             
             if(reportCharts.roas) reportCharts.roas.destroy(); 
             const ctxRoas = document.getElementById('roasDailyChart').getContext('2d'); 
-            reportCharts.roas = new Chart(ctxRoas, { type: 'line', data: { labels, datasets: [{ label: 'ROAS', data: dataRoas, borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.05)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#fbbf24' }] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } } });
+            reportCharts.roas = new Chart(ctxRoas, { 
+                type: 'bar', // Tipo barra
+                data: { 
+                    labels, 
+                    datasets: [{ 
+                        label: 'ROAS', 
+                        data: dataRoas, 
+                        backgroundColor: '#fbbf24', 
+                        borderColor: '#fbbf24', 
+                        borderWidth: 1, 
+                        borderRadius: 4,
+                        barPercentage: 0.5
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { labels: { color: '#94a3b8' } } }, 
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, 
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } } 
+                    } 
+                } 
+            });
         };
 
         window.generateSocialReport = () => {
@@ -1116,4 +1173,4 @@
         startMatrix();
     </script>
 </body>
-</html>
+</html>16.02
