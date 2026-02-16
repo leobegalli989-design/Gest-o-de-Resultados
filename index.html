@@ -100,15 +100,15 @@
         
         /* Calendario */
         .calendar-day {
-            min-height: 100px;
+            min-height: 120px; /* Aumentado um pouco para caber o ícone */
             border: 1px solid #1e293b;
             background-color: #0f172a;
             transition: all 0.2s;
             color: #94a3b8;
+            position: relative;
         }
         .calendar-day:hover {
             transform: translateY(-2px);
-            cursor: pointer;
             background-color: #1e293b;
             border-color: #06b6d4;
             box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
@@ -660,6 +660,33 @@
                 <div class="mb-4"><select id="filterClient" onchange="renderCalendar()" class="p-2 rounded bg-slate-800 border-slate-700 text-white w-full md:w-auto"><option value="">Todos os Clientes</option></select></div>
                 <div class="grid grid-cols-7 gap-1 text-center text-gray-500 text-xs font-bold uppercase mb-2"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sab</div></div>
                 <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+                
+                <!-- Área de Resumo do Dia -->
+                <div id="calendarSummary" class="mt-8 bg-slate-900/50 p-6 rounded-xl border border-slate-800 transition-all">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
+                            Resumo do Dia: <span id="summaryDateDisplay" class="text-cyan-400 ml-1"></span>
+                        </h3>
+                        <!-- Filtro de Checkboxes -->
+                        <div class="flex flex-wrap gap-4 items-center bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase mr-2">Exibir:</span>
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <input type="checkbox" name="taskFilter" value="Pendente" checked onchange="renderDaySummaryList()" class="form-checkbox h-4 w-4 text-cyan-500 rounded bg-slate-900 border-slate-600 focus:ring-0 focus:ring-offset-0 focus:border-cyan-500 transition duration-150 ease-in-out">
+                                <span class="text-xs text-gray-300 group-hover:text-cyan-400 transition">Pendentes</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <input type="checkbox" name="taskFilter" value="Em Andamento" checked onchange="renderDaySummaryList()" class="form-checkbox h-4 w-4 text-amber-500 rounded bg-slate-900 border-slate-600 focus:ring-0 focus:ring-offset-0 focus:border-amber-500 transition duration-150 ease-in-out">
+                                <span class="text-xs text-gray-300 group-hover:text-amber-400 transition">Andamento</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <input type="checkbox" name="taskFilter" value="Concluido" checked onchange="renderDaySummaryList()" class="form-checkbox h-4 w-4 text-emerald-500 rounded bg-slate-900 border-slate-600 focus:ring-0 focus:ring-offset-0 focus:border-emerald-500 transition duration-150 ease-in-out">
+                                <span class="text-xs text-gray-300 group-hover:text-emerald-400 transition">Concluídos</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="summaryList" class="space-y-3"></div>
+                </div>
             </section>
 
             <!-- Gestão -->
@@ -782,6 +809,13 @@
         let reportCharts = { spend: null, metrics: null, roas: null };
         let socialReportCharts = { growth: null, engagement: null };
         
+        // Helper to get local date string YYYY-MM-DD
+        const toLocalISO = (date) => {
+            const offset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() - offset).toISOString().split('T')[0];
+        }
+        let currentSummaryDateStr = toLocalISO(new Date()); // Initialize with today's date
+
         window.lastTrafficStats = null;
         window.lastSocialStats = null;
         let currentListingTab = 'traffic';
@@ -844,7 +878,20 @@
             onSnapshot(clientsCollection, s => { clients = s.docs.map(d => ({ id: d.id, ...d.data() })); renderClientList(); populateClientSelects(); });
             onSnapshot(resultsCollection, s => { results = s.docs.map(d => ({ id: d.id, ...d.data() })); renderResultsTable(); });
             onSnapshot(socialResultsCollection, s => { socialResults = s.docs.map(d => ({ id: d.id, ...d.data() })); renderSocialResultsTable(); });
-            onSnapshot(tasksCollection, s => { tasks = s.docs.map(d => ({ id: d.id, ...d.data() })); renderCalendar(); renderTaskManagement(); });
+            onSnapshot(tasksCollection, s => { 
+                tasks = s.docs.map(d => ({ id: d.id, ...d.data() })); 
+                renderCalendar(); 
+                renderTaskManagement(); 
+                
+                // Initialize Header if empty
+                const displayDate = document.getElementById('summaryDateDisplay');
+                if (displayDate && !displayDate.textContent) {
+                     const selectedDate = new Date(currentSummaryDateStr + "T00:00:00");
+                     displayDate.textContent = selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+                }
+
+                renderDaySummaryList(); // Always render summary on updates
+            });
             switchTab('clientes');
             attachCalculationListeners();
         }
@@ -960,7 +1007,144 @@
         window.generateDailySummary = async () => { const today = new Date().toISOString().split('T')[0]; const filtered = results.filter(r => r.data === today); if(!filtered.length) return showMessage("Sem dados para hoje.", true); const content = filtered.map(r => { const cli = clients.find(c => c.id === r.clientId); return `<div class="mb-2 pb-2 border-b border-gray-800 last:border-0"><span class="text-cyan-400 font-bold">${cli?.nome || 'Geral'}</span>: Gasto ${formatCurrency(r.investimento)} ➔ Retorno ${formatCurrency(r.vendas)} (${r.roas.toFixed(2)}x)</div>`; }).join(''); document.getElementById('summaryModal').classList.remove('hidden'); document.getElementById('summaryModal').classList.add('flex'); document.getElementById('summaryTitle').textContent = "Resumo Diário"; document.getElementById('summaryContent').innerHTML = content; };
         window.toggleTaskForm = () => document.getElementById('taskFormContainer').classList.toggle('hidden');
         window.changeMonth = (v) => { currentMonth.setMonth(currentMonth.getMonth() + v); window.renderCalendar(); };
-        window.renderCalendar = () => { const grid = document.getElementById('calendarGrid'); if(!grid) return; const myYear = currentMonth.getFullYear(); const myMonth = currentMonth.getMonth(); document.getElementById('currentMonthYear').textContent = currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }); grid.innerHTML = ''; const first = new Date(myYear, myMonth, 1).getDay(); const last = new Date(myYear, myMonth + 1, 0).getDate(); const filter = document.getElementById('filterClient').value; for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20 border-none bg-transparent"></div>'; for (let d = 1; d <= last; d++) { const dateStr = `${myYear}-${String(myMonth+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; let dayTasks = tasks.filter(t => t.date.startsWith(dateStr)); if(filter) dayTasks = dayTasks.filter(t => t.clientId === filter); const tasksHtml = dayTasks.map(t => t.status === 'Concluido' ? `<div class="text-center text-[10px] mt-0.5" title="${t.type} - Concluído">✅</div>` : `<div class="bg-cyan-900/50 border border-cyan-500/30 text-[9px] truncate px-1 text-cyan-200 rounded-sm mb-0.5" title="${t.status}">${t.type}</div>`).join(''); grid.innerHTML += `<div class="calendar-day p-1 text-xs relative group"><span class="font-bold absolute top-1 right-2 text-slate-600 group-hover:text-cyan-400">${d}</span><div class="mt-4 space-y-1">${tasksHtml}</div></div>`; } };
+        
+        window.renderCalendar = () => {
+            const grid = document.getElementById('calendarGrid');
+            if(!grid) return;
+            const myYear = currentMonth.getFullYear();
+            const myMonth = currentMonth.getMonth();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            document.getElementById('currentMonthYear').textContent = currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            grid.innerHTML = '';
+            
+            const first = new Date(myYear, myMonth, 1).getDay();
+            const last = new Date(myYear, myMonth + 1, 0).getDate();
+            const filter = document.getElementById('filterClient').value;
+
+            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20 border-none bg-transparent"></div>';
+            
+            for (let d = 1; d <= last; d++) {
+                const dateStr = `${myYear}-${String(myMonth+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                let dayTasks = tasks.filter(t => t.date.startsWith(dateStr));
+                if(filter) dayTasks = dayTasks.filter(t => t.clientId === filter);
+                
+                const tasksHtml = dayTasks.map(t => {
+                    const taskDate = new Date(t.date);
+                    taskDate.setHours(0,0,0,0);
+                    const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
+                    const bgClass = isOverdue ? 'bg-red-600 text-white animate-pulse shadow-[0_0_5px_rgba(220,38,38,0.8)]' : (t.status === 'Concluido' ? 'text-center text-[10px]' : 'bg-cyan-900/50 border border-cyan-500/30 text-cyan-200');
+                    const content = t.status === 'Concluido' ? '✅' : t.type;
+                    
+                    return `<div class="${bgClass} text-[9px] truncate px-1 rounded-sm mb-0.5 cursor-pointer hover:opacity-80" title="${t.status}: ${t.notes || ''}">${content}</div>`;
+                }).join('');
+
+                grid.innerHTML += `
+                    <div class="calendar-day p-1 text-xs relative group flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <button onclick="viewDaySummary('${dateStr}')" class="text-slate-600 hover:text-cyan-400 transition p-1" title="Ver Resumo do Dia">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <span class="font-bold text-slate-600 group-hover:text-cyan-400">${d}</span>
+                        </div>
+                        <div class="mt-1 space-y-1 overflow-y-auto max-h-[80px] custom-scrollbar">${tasksHtml}</div>
+                    </div>`;
+            }
+        };
+
+        // Função Principal para Abrir o Resumo do Dia
+        window.viewDaySummary = (dateStr) => {
+            currentSummaryDateStr = dateStr;
+            const container = document.getElementById('calendarSummary');
+            const displayDate = document.getElementById('summaryDateDisplay');
+            const selectedDate = new Date(dateStr + "T00:00:00");
+            
+            container.classList.remove('hidden');
+            displayDate.textContent = selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            // Certifica-se de que os checkboxes estão marcados na primeira abertura
+            // Se quiser persistir o estado, pode remover este bloco.
+            /* document.querySelectorAll('input[name="taskFilter"]').forEach(cb => cb.checked = true);
+            */
+            
+            renderDaySummaryList();
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+
+        // Renderiza a lista com base na data atual selecionada e nos CHECKBOXES ativos
+        window.renderDaySummaryList = () => {
+            if (!currentSummaryDateStr) return;
+            
+            const list = document.getElementById('summaryList');
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            // Pega todos os valores de checkbox marcados
+            const activeFilters = Array.from(document.querySelectorAll('input[name="taskFilter"]:checked')).map(cb => cb.value);
+
+            let dayTasks = tasks.filter(t => t.date.startsWith(currentSummaryDateStr));
+            
+            // Filtra se a tarefa está nos status selecionados
+            dayTasks = dayTasks.filter(t => activeFilters.includes(t.status));
+            
+            dayTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+            list.innerHTML = '';
+
+            if (dayTasks.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 italic text-center py-4">Nenhuma tarefa encontrada com este filtro.</p>';
+            } else {
+                dayTasks.forEach(t => {
+                    const client = clients.find(c => c.id === t.clientId);
+                    const taskDate = new Date(t.date);
+                    taskDate.setHours(0,0,0,0);
+                    const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
+                    
+                    let statusColor = "text-gray-400";
+                    let borderClass = "border-slate-700";
+                    let bgClass = "bg-slate-800";
+                    
+                    if (isOverdue) {
+                        statusColor = "text-red-400 font-bold uppercase tracking-wider animate-pulse";
+                        borderClass = "border-red-500/50";
+                        bgClass = "bg-red-900/10";
+                    } else if (t.status === 'Concluido') {
+                        statusColor = "text-emerald-400 font-bold";
+                        borderClass = "border-emerald-500/30";
+                        bgClass = "bg-emerald-900/10";
+                    } else if (t.status === 'Em Andamento') {
+                        statusColor = "text-amber-400 font-bold";
+                        borderClass = "border-amber-500/30";
+                    } else {
+                        statusColor = "text-cyan-400";
+                    }
+
+                    list.innerHTML += `
+                        <div class="p-4 rounded-lg border ${borderClass} ${bgClass} flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-opacity-80">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs font-bold text-white bg-slate-900 px-2 py-0.5 rounded border border-slate-700">${client?.nome || 'Geral'}</span>
+                                    <span class="text-xs text-gray-500">${t.date.split('T')[1]}</span>
+                                </div>
+                                <h4 class="text-sm font-semibold text-gray-200">${t.type}</h4>
+                                <p class="text-xs text-gray-400 mt-1 italic">${t.notes || 'Sem observações.'}</p>
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                <span class="text-xs ${statusColor}">${isOverdue ? '⚠️ ATRASADO' : t.status}</span>
+                                <div class="flex gap-2">
+                                    ${t.status !== 'Concluido' ? `<button onclick="updateTaskStatus('${t.id}', 'Concluido')" class="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition">Concluir</button>` : ''}
+                                    <button onclick="viewTaskDetails('${t.id}')" class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs transition">Ver</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        };
+
         window.viewTaskDetails = (id) => { const t = tasks.find(item => item.id === id); if(!t) return; const cli = clients.find(c => c.id === t.clientId); const content = `<div class="p-4 bg-slate-950 rounded-lg space-y-3 text-sm text-gray-300 border border-slate-800"><p><strong>Cliente:</strong> <span class="text-white">${cli?.nome || 'N/A'}</span></p><p><strong>Tipo:</strong> <span class="text-cyan-400">${t.type}</span></p><p><strong>Data/Hora:</strong> ${new Date(t.date).toLocaleString('pt-BR')}</p><p><strong>Status:</strong> ${t.status}</p><hr class="border-slate-800 my-2"/><p class="text-xs text-gray-500 uppercase font-bold">Observações:</p><p class="text-gray-300 italic whitespace-pre-wrap bg-slate-900/50 p-3 rounded border border-slate-800">${t.notes || 'Sem descrição.'}</p></div>`; document.getElementById('summaryModal').classList.remove('hidden'); document.getElementById('summaryModal').classList.add('flex'); document.getElementById('summaryTitle').textContent = "Detalhes da Tarefa"; document.getElementById('summaryContent').innerHTML = content; };
         window.renderTaskManagement = () => { const board = document.getElementById('taskManagementBoard'); if(!board) return; board.innerHTML = ''; const columns = [{ id: 'Pendente', title: 'Pendente', icon: '⏳', color: 'red', bg: 'bg-red-900/10', border: 'border-red-500' }, { id: 'Em Andamento', title: 'Em Andamento', icon: '🚀', color: 'amber', bg: 'bg-amber-900/10', border: 'border-amber-500' }, { id: 'Concluido', title: 'Concluído', icon: '✅', color: 'emerald', bg: 'bg-emerald-900/10', border: 'border-emerald-500' }]; columns.forEach(col => { const columnTasks = tasks.filter(t => t.status === col.id); if (col.id === 'Concluido') columnTasks.sort((a, b) => new Date(b.date) - new Date(a.date)); else columnTasks.sort((a, b) => new Date(a.date) - new Date(b.date)); board.innerHTML += `<div class="${col.bg} backdrop-blur-sm p-4 rounded-xl min-h-[400px] border-t-4 ${col.border} shadow-lg flex flex-col transition-all duration-300 hover:bg-opacity-20"><h3 class="text-sm font-bold text-${col.color}-400 mb-4 flex justify-between items-center uppercase tracking-wider"><span class="flex items-center gap-2 text-lg">${col.icon} ${col.title}</span><span class="bg-slate-900/80 px-3 py-1 rounded-full text-white text-xs border border-slate-700 font-mono">${columnTasks.length}</span></h3><div class="space-y-3 flex-grow custom-scrollbar overflow-y-auto pr-1" style="max-height: 600px;">${columnTasks.map(t => { const cli = clients.find(c => c.id === t.clientId); return `<div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700 shadow-lg hover:shadow-${col.color}-500/20 hover:border-${col.color}-500/50 transition-all duration-300 transform hover:-translate-y-1 relative group"><button onclick="viewTaskDetails('${t.id}')" class="absolute top-3 right-8 text-slate-500 hover:text-cyan-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Ver Detalhes"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button><button onclick="deleteTask('${t.id}')" class="absolute top-3 right-2 text-slate-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button><div class="text-[10px] text-${col.color}-400 font-bold uppercase tracking-wide mb-1 pr-12 truncate flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-${col.color}-500 inline-block animate-pulse"></span>${cli?.nome || 'Geral'}</div><div class="text-sm text-white font-medium mb-3 line-clamp-2">${t.type}</div><div class="flex justify-between items-center mt-3 border-t border-slate-700/50 pt-3"><span class="text-[10px] text-gray-400 flex items-center gap-1">📅 ${new Date(t.date).toLocaleDateString()}</span><select onchange="updateTaskStatus('${t.id}', this.value)" class="text-[10px] bg-slate-900 text-${col.color}-300 rounded-lg px-2 py-1 border border-slate-700 focus:ring-0 cursor-pointer hover:bg-slate-800 transition shadow-inner"><option value="Pendente" ${col.id === 'Pendente' ? 'selected' : ''}>⏳ Pendente</option><option value="Em Andamento" ${col.id === 'Em Andamento' ? 'selected' : ''}>🚀 Andamento</option><option value="Concluido" ${col.id === 'Concluido' ? 'selected' : ''}>✅ Concluído</option></select></div></div>`; }).join('')}</div></div>`; }); };
         window.updateTaskStatus = async (id, s) => { await updateDoc(doc(db, 'users', userId, 'tasks', id), { status: s }); };
@@ -1173,4 +1357,4 @@
         startMatrix();
     </script>
 </body>
-</html>16.02
+</html>
