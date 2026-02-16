@@ -47,6 +47,7 @@
             background-color: #020617; /* Fundo muito escuro */
             background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); /* Gradiente sutil */
             color: #e2e8f0;
+            scroll-behavior: smooth;
         }
 
         /* Scrollbar Futurista */
@@ -100,12 +101,13 @@
         
         /* Calendario */
         .calendar-day {
-            min-height: 120px; /* Aumentado um pouco para caber o ícone */
+            min-height: 120px; 
             border: 1px solid #1e293b;
             background-color: #0f172a;
             transition: all 0.2s;
             color: #94a3b8;
             position: relative;
+            cursor: pointer; /* Indica que é clicável */
         }
         .calendar-day:hover {
             transform: translateY(-2px);
@@ -113,6 +115,30 @@
             border-color: #06b6d4;
             box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
             z-index: 10;
+        }
+        
+        /* Alpha Index Sidebar */
+        .alpha-sidebar {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .alpha-link {
+            display: block;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #64748b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .alpha-link:hover, .alpha-link.active {
+            background-color: rgba(6, 182, 212, 0.2);
+            color: #22d3ee;
         }
         
         /* Login Page */
@@ -422,14 +448,20 @@
                     </form>
                 </div>
 
-                <!-- Client List Block -->
-                <div class="mt-8">
-                    <div class="flex justify-start space-x-4 mb-6 border-b border-slate-700 pb-2">
-                        <button onclick="setListingCategory('traffic')" id="list_tab_traffic" class="pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition">TRÁFEGO</button>
-                        <button onclick="setListingCategory('social')" id="list_tab_social" class="pb-2 text-sm font-bold text-gray-500 hover:text-white transition">SOCIAL</button>
+                <!-- Client List Block with Alpha Index -->
+                <div class="mt-8 flex gap-4">
+                    <div class="flex-grow">
+                        <div class="flex justify-start space-x-4 mb-6 border-b border-slate-700 pb-2">
+                            <button onclick="setListingCategory('traffic')" id="list_tab_traffic" class="pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition">TRÁFEGO</button>
+                            <button onclick="setListingCategory('social')" id="list_tab_social" class="pb-2 text-sm font-bold text-gray-500 hover:text-white transition">SOCIAL</button>
+                        </div>
+                        <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 scroll-mt-20"></div>
+                        <p id="noClients" class="text-center text-slate-500 mt-12 hidden italic">Nenhum registro encontrado.</p>
                     </div>
-                    <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                    <p id="noClients" class="text-center text-slate-500 mt-12 hidden italic">Nenhum registro encontrado.</p>
+                    <!-- Menu Lateral (Índice Alfabético) -->
+                    <div id="alphaIndexSidebar" class="hidden md:flex flex-col gap-1 w-10 alpha-sidebar bg-slate-900/50 backdrop-blur-sm p-1 rounded-lg border border-slate-800">
+                        <!-- Index injected here by JS -->
+                    </div>
                 </div>
             </section>
 
@@ -986,7 +1018,90 @@
         window.toggleFormCategory = (type) => { const btnTraffic = document.getElementById('form_btn_traffic'); const btnSocial = document.getElementById('form_btn_social'); const trafficFields = document.getElementById('trafficFields'); const socialFields = document.getElementById('socialMediaFields'); const hiddenType = document.getElementById('cli_service_type'); hiddenType.value = type; if(type === 'traffic') { btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition"; btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition"; trafficFields.classList.remove('hidden'); socialFields.classList.add('hidden'); } else { btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition"; btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition"; socialFields.classList.remove('hidden'); trafficFields.classList.add('hidden'); } };
         window.toggleClientForm = () => document.getElementById('clientRegistrationContainer').classList.toggle('hidden');
         window.setListingCategory = (type) => { currentListingTab = type; const tabTraffic = document.getElementById('list_tab_traffic'); const tabSocial = document.getElementById('list_tab_social'); if(type === 'traffic') { tabTraffic.className = "pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition"; tabSocial.className = "pb-2 text-sm font-bold text-gray-500 hover:text-white transition"; } else { tabSocial.className = "pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition"; tabTraffic.className = "pb-2 text-sm font-bold text-gray-500 hover:text-white transition"; } renderClientList(); };
-        window.renderClientList = () => { const container = document.getElementById('clientList'); if(!container) return; container.innerHTML = ''; const filteredClients = clients.filter(c => (c.serviceTypes || [c.serviceType]).includes(currentListingTab)); if (filteredClients.length === 0) { document.getElementById('noClients').classList.remove('hidden'); return; } document.getElementById('noClients').classList.add('hidden'); filteredClients.forEach(c => { const isActive = c.active !== false; const cardColor = isActive ? (c.color || '#06b6d4') : '#334155'; const otherType = currentListingTab === 'traffic' ? 'social' : 'traffic'; const hasOtherService = (c.serviceTypes || [c.serviceType]).includes(otherType); let actionButton = hasOtherService ? `<span class="bg-slate-900 border border-cyan-500/30 text-cyan-400 text-[9px] uppercase font-bold py-2 rounded flex items-center justify-center cursor-default">Multiserviço ✨</span>` : `<button onclick="toggleServiceType('${c.id}', '${otherType}')" class="bg-slate-700 hover:bg-slate-600 text-amber-400 text-[10px] uppercase font-bold py-2 rounded transition border border-transparent hover:border-amber-400/30">Ativar ${otherType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</button>`; container.innerHTML += `<div class="group relative bg-slate-800/80 p-5 rounded-xl border-t-2 border-b border-r border-l border-slate-700/50 hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-cyan-900/20 overflow-hidden ${!isActive ? 'opacity-60 grayscale' : ''}" style="border-top-color: ${cardColor}"><div class="flex justify-between items-start mb-2"><h4 class="font-bold text-lg text-white group-hover:text-cyan-400 transition">${c.nome}</h4><span class="w-2 h-2 rounded-full ${isActive ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500'}"></span></div><p class="text-xs text-gray-400 mb-4 font-mono tracking-tight">${c.serviceType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</p><div class="grid grid-cols-2 gap-2 mt-4 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity"><button onclick="viewClientDetails('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] uppercase font-bold py-2 rounded transition">Ver</button>${actionButton}<button onclick="openCredentialsModal('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-300 text-[10px] uppercase font-bold py-2 rounded transition flex items-center justify-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Acessos</button><button onclick="editClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-400 text-[10px] uppercase font-bold py-2 rounded transition">Edit</button><button onclick="deleteClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-red-400 text-[10px] uppercase font-bold py-2 rounded transition">Del</button></div></div>`; }); };
+        
+        // --- UPDATED RENDER CLIENT LIST WITH ALPHA SORT AND SIDEBAR ---
+        window.renderClientList = () => { 
+            const container = document.getElementById('clientList'); 
+            const alphaSidebar = document.getElementById('alphaIndexSidebar');
+            if(!container) return; 
+            container.innerHTML = ''; 
+            alphaSidebar.innerHTML = '';
+            
+            const filteredClients = clients.filter(c => (c.serviceTypes || [c.serviceType]).includes(currentListingTab)); 
+            
+            if (filteredClients.length === 0) { 
+                document.getElementById('noClients').classList.remove('hidden'); 
+                alphaSidebar.classList.add('hidden');
+                return; 
+            } 
+            
+            document.getElementById('noClients').classList.add('hidden'); 
+            alphaSidebar.classList.remove('hidden');
+            alphaSidebar.classList.add('md:flex'); // Restore flex if it was hidden
+
+            // 1. Sort Alphabetically
+            filteredClients.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            // 2. Track letters for Sidebar
+            let currentLetter = '';
+            let lettersFound = new Set();
+
+            filteredClients.forEach(c => { 
+                const isActive = c.active !== false; 
+                const cardColor = isActive ? (c.color || '#06b6d4') : '#334155'; 
+                const otherType = currentListingTab === 'traffic' ? 'social' : 'traffic'; 
+                const hasOtherService = (c.serviceTypes || [c.serviceType]).includes(otherType); 
+                
+                // Letter grouping logic
+                const firstLetter = c.nome.charAt(0).toUpperCase();
+                let anchorId = '';
+                if (firstLetter !== currentLetter) {
+                    currentLetter = firstLetter;
+                    lettersFound.add(currentLetter);
+                    anchorId = `client-anchor-${currentLetter}`;
+                }
+
+                let actionButton = hasOtherService ? 
+                    `<span class="bg-slate-900 border border-cyan-500/30 text-cyan-400 text-[9px] uppercase font-bold py-2 rounded flex items-center justify-center cursor-default">Multiserviço ✨</span>` : 
+                    `<button onclick="toggleServiceType('${c.id}', '${otherType}')" class="bg-slate-700 hover:bg-slate-600 text-amber-400 text-[10px] uppercase font-bold py-2 rounded transition border border-transparent hover:border-amber-400/30">Ativar ${otherType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</button>`; 
+                
+                container.innerHTML += `
+                    <div ${anchorId ? `id="${anchorId}"` : ''} class="group relative bg-slate-800/80 p-5 rounded-xl border-t-2 border-b border-r border-l border-slate-700/50 hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-cyan-900/20 overflow-hidden ${!isActive ? 'opacity-60 grayscale' : ''}" style="border-top-color: ${cardColor}">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-lg text-white group-hover:text-cyan-400 transition">${c.nome}</h4>
+                            <span class="w-2 h-2 rounded-full ${isActive ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500'}"></span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4 font-mono tracking-tight">${c.serviceType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</p>
+                        <div class="grid grid-cols-2 gap-2 mt-4 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <button onclick="viewClientDetails('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] uppercase font-bold py-2 rounded transition">Ver</button>
+                            ${actionButton}
+                            <button onclick="openCredentialsModal('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-300 text-[10px] uppercase font-bold py-2 rounded transition flex items-center justify-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Acessos
+                            </button>
+                            <button onclick="editClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-400 text-[10px] uppercase font-bold py-2 rounded transition">Edit</button>
+                            <button onclick="deleteClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-red-400 text-[10px] uppercase font-bold py-2 rounded transition">Del</button>
+                        </div>
+                    </div>`; 
+            });
+
+            // 3. Render Sidebar
+            lettersFound.forEach(letter => {
+                alphaSidebar.innerHTML += `<a onclick="scrollToClientLetter('${letter}')" class="alpha-link">${letter}</a>`;
+            });
+        };
+        
+        window.scrollToClientLetter = (letter) => {
+            const el = document.getElementById(`client-anchor-${letter}`);
+            if(el) {
+                // Adjust scroll position to account for sticky header or padding if needed
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Visual feedback
+                el.classList.add('ring-2', 'ring-cyan-500', 'ring-offset-2', 'ring-offset-slate-900');
+                setTimeout(() => el.classList.remove('ring-2', 'ring-cyan-500', 'ring-offset-2', 'ring-offset-slate-900'), 2000);
+            }
+        };
+
         window.editClient = (id) => { const c = clients.find(item => item.id === id); if(!c) return; document.getElementById('cli_id_edit').value = c.id; document.getElementById('cli_nome').value = c.nome; document.getElementById('cli_responsavel').value = c.responsavel; document.getElementById('cli_telefone').value = c.telefone; document.getElementById('cli_link').value = c.link || ""; document.getElementById('cli_observacoes').value = c.observacoes || ""; const editType = c.serviceType || (c.serviceTypes ? c.serviceTypes[0] : 'traffic'); toggleFormCategory(editType); document.getElementById('clientRegistrationContainer').classList.remove('hidden'); if(editType === 'traffic') { document.getElementById('cli_plataforma_traffic').value = c.plataformaTraffic || "Meta"; document.getElementById('cli_budget_value_traffic').value = c.budgetValueTraffic || ""; document.getElementById('cli_budget_type_traffic').value = c.budgetTypeTraffic || "Diário"; document.getElementById('cli_conversion_goals_traffic').value = c.conversionGoalsTraffic || "Mensagem"; } else { document.getElementById('cli_sm_fee').value = c.smFee || ""; document.getElementById('cli_sm_platform').value = c.smPlatform || "Instagram"; document.getElementById('cli_sm_needs').value = c.smNeeds || "Conteudo"; } window.scrollTo({ top: 0, behavior: 'smooth' }); };
         window.toggleClientStatus = async (id, current) => { await updateDoc(doc(db, 'users', userId, 'clients', id), { active: !current }); showMessage(`Status alterado!`); };
         window.viewClientDetails = (id) => { const c = clients.find(item => item.id === id); if(!c) return; const content = `<div class="p-4 bg-slate-950 rounded-lg space-y-3 text-sm text-gray-300 border border-slate-800"><p><strong>Responsável:</strong> <span class="text-white">${c.responsavel}</span></p><p><strong>Contato:</strong> ${c.telefone}</p><p><strong>Plataforma:</strong> ${c.plataformaTraffic || c.smPlatform}</p><p><strong>Investimento:</strong> ${formatCurrency(c.budgetValueTraffic || c.smFee)}</p><p><strong>Link:</strong> <a href="${c.link}" target="_blank" class="text-cyan-400 hover:text-white transition underline">${c.link || '-'}</a></p><p class="border-t border-slate-800 pt-2 italic text-xs">"${c.observacoes || 'Sem notas'}"</p></div>`; document.getElementById('summaryModal').classList.remove('hidden'); document.getElementById('summaryModal').classList.add('flex'); document.getElementById('summaryTitle').textContent = c.nome; document.getElementById('summaryContent').innerHTML = content; };
@@ -1023,7 +1138,7 @@
             const last = new Date(myYear, myMonth + 1, 0).getDate();
             const filter = document.getElementById('filterClient').value;
 
-            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20 border-none bg-transparent"></div>';
+            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20 border-none bg-transparent cursor-default"></div>';
             
             for (let d = 1; d <= last; d++) {
                 const dateStr = `${myYear}-${String(myMonth+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -1040,18 +1155,20 @@
                     return `<div class="${bgClass} text-[9px] truncate px-1 rounded-sm mb-0.5 cursor-pointer hover:opacity-80" title="${t.status}: ${t.notes || ''}">${content}</div>`;
                 }).join('');
 
+                // onclick moved to the outer div
                 grid.innerHTML += `
-                    <div class="calendar-day p-1 text-xs relative group flex flex-col justify-between">
+                    <div class="calendar-day p-1 text-xs relative group flex flex-col justify-between cursor-pointer" onclick="viewDaySummary('${dateStr}')">
                         <div class="flex justify-between items-start">
-                            <button onclick="viewDaySummary('${dateStr}')" class="text-slate-600 hover:text-cyan-400 transition p-1" title="Ver Resumo do Dia">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <span class="text-slate-600 hover:text-cyan-400 transition p-1">
+                                <!-- Eye icon removed/minimized since entire cell is clickable -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                            </button>
+                            </span>
                             <span class="font-bold text-slate-600 group-hover:text-cyan-400">${d}</span>
                         </div>
-                        <div class="mt-1 space-y-1 overflow-y-auto max-h-[80px] custom-scrollbar">${tasksHtml}</div>
+                        <div class="mt-1 space-y-1 overflow-y-auto max-h-[80px] custom-scrollbar pointer-events-none">${tasksHtml}</div>
                     </div>`;
             }
         };
