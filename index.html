@@ -735,14 +735,14 @@
             100% { background-position: -200% center; }
         }
         .task-card-progress {
-            background: linear-gradient(90deg, rgba(15,23,42,1) 0%, rgba(30,41,59,1) 50%, rgba(15,23,42,1) 100%);
+            background: linear-gradient(90deg, rgba(15,23,42,1) 0%, rgba(66,32,6,0.3) 50%, rgba(15,23,42,1) 100%);
             background-size: 200% auto;
             animation: shineProgress 3s linear infinite;
-            border-left: 4px solid #f59e0b; /* Amber 500 */
+            border-left: 4px solid #eab308; /* Yellow 500 */
         }
         .task-card-completed {
-            background: linear-gradient(135deg, rgba(15,23,42,1) 0%, rgba(6,78,59,0.3) 100%);
-            border-left: 4px solid #10b981; /* Emerald 500 */
+            background: linear-gradient(135deg, rgba(15,23,42,1) 0%, rgba(20,83,45,0.3) 100%);
+            border-left: 4px solid #22c55e; /* Green 500 */
             opacity: 0.8;
         }
         .task-card-overdue {
@@ -750,7 +750,18 @@
             background: rgba(127,29,29,0.1);
         }
         .task-card-pending {
-            border-left: 4px solid #64748b; /* Slate 500 */
+            border-left: 4px solid #3b82f6; /* Blue 500 */
+            background: rgba(30,58,138,0.1);
+        }
+
+        /* --- Animações KPIs --- */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        .animate-kpi {
+            animation: slideUpFade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
         }
     </style>
 </head>
@@ -1080,6 +1091,8 @@
                     <select id="social_filter_cliente" class="p-2 rounded-lg text-sm bg-slate-900 border-slate-700 text-white" onchange="renderSocialResultsTable()"><option value="">Todos</option></select>
                 </div>
 
+                <!-- NOVO: Container de KPI Social -->
+                <div id="socialKpiCardsContainer" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 text-white"></div>
                 <div id="socialResultsListContainer" class="space-y-3"></div>
             </section>
 
@@ -1419,6 +1432,35 @@
         let currentListingTab = 'traffic';
         let matrixInterval;
         let customUIInitialized = false;
+
+        // --- Helper de KPI Animado ---
+        window.renderKpiCard = (label, value, theme, delayIndex) => {
+            const themes = {
+                red: { c: '#ef4444', classes: 'hover:border-red-500/50 group-hover:bg-red-500/20 from-red-500/0 via-red-500 to-red-500/0 bg-red-500 text-red-400 bg-red-500/10' },
+                emerald: { c: '#10b981', classes: 'hover:border-emerald-500/50 group-hover:bg-emerald-500/20 from-emerald-500/0 via-emerald-500 to-emerald-500/0 bg-emerald-500 text-emerald-400 bg-emerald-500/10' },
+                green: { c: '#22c55e', classes: 'hover:border-green-500/50 group-hover:bg-green-500/20 from-green-500/0 via-green-500 to-green-500/0 bg-green-500 text-green-400 bg-green-500/10' },
+                yellow: { c: '#eab308', classes: 'hover:border-yellow-500/50 group-hover:bg-yellow-500/20 from-yellow-500/0 via-yellow-500 to-yellow-500/0 bg-yellow-500 text-yellow-400 bg-yellow-500/10' },
+                indigo: { c: '#6366f1', classes: 'hover:border-indigo-500/50 group-hover:bg-indigo-500/20 from-indigo-500/0 via-indigo-500 to-indigo-500/0 bg-indigo-500 text-indigo-400 bg-indigo-500/10' },
+                cyan: { c: '#06b6d4', classes: 'hover:border-cyan-500/50 group-hover:bg-cyan-500/20 from-cyan-500/0 via-cyan-500 to-cyan-500/0 bg-cyan-500 text-cyan-400 bg-cyan-500/10' },
+                purple: { c: '#a855f7', classes: 'hover:border-purple-500/50 group-hover:bg-purple-500/20 from-purple-500/0 via-purple-500 to-purple-500/0 bg-purple-500 text-purple-400 bg-purple-500/10' },
+                pink: { c: '#ec4899', classes: 'hover:border-pink-500/50 group-hover:bg-pink-500/20 from-pink-500/0 via-pink-500 to-pink-500/0 bg-pink-500 text-pink-400 bg-pink-500/10' },
+                blue: { c: '#3b82f6', classes: 'hover:border-blue-500/50 group-hover:bg-blue-500/20 from-blue-500/0 via-blue-500 to-blue-500/0 bg-blue-500 text-blue-400 bg-blue-500/10' },
+                orange: { c: '#f97316', classes: 'hover:border-orange-500/50 group-hover:bg-orange-500/20 from-orange-500/0 via-orange-500 to-orange-500/0 bg-orange-500 text-orange-400 bg-orange-500/10' },
+                teal: { c: '#14b8a6', classes: 'hover:border-teal-500/50 group-hover:bg-teal-500/20 from-teal-500/0 via-teal-500 to-teal-500/0 bg-teal-500 text-teal-400 bg-teal-500/10' }
+            };
+            const t = themes[theme] || themes.cyan;
+            const cls = t.classes.split(' ');
+            
+            return `<div class="animate-kpi bg-slate-800/60 backdrop-blur-sm p-4 rounded-2xl border border-slate-700/50 ${cls[0]} transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)] group relative overflow-hidden" style="animation-delay: ${delayIndex * 0.05}s">
+                <div class="absolute -right-6 -top-6 w-24 h-24 ${cls[7]} rounded-full blur-2xl ${cls[1]} transition-all"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${cls[2]} ${cls[3]} ${cls[4]} opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5 relative z-10">
+                    <span class="w-1.5 h-1.5 rounded-full ${cls[5]} shadow-[0_0_5px_${t.c}] animate-pulse"></span>
+                    ${label}
+                </p>
+                <p class="text-xl font-black ${cls[6]} tracking-tight relative z-10">${value}</p>
+            </div>`;
+        };
 
         // Lógica de Custom Select Engine
         window.setupCustomSelects = () => {
@@ -1870,10 +1912,81 @@
         window.toggleResultForm = () => { document.getElementById('resultFormContainer').classList.toggle('hidden'); if(!document.getElementById('resultFormContainer').classList.contains('hidden')) calculateLiveMetrics(); };
         window.toggleTrafficDateMode = () => { const type = document.querySelector('input[name="traffic_type_date"]:checked').value; const daily = type === 'daily'; document.getElementById('traffic_daily_input').classList.toggle('hidden', !daily); document.getElementById('traffic_period_input').classList.toggle('hidden', daily); document.getElementById('traffic_period_input').classList.toggle('flex', !daily); document.getElementById('res_data').required = daily; document.getElementById('res_data_inicio').required = !daily; document.getElementById('res_data_fim').required = !daily; };
         window.setTrafficDateRange = (days) => { if (days === 'all') { document.getElementById('results_filter_end_date').value = ""; document.getElementById('results_filter_start_date').value = ""; renderResultsTable(); return; } const end = new Date(); const start = new Date(); if (days !== 1) start.setDate(end.getDate() - (days - 1)); document.getElementById('results_filter_end_date').value = end.toISOString().split('T')[0]; document.getElementById('results_filter_start_date').value = start.toISOString().split('T')[0]; renderResultsTable(); };
-        window.renderResultsTable = function() { const list = document.getElementById('resultsListContainer'); const filterClient = document.getElementById('results_filter_cliente').value; const start = document.getElementById('results_filter_start_date').value; const end = document.getElementById('results_filter_end_date').value; if (!list) return; let filtered = [...results]; if (filterClient) filtered = filtered.filter(r => r.clientId === filterClient); if (start) filtered = filtered.filter(r => (r.dataFim || r.data) >= start); if (end) filtered = filtered.filter(r => (r.dataFim || r.data) <= end); filtered.sort((a, b) => new Date(b.dataFim || b.data) - new Date(a.dataFim || a.data)); const summary = filtered.reduce((acc, r) => { acc.gasto += r.investimento; acc.vendas += r.vendas; acc.conv += r.conversionCount || 0; acc.imp += r.impressoes; acc.cliques += r.cliques || 0; acc.alcance += r.alcance || 0; return acc; }, { gasto: 0, vendas: 0, conv: 0, imp: 0, cliques: 0, alcance: 0 }); document.getElementById('kpiCardsContainer').innerHTML = `<div class="bg-slate-800 p-3 rounded-xl border-t-2 border-red-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Investimento</p><p class="text-lg font-bold text-white">${formatCurrency(summary.gasto)}</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-green-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Retorno</p><p class="text-lg font-bold text-emerald-400">${formatCurrency(summary.vendas)}</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-yellow-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">ROAS</p><p class="text-lg font-bold text-yellow-400">${(summary.gasto > 0 ? summary.vendas / summary.gasto : 0).toFixed(2)}x</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-indigo-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">CPA</p><p class="text-lg font-bold text-indigo-400">${formatCurrency(summary.conv > 0 ? summary.gasto / summary.conv : 0)}</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-cyan-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">CPC Médio</p><p class="text-lg font-bold text-cyan-400">${formatCurrency(summary.cliques > 0 ? summary.gasto / summary.cliques : 0)}</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-purple-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">CTR Médio</p><p class="text-lg font-bold text-purple-400">${(summary.imp > 0 ? (summary.cliques / summary.imp) * 100 : 0).toFixed(2)}%</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-pink-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Tx. Conv.</p><p class="text-lg font-bold text-pink-400">${(summary.cliques > 0 ? (summary.conv / summary.cliques) * 100 : 0).toFixed(2)}%</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-blue-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Freq. Méd</p><p class="text-lg font-bold text-blue-400">${(summary.alcance > 0 ? summary.imp / summary.alcance : 0).toFixed(2)}</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-orange-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Cliques</p><p class="text-lg font-bold text-orange-400">${formatCompact(summary.cliques)}</p></div><div class="bg-slate-800 p-3 rounded-xl border-t-2 border-teal-500 shadow-lg border-b border-r border-l border-slate-700/50"><p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Conversões</p><p class="text-lg font-bold text-teal-400">${formatCompact(summary.conv)}</p></div>`; list.innerHTML = ''; filtered.forEach(res => { const client = clients.find(c => c.id === res.clientId); const color = client?.color || '#06b6d4'; const dateDisplay = (res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim) ? `${new Date(res.dataInicio+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} - ${new Date(res.dataFim+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}` : new Date(res.data+'T12:00:00').toLocaleDateString('pt-BR'); list.innerHTML += `<div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}"><div class="flex justify-between items-center mb-2"><div><div class="flex items-center gap-2"><span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span><span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700 flex items-center gap-1">${res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim ? '📅' : ''} ${dateDisplay}</span></div></div><div class="flex items-center gap-4"><div class="text-right"><span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span><span class="text-[9px] uppercase text-gray-500">ROAS</span></div><div class="flex gap-1"><button onclick="editResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></div></div><div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs"><div class="text-gray-400">Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></div><div class="text-gray-400">Retorno: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></div><div class="text-gray-400 hidden md:block">CPC: <span class="text-cyan-400">${formatCurrency(res.cpc || (res.cliques > 0 ? res.investimento / res.cliques : 0))}</span></div><div class="text-gray-400 hidden md:block">CTR: <span class="text-yellow-400">${(res.ctr || (res.impressoes > 0 ? (res.cliques / res.impressoes) * 100 : 0)).toFixed(2)}%</span></div><div class="text-gray-400 hidden md:block">Freq: <span class="text-blue-400">${(res.frequency || (res.alcance > 0 ? res.impressoes / res.alcance : 0)).toFixed(2)}</span></div></div></div>`; }); };
+        window.renderResultsTable = function() { 
+            const list = document.getElementById('resultsListContainer'); 
+            const filterClient = document.getElementById('results_filter_cliente').value; 
+            const start = document.getElementById('results_filter_start_date').value; 
+            const end = document.getElementById('results_filter_end_date').value; 
+            if (!list) return; 
+            let filtered = [...results]; 
+            if (filterClient) filtered = filtered.filter(r => r.clientId === filterClient); 
+            if (start) filtered = filtered.filter(r => (r.dataFim || r.data) >= start); 
+            if (end) filtered = filtered.filter(r => (r.dataFim || r.data) <= end); 
+            filtered.sort((a, b) => new Date(b.dataFim || b.data) - new Date(a.dataFim || a.data)); 
+            const summary = filtered.reduce((acc, r) => { acc.gasto += r.investimento; acc.vendas += r.vendas; acc.conv += r.conversionCount || 0; acc.imp += r.impressoes; acc.cliques += r.cliques || 0; acc.alcance += r.alcance || 0; return acc; }, { gasto: 0, vendas: 0, conv: 0, imp: 0, cliques: 0, alcance: 0 }); 
+            
+            const kpis = [
+                { l: 'Investimento', v: formatCurrency(summary.gasto), c: 'red' },
+                { l: 'Retorno', v: formatCurrency(summary.vendas), c: 'emerald' },
+                { l: 'ROAS', v: (summary.gasto > 0 ? summary.vendas / summary.gasto : 0).toFixed(2) + 'x', c: 'yellow' },
+                { l: 'CPA', v: formatCurrency(summary.conv > 0 ? summary.gasto / summary.conv : 0), c: 'indigo' },
+                { l: 'CPC Médio', v: formatCurrency(summary.cliques > 0 ? summary.gasto / summary.cliques : 0), c: 'cyan' },
+                { l: 'CTR Médio', v: (summary.imp > 0 ? (summary.cliques / summary.imp) * 100 : 0).toFixed(2) + '%', c: 'purple' },
+                { l: 'Tx. Conv.', v: (summary.cliques > 0 ? (summary.conv / summary.cliques) * 100 : 0).toFixed(2) + '%', c: 'pink' },
+                { l: 'Freq. Méd', v: (summary.alcance > 0 ? summary.imp / summary.alcance : 0).toFixed(2), c: 'blue' },
+                { l: 'Cliques', v: formatCompact(summary.cliques), c: 'orange' },
+                { l: 'Conversões', v: formatCompact(summary.conv), c: 'teal' }
+            ];
+            document.getElementById('kpiCardsContainer').className = "grid grid-cols-2 md:grid-cols-5 gap-3 mb-8 text-white";
+            document.getElementById('kpiCardsContainer').innerHTML = kpis.map((k, i) => window.renderKpiCard(k.l, k.v, k.c, i)).join('');
+            
+            list.innerHTML = ''; 
+            filtered.forEach(res => { 
+                const client = clients.find(c => c.id === res.clientId); 
+                const color = client?.color || '#06b6d4'; 
+                const dateDisplay = (res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim) ? `${new Date(res.dataInicio+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} - ${new Date(res.dataFim+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}` : new Date(res.data+'T12:00:00').toLocaleDateString('pt-BR'); 
+                list.innerHTML += `<div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}"><div class="flex justify-between items-center mb-2"><div><div class="flex items-center gap-2"><span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span><span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700 flex items-center gap-1">${res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim ? '📅' : ''} ${dateDisplay}</span></div></div><div class="flex items-center gap-4"><div class="text-right"><span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span><span class="text-[9px] uppercase text-gray-500">ROAS</span></div><div class="flex gap-1"><button onclick="editResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></div></div><div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs"><div class="text-gray-400">Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></div><div class="text-gray-400">Retorno: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></div><div class="text-gray-400 hidden md:block">CPC: <span class="text-cyan-400">${formatCurrency(res.cpc || (res.cliques > 0 ? res.investimento / res.cliques : 0))}</span></div><div class="text-gray-400 hidden md:block">CTR: <span class="text-yellow-400">${(res.ctr || (res.impressoes > 0 ? (res.cliques / res.impressoes) * 100 : 0)).toFixed(2)}%</span></div><div class="text-gray-400 hidden md:block">Freq: <span class="text-blue-400">${(res.frequency || (res.alcance > 0 ? res.impressoes / res.alcance : 0)).toFixed(2)}</span></div></div></div>`; 
+            }); 
+        };
         window.toggleSocialResultForm = () => document.getElementById('socialResultFormContainer').classList.toggle('hidden');
         window.setSocialDateRange = (days) => { if (days === 'all') { document.getElementById('social_filter_end').value = ""; document.getElementById('social_filter_start').value = ""; renderSocialResultsTable(); return; } const end = new Date(); const start = new Date(); if (days !== 1) start.setDate(end.getDate() - (days - 1)); document.getElementById('social_filter_end').value = end.toISOString().split('T')[0]; document.getElementById('social_filter_start').value = start.toISOString().split('T')[0]; renderSocialResultsTable(); };
-        window.renderSocialResultsTable = function() { const list = document.getElementById('socialResultsListContainer'); const filterClient = document.getElementById('social_filter_cliente').value; const start = document.getElementById('social_filter_start').value; const end = document.getElementById('social_filter_end').value; if (!list) return; let filtered = [...socialResults]; if (filterClient) filtered = filtered.filter(r => r.clientId === filterClient); if (start) filtered = filtered.filter(r => (r.dataFim || r.data) >= start); if (end) filtered = filtered.filter(r => (r.dataFim || r.data) <= end); filtered.sort((a, b) => new Date(b.dataFim || b.data) - new Date(a.dataFim || a.data)); list.innerHTML = ''; if (filtered.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 italic mt-4">Nenhum resultado social encontrado.</p>'; return; } filtered.forEach(res => { const client = clients.find(c => c.id === res.clientId); const color = client?.color || '#ec4899'; const dateDisplay = (res.dataInicio && res.dataFim) ? `${new Date(res.dataInicio+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} à ${new Date(res.dataFim+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}` : new Date(res.data+'T12:00:00').toLocaleDateString('pt-BR'); list.innerHTML += `<div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}"><div class="flex justify-between items-center mb-2"><div><div class="flex items-center gap-2"><span class="font-bold text-white text-sm group-hover:text-pink-400 transition">${client?.nome || 'Cliente'}</span><span class="text-[10px] text-pink-200 font-mono bg-pink-900/40 px-1 rounded border border-pink-500/30">${res.plataforma}</span><span class="text-[10px] text-gray-500 font-mono flex items-center gap-1">📅 ${dateDisplay}</span></div></div><div class="flex items-center gap-4"><div class="text-right"><span class="block text-lg font-bold text-pink-400">${(res.engagementRate || 0).toFixed(2)}%</span><span class="text-[9px] uppercase text-gray-500">Engajamento</span></div><div class="flex gap-1"><button onclick="editSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><button onclick="deleteSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></div></div><div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs"><div class="text-gray-400">Seguidores: <span class="text-white font-medium">${formatCompact(res.seguidores)}</span> <span class="text-green-400 text-[10px]">(+${res.novosSeguidores || 0})</span></div><div class="text-gray-400">Alcance: <span class="text-cyan-400 font-medium">${formatCompact(res.alcance)}</span></div><div class="text-gray-400 hidden md:block">Impressões: <span class="text-white">${formatCompact(res.impressoes)}</span></div><div class="text-gray-400 hidden md:block">Interações: <span class="text-yellow-400">${formatCompact(res.interacoes)}</span></div><div class="text-gray-400 hidden md:block">Posts: <span class="text-white">${res.posts}</span></div></div></div>`; }); };
+        window.renderSocialResultsTable = function() { 
+            const list = document.getElementById('socialResultsListContainer'); 
+            const kpiCont = document.getElementById('socialKpiCardsContainer');
+            const filterClient = document.getElementById('social_filter_cliente').value; 
+            const start = document.getElementById('social_filter_start').value; 
+            const end = document.getElementById('social_filter_end').value; 
+            if (!list) return; 
+            let filtered = [...socialResults]; 
+            if (filterClient) filtered = filtered.filter(r => r.clientId === filterClient); 
+            if (start) filtered = filtered.filter(r => (r.dataFim || r.data) >= start); 
+            if (end) filtered = filtered.filter(r => (r.dataFim || r.data) <= end); 
+            filtered.sort((a, b) => new Date(b.dataFim || b.data) - new Date(a.dataFim || a.data)); 
+            
+            const totalNewFollowers = filtered.reduce((acc, r) => acc + (r.novosSeguidores || 0), 0);
+            const avgEngagement = filtered.length > 0 ? (filtered.reduce((acc, r) => acc + (r.engagementRate || 0), 0) / filtered.length) : 0;
+            const totalReach = filtered.reduce((acc, r) => acc + (r.alcance || 0), 0);
+            const totalInteractions = filtered.reduce((acc, r) => acc + (r.interacoes || 0), 0);
+            const totalImpressions = filtered.reduce((acc, r) => acc + (r.impressoes || 0), 0);
+
+            const skpis = [
+                { l: 'Novos Seguid.', v: '+'+formatCompact(totalNewFollowers), c: 'green' },
+                { l: 'Engajamento', v: avgEngagement.toFixed(2)+'%', c: 'pink' },
+                { l: 'Alcance', v: formatCompact(totalReach), c: 'cyan' },
+                { l: 'Interações', v: formatCompact(totalInteractions), c: 'yellow' },
+                { l: 'Impressões', v: formatCompact(totalImpressions), c: 'indigo' }
+            ];
+            if(kpiCont) kpiCont.innerHTML = skpis.map((k, i) => window.renderKpiCard(k.l, k.v, k.c, i)).join('');
+
+            list.innerHTML = ''; 
+            if (filtered.length === 0) { list.innerHTML = '<p class="text-center text-slate-500 italic mt-4">Nenhum resultado social encontrado.</p>'; return; } 
+            filtered.forEach(res => { 
+                const client = clients.find(c => c.id === res.clientId); 
+                const color = client?.color || '#ec4899'; 
+                const dateDisplay = (res.dataInicio && res.dataFim) ? `${new Date(res.dataInicio+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} à ${new Date(res.dataFim+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}` : new Date(res.data+'T12:00:00').toLocaleDateString('pt-BR'); 
+                list.innerHTML += `<div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}"><div class="flex justify-between items-center mb-2"><div><div class="flex items-center gap-2"><span class="font-bold text-white text-sm group-hover:text-pink-400 transition">${client?.nome || 'Cliente'}</span><span class="text-[10px] text-pink-200 font-mono bg-pink-900/40 px-1 rounded border border-pink-500/30">${res.plataforma}</span><span class="text-[10px] text-gray-500 font-mono flex items-center gap-1">📅 ${dateDisplay}</span></div></div><div class="flex items-center gap-4"><div class="text-right"><span class="block text-lg font-bold text-pink-400">${(res.engagementRate || 0).toFixed(2)}%</span><span class="text-[9px] uppercase text-gray-500">Engajamento</span></div><div class="flex gap-1"><button onclick="editSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><button onclick="deleteSocialResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></div></div><div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs"><div class="text-gray-400">Seguidores: <span class="text-white font-medium">${formatCompact(res.seguidores)}</span> <span class="text-green-400 text-[10px]">(+${res.novosSeguidores || 0})</span></div><div class="text-gray-400">Alcance: <span class="text-cyan-400 font-medium">${formatCompact(res.alcance)}</span></div><div class="text-gray-400 hidden md:block">Impressões: <span class="text-white">${formatCompact(res.impressoes)}</span></div><div class="text-gray-400 hidden md:block">Interações: <span class="text-yellow-400">${formatCompact(res.interacoes)}</span></div><div class="text-gray-400 hidden md:block">Posts: <span class="text-white">${res.posts}</span></div></div></div>`; 
+            }); 
+        };
         window.editSocialResult = (id) => { const res = socialResults.find(r => r.id === id); if (!res) return; document.getElementById('soc_id_edit').value = res.id; if (res.dataInicio && res.dataFim) { document.getElementById('soc_data_inicio').value = res.dataInicio; document.getElementById('soc_data_fim').value = res.dataFim; } else { document.getElementById('soc_data_inicio').value = res.data; document.getElementById('soc_data_fim').value = res.data; } document.getElementById('soc_cliente').value = res.clientId; document.getElementById('soc_plataforma').value = res.plataforma; document.getElementById('soc_seguidores').value = res.seguidores; document.getElementById('soc_novos_seguidores').value = res.novosSeguidores; document.getElementById('soc_alcance').value = res.alcance; document.getElementById('soc_impressoes').value = res.impressoes; document.getElementById('soc_interacoes').value = res.interacoes; document.getElementById('soc_posts').value = res.posts; document.getElementById('soc_stories_views').value = res.storiesViews || ""; document.getElementById('soc_reels_views').value = res.reelsViews || ""; document.getElementById('soc_observacoes').value = res.observacoes || ""; toggleSocialResultForm(); };
         window.editResult = (id) => { const res = results.find(r => r.id === id); if (!res) return; document.getElementById('res_id_edit').value = res.id; if (res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim) { document.querySelector('input[name="traffic_type_date"][value="period"]').checked = true; document.getElementById('res_data_inicio').value = res.dataInicio; document.getElementById('res_data_fim').value = res.dataFim; } else { document.querySelector('input[name="traffic_type_date"][value="daily"]').checked = true; document.getElementById('res_data').value = res.dataFim || res.data; } toggleTrafficDateMode(); document.getElementById('res_cliente').value = res.clientId; document.getElementById('res_plataforma').value = res.plataforma; document.getElementById('res_investimento').value = res.investimento; document.getElementById('res_impressoes').value = res.impressoes; document.getElementById('res_alcance').value = res.alcance; document.getElementById('res_cliques').value = res.cliques; document.getElementById('res_vendas').value = res.vendas; document.getElementById('res_conversion_type').value = res.conversionType || ""; document.getElementById('res_conversion_count').value = res.conversionCount || ""; document.getElementById('res_observacoes').value = res.observacoes || ""; toggleResultForm(); };
         window.deleteResult = (id) => { window.pendingDeleteId = id; window.pendingDeleteCollection = 'results'; document.getElementById('confirmationModal').classList.remove('hidden'); document.getElementById('confirmationModal').classList.add('flex'); };
@@ -2011,21 +2124,22 @@
                     const taskDate = new Date(t.date);
                     taskDate.setHours(0,0,0,0);
                     const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
+                    const clientColor = client?.color || '#3b82f6';
                     
-                    let cardClass = "task-card-pending";
-                    let statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-700 text-slate-300">Pendente</span>`;
+                    let cardClass = "task-card-pending shadow-[0_0_15px_rgba(59,130,246,0.1)]";
+                    let statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-blue-900/50 text-blue-300 border border-blue-500/50 flex items-center gap-1"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span> Pendente</span>`;
                     let titleStyle = "text-white";
                     
                     if (isOverdue) {
                         cardClass = "task-card-overdue shadow-[0_0_15px_rgba(239,68,68,0.15)]";
                         statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-red-900/80 text-red-300 border border-red-500/50 animate-pulse flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg> Atrasado</span>`;
                     } else if (t.status === 'Concluido') {
-                        cardClass = "task-card-completed";
-                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Concluído</span>`;
-                        titleStyle = "text-emerald-400 line-through decoration-emerald-500/50";
+                        cardClass = "task-card-completed shadow-[0_0_15px_rgba(34,197,94,0.1)]";
+                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-green-900/50 text-green-300 border border-green-500/50 flex items-center gap-1"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span> Concluído</span>`;
+                        titleStyle = "text-green-400 line-through decoration-green-500/50";
                     } else if (t.status === 'Em Andamento') {
-                        cardClass = "task-card-progress shadow-[0_0_15px_rgba(245,158,11,0.1)]";
-                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-900/50 text-amber-300 border border-amber-500/50 flex items-center gap-1"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span> Andamento</span>`;
+                        cardClass = "task-card-progress shadow-[0_0_15px_rgba(234,179,8,0.1)]";
+                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-yellow-900/50 text-yellow-300 border border-yellow-500/50 flex items-center gap-1"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span> Andamento</span>`;
                     }
 
                     list.innerHTML += `
@@ -2034,7 +2148,7 @@
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex flex-col gap-1.5">
                                         ${statusBadge}
-                                        <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider font-mono">${client?.nome || 'Geral'}</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider font-mono drop-shadow-md" style="color: ${clientColor}; text-shadow: 0 0 8px ${clientColor}80;">${client?.nome || 'Geral'}</span>
                                     </div>
                                     <span class="text-xs font-mono text-slate-500 bg-slate-900/80 px-2 py-1 rounded-md border border-slate-700/50">⏱️ ${t.date.split('T')[1]}</span>
                                 </div>
@@ -2058,7 +2172,105 @@
         };
 
         window.viewTaskDetails = (id) => { const t = tasks.find(item => item.id === id); if(!t) return; const cli = clients.find(c => c.id === t.clientId); const content = `<div class="p-4 bg-slate-950 rounded-lg space-y-3 text-sm text-gray-300 border border-slate-800"><p><strong>Cliente:</strong> <span class="text-white">${cli?.nome || 'N/A'}</span></p><p><strong>Tipo:</strong> <span class="text-cyan-400">${t.type}</span></p><p><strong>Data/Hora:</strong> ${new Date(t.date).toLocaleString('pt-BR')}</p><p><strong>Status:</strong> ${t.status}</p><hr class="border-slate-800 my-2"/><p class="text-xs text-gray-500 uppercase font-bold">Observações:</p><p class="text-gray-300 italic whitespace-pre-wrap bg-slate-900/50 p-3 rounded border border-slate-800">${t.notes || 'Sem descrição.'}</p></div>`; document.getElementById('summaryModal').classList.remove('hidden'); document.getElementById('summaryModal').classList.add('flex'); document.getElementById('summaryTitle').textContent = "Detalhes da Tarefa"; document.getElementById('summaryContent').innerHTML = content; };
-        window.renderTaskManagement = () => { const board = document.getElementById('taskManagementBoard'); if(!board) return; board.innerHTML = ''; const columns = [{ id: 'Pendente', title: 'Pendente', icon: '⏳', color: 'red', bg: 'bg-red-900/10', border: 'border-red-500' }, { id: 'Em Andamento', title: 'Em Andamento', icon: '🚀', color: 'amber', bg: 'bg-amber-900/10', border: 'border-amber-500' }, { id: 'Concluido', title: 'Concluído', icon: '✅', color: 'emerald', bg: 'bg-emerald-900/10', border: 'border-emerald-500' }]; columns.forEach(col => { const columnTasks = tasks.filter(t => t.status === col.id); if (col.id === 'Concluido') columnTasks.sort((a, b) => new Date(b.date) - new Date(a.date)); else columnTasks.sort((a, b) => new Date(a.date) - new Date(b.date)); board.innerHTML += `<div class="${col.bg} backdrop-blur-sm p-4 rounded-xl min-h-[400px] border-t-4 ${col.border} shadow-lg flex flex-col transition-all duration-300 hover:bg-opacity-20"><h3 class="text-sm font-bold text-${col.color}-400 mb-4 flex justify-between items-center uppercase tracking-wider"><span class="flex items-center gap-2 text-lg">${col.icon} ${col.title}</span><span class="bg-slate-900/80 px-3 py-1 rounded-full text-white text-xs border border-slate-700 font-mono">${columnTasks.length}</span></h3><div class="space-y-3 flex-grow custom-scrollbar overflow-y-auto pr-1" style="max-height: 600px;">${columnTasks.map(t => { const cli = clients.find(c => c.id === t.clientId); return `<div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700 shadow-lg hover:shadow-${col.color}-500/20 hover:border-${col.color}-500/50 transition-all duration-300 transform hover:-translate-y-1 relative group"><button onclick="viewTaskDetails('${t.id}')" class="absolute top-3 right-14 text-slate-500 hover:text-cyan-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Ver Detalhes"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button><button onclick="editTask('${t.id}')" class="absolute top-3 right-8 text-slate-500 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button><button onclick="deleteTask('${t.id}')" class="absolute top-3 right-2 text-slate-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button><div class="text-[10px] text-${col.color}-400 font-bold uppercase tracking-wide mb-1 pr-16 truncate flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-${col.color}-500 inline-block animate-pulse"></span>${cli?.nome || 'Geral'}</div><div class="text-sm text-white font-medium mb-3 line-clamp-2">${t.type}</div><div class="flex justify-between items-center mt-3 border-t border-slate-700/50 pt-3"><span class="text-[10px] text-gray-400 flex items-center gap-1">📅 ${new Date(t.date).toLocaleDateString()}</span><select onchange="updateTaskStatus('${t.id}', this.value)" class="no-custom-select text-[10px] bg-slate-900 text-${col.color}-300 rounded-lg px-2 py-1 border border-slate-700 focus:ring-0 cursor-pointer transition shadow-inner"><option value="Pendente" ${col.id === 'Pendente' ? 'selected' : ''}>⏳ Pendente</option><option value="Em Andamento" ${col.id === 'Em Andamento' ? 'selected' : ''}>🚀 Andamento</option><option value="Concluido" ${col.id === 'Concluido' ? 'selected' : ''}>✅ Concluído</option></select></div></div>`; }).join('')}</div></div>`; }); window.setupCustomSelects(); };
+        
+        window.renderTaskManagement = () => { 
+            const board = document.getElementById('taskManagementBoard'); 
+            if(!board) return; 
+            board.innerHTML = ''; 
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const columns = [
+                { id: 'Pendente', title: 'Pendente', icon: '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>', color: 'blue', glow: 'rgba(59,130,246,0.4)', text: 'text-blue-400' }, 
+                { id: 'Em Andamento', title: 'Andamento', icon: '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>', color: 'yellow', glow: 'rgba(234,179,8,0.4)', text: 'text-yellow-400' }, 
+                { id: 'Concluido', title: 'Concluído', icon: '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>', color: 'green', glow: 'rgba(34,197,94,0.4)', text: 'text-green-400' }
+            ]; 
+
+            columns.forEach(col => { 
+                const columnTasks = tasks.filter(t => t.status === col.id); 
+                if (col.id === 'Concluido') columnTasks.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+                else columnTasks.sort((a, b) => new Date(a.date) - new Date(b.date)); 
+                
+                board.innerHTML += `
+                <div class="bg-slate-900/50 backdrop-blur-md p-5 rounded-2xl min-h-[500px] border border-slate-800 flex flex-col transition-all duration-300 relative overflow-hidden group/col" style="box-shadow: 0 -4px 20px -5px ${col.glow}, 0 10px 15px -3px rgba(0,0,0,0.5);">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-${col.color}-500 group-hover/col:h-1.5 transition-all"></div>
+                    <h3 class="text-sm font-bold ${col.text} mb-6 flex justify-between items-center uppercase tracking-wider border-b border-slate-700/50 pb-3">
+                        <span class="flex items-center gap-2 text-lg drop-shadow-md">
+                            ${col.icon} ${col.title}
+                        </span>
+                        <span class="bg-slate-800 px-3 py-1 rounded-full text-white text-xs border border-${col.color}-500/30 font-mono shadow-[0_0_8px_${col.glow}]">${columnTasks.length}</span>
+                    </h3>
+                    
+                    <div class="space-y-4 flex-grow custom-scrollbar overflow-y-auto pr-2 pb-4" style="max-height: 650px;">
+                        ${columnTasks.map(t => { 
+                            const cli = clients.find(c => c.id === t.clientId); 
+                            const taskDate = new Date(t.date);
+                            taskDate.setHours(0,0,0,0);
+                            const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
+                            const clientColor = cli?.color || '#3b82f6';
+                            
+                            let cardClass = "task-card-pending shadow-[0_0_15px_rgba(59,130,246,0.1)]";
+                            let statusLed = `<span class="relative flex h-2 w-2 shrink-0"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span>`;
+                            let titleStyle = "text-white";
+                            
+                            if (isOverdue) {
+                                cardClass = "task-card-overdue shadow-[0_0_15px_rgba(239,68,68,0.15)]";
+                                statusLed = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-red-500 animate-pulse shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`;
+                            } else if (t.status === 'Concluido') {
+                                cardClass = "task-card-completed shadow-[0_0_15px_rgba(34,197,94,0.1)]";
+                                statusLed = `<span class="relative flex h-2 w-2 shrink-0"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>`;
+                                titleStyle = "text-green-400 line-through decoration-green-500/50";
+                            } else if (t.status === 'Em Andamento') {
+                                cardClass = "task-card-progress shadow-[0_0_15px_rgba(234,179,8,0.1)]";
+                                statusLed = `<span class="relative flex h-2 w-2 shrink-0"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>`;
+                            }
+
+                            return `
+                            <div class="${cardClass} rounded-xl p-4 flex flex-col hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group bg-slate-800/80 backdrop-blur-sm relative">
+                                
+                                <!-- Ações Rápidas (Hover) -->
+                                <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-slate-900/95 rounded-lg p-1 border border-slate-700 shadow-lg z-20">
+                                    <button onclick="viewTaskDetails('${t.id}')" class="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded transition-colors" title="Detalhes">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    </button>
+                                    <button onclick="editTask('${t.id}')" class="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded transition-colors" title="Editar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                    </button>
+                                    <button onclick="deleteTask('${t.id}')" class="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded transition-colors" title="Excluir">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </div>
+
+                                <div class="flex justify-between items-start mb-2 pr-10">
+                                    <div class="flex items-center gap-1.5 bg-slate-900/50 px-2 py-1 rounded-md border border-slate-700/50">
+                                        ${statusLed}
+                                        <span class="text-[9px] font-bold uppercase tracking-wider font-mono drop-shadow-md truncate max-w-[120px]" style="color: ${clientColor}; text-shadow: 0 0 8px ${clientColor}80;">${cli?.nome || 'Geral'}</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-500 flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        ${new Date(t.date).toLocaleDateString('pt-BR', {day: '2-digit', month:'2-digit'})}
+                                    </span>
+                                </div>
+                                
+                                <h4 class="text-base font-bold mb-3 ${titleStyle} leading-tight">${t.type}</h4>
+                                
+                                <!-- Substituição do Select Nativo por Botões Animados (Smart Pills) -->
+                                <div class="mt-auto pt-3 border-t border-slate-700/50 flex gap-1 justify-between items-center bg-slate-900/40 p-1.5 rounded-lg relative z-10">
+                                    <button onclick="updateTaskStatus('${t.id}', 'Pendente')" class="flex-1 py-1.5 text-[9px] font-bold uppercase tracking-wider rounded-md transition-all duration-300 ${t.status === 'Pendente' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50 shadow-[0_0_10px_rgba(59,130,246,0.3)]' : 'text-slate-500 hover:text-blue-300 hover:bg-slate-800'}">Pend</button>
+                                    
+                                    <button onclick="updateTaskStatus('${t.id}', 'Em Andamento')" class="flex-1 py-1.5 text-[9px] font-bold uppercase tracking-wider rounded-md transition-all duration-300 ${t.status === 'Em Andamento' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.3)]' : 'text-slate-500 hover:text-yellow-300 hover:bg-slate-800'}">Fazendo</button>
+                                    
+                                    <button onclick="updateTaskStatus('${t.id}', 'Concluido')" class="flex-1 py-1.5 text-[9px] font-bold uppercase tracking-wider rounded-md transition-all duration-300 ${t.status === 'Concluido' ? 'bg-green-500/20 text-green-400 border border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]' : 'text-slate-500 hover:text-green-300 hover:bg-slate-800'}">Feito</button>
+                                </div>
+                            </div>`; 
+                        }).join('')}
+                    </div>
+                </div>`; 
+            }); 
+            window.setupCustomSelects(); 
+        };
+
         window.updateTaskStatus = async (id, s) => { await updateDoc(doc(db, 'users', userId, 'tasks', id), { status: s }); };
         window.populateClientSelects = () => { ['res_cliente', 'task_cliente', 'filterClient', 'report_cliente', 'report_social_cliente', 'results_filter_cliente', 'soc_cliente', 'social_filter_cliente'].forEach(id => { const s = document.getElementById(id); if (!s) return; const current = s.value; s.innerHTML = id.includes('filter') || id.includes('report') ? '<option value="">Todos</option>' : '<option value="">Selecione...</option>'; const sortedClients = [...clients].sort((a, b) => a.nome.localeCompare(b.nome)); sortedClients.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nome; if (c.id === current) o.selected = true; s.appendChild(o); }); if (s.closest('.custom-select-wrapper')) { window.updateCustomSelect(s); } }); window.setupCustomSelects(); };
         window.maskPhone = (i) => { let v = i.value.replace(/\D/g, ''); v = v.replace(/^(\d{2})(\d)/g, '($1) $2'); v = v.replace(/(\d{5})(\d)/, '$1-$2'); i.value = v; };
@@ -2084,21 +2296,25 @@
             const freq = stats.alcance > 0 ? stats.imp / stats.alcance : 0;
             const convRate = stats.cliques > 0 ? (stats.conv / stats.cliques) * 100 : 0;
 
-            document.getElementById('reportSummaryAggregated').innerHTML = `
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Gasto Total</p><p class="text-sm font-bold text-white">${formatCurrency(stats.gasto)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Faturamento</p><p class="text-sm font-bold text-emerald-400">${formatCurrency(stats.vendas)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">ROAS Médio</p><p class="text-sm font-bold text-yellow-400">${roas.toFixed(2)}x</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPA Médio</p><p class="text-sm font-bold text-indigo-400">${formatCurrency(cpa)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPM Médio</p><p class="text-sm font-bold text-blue-400">${formatCurrency(cpm)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CPC Médio</p><p class="text-sm font-bold text-cyan-400">${formatCurrency(cpc)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">CTR Médio</p><p class="text-sm font-bold text-purple-400">${ctr.toFixed(2)}%</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Freq. Média</p><p class="text-sm font-bold text-orange-400">${freq.toFixed(2)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Taxa Conv.</p><p class="text-sm font-bold text-pink-400">${convRate.toFixed(2)}%</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Impressões</p><p class="text-sm font-bold text-white">${formatCompact(stats.imp)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Alcance</p><p class="text-sm font-bold text-white">${formatCompact(stats.alcance)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Cliques</p><p class="text-sm font-bold text-orange-400">${formatCompact(stats.cliques)}</p></div>
-                <div class="bg-slate-900 p-3 rounded-lg border-t border-slate-700"><p class="text-[9px] text-gray-500 font-bold uppercase">Conversões</p><p class="text-sm font-bold text-teal-400">${formatCompact(stats.conv)}</p></div>
-            `;
+            const reportKpis = [
+                { l: 'Gasto Total', v: formatCurrency(stats.gasto), c: 'red' },
+                { l: 'Faturamento', v: formatCurrency(stats.vendas), c: 'emerald' },
+                { l: 'ROAS Médio', v: roas.toFixed(2) + 'x', c: 'yellow' },
+                { l: 'CPA Médio', v: formatCurrency(cpa), c: 'indigo' },
+                { l: 'CPM Médio', v: formatCurrency(cpm), c: 'blue' },
+                { l: 'CPC Médio', v: formatCurrency(cpc), c: 'cyan' },
+                { l: 'CTR Médio', v: ctr.toFixed(2) + '%', c: 'purple' },
+                { l: 'Freq. Média', v: freq.toFixed(2), c: 'orange' },
+                { l: 'Taxa Conv.', v: convRate.toFixed(2) + '%', c: 'pink' },
+                { l: 'Impressões', v: formatCompact(stats.imp), c: 'teal' },
+                { l: 'Alcance', v: formatCompact(stats.alcance), c: 'blue' },
+                { l: 'Cliques', v: formatCompact(stats.cliques), c: 'orange' },
+                { l: 'Conversões', v: formatCompact(stats.conv), c: 'emerald' }
+            ];
+            
+            const aggCont = document.getElementById('reportSummaryAggregated');
+            aggCont.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8 text-white";
+            aggCont.innerHTML = reportKpis.map((k, i) => window.renderKpiCard(k.l, k.v, k.c, i)).join('');
 
             const labels = filtered.map(r => new Date(r.data + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})); 
             const dataGasto = filtered.map(r => r.investimento); 
@@ -2181,7 +2397,20 @@
             const cid = document.getElementById('report_social_cliente').value; const start = document.getElementById('report_social_start_date').value; const end = document.getElementById('report_social_end_date').value;
             let filtered = [...socialResults]; if(cid) filtered = filtered.filter(r => r.clientId === cid); if(start) filtered = filtered.filter(r => (r.dataFim || r.data) >= start); if(end) filtered = filtered.filter(r => (r.dataFim || r.data) <= end); filtered.sort((a, b) => new Date(a.dataFim || a.data) - new Date(b.dataFim || b.data));
             const totalNewFollowers = filtered.reduce((acc, r) => acc + (r.novosSeguidores || 0), 0); const totalReach = filtered.reduce((acc, r) => acc + (r.alcance || 0), 0); const totalImpressions = filtered.reduce((acc, r) => acc + (r.impressoes || 0), 0); const totalInteractions = filtered.reduce((acc, r) => acc + (r.interacoes || 0), 0); const avgEngagement = filtered.length > 0 ? (filtered.reduce((acc, r) => acc + (r.engagementRate || 0), 0) / filtered.length) : 0; const totalPosts = filtered.reduce((acc, r) => acc + (r.posts || 0), 0);
-            document.getElementById('socialReportSummaryAggregated').innerHTML = `<div class="bg-slate-900 p-4 rounded-lg border-t border-pink-500"><p class="text-[10px] text-gray-500 font-bold uppercase">Novos Seguidores</p><p class="text-2xl font-bold text-green-400">+${formatCompact(totalNewFollowers)}</p></div><div class="bg-slate-900 p-4 rounded-lg border-t border-pink-500"><p class="text-[10px] text-gray-500 font-bold uppercase">Engajamento Médio</p><p class="text-2xl font-bold text-pink-400">${avgEngagement.toFixed(2)}%</p></div><div class="bg-slate-900 p-4 rounded-lg border-t border-pink-500"><p class="text-[10px] text-gray-500 font-bold uppercase">Alcance Total</p><p class="text-2xl font-bold text-white">${formatCompact(totalReach)}</p></div><div class="bg-slate-900 p-4 rounded-lg border-t border-pink-500"><p class="text-[10px] text-gray-500 font-bold uppercase">Interações Totais</p><p class="text-2xl font-bold text-yellow-400">${formatCompact(totalInteractions)}</p></div><div class="bg-slate-900 p-4 rounded-lg border-t border-pink-500"><p class="text-[10px] text-gray-500 font-bold uppercase">Posts Publicados</p><p class="text-2xl font-bold text-cyan-400">${totalPosts}</p></div><div class="bg-slate-900 p-4 rounded-lg border-t border-pink-500"><p class="text-[10px] text-gray-500 font-bold uppercase">Impressões Totais</p><p class="text-2xl font-bold text-indigo-400">${formatCompact(totalImpressions)}</p></div>`;
+            
+            const sRepKpis = [
+                { l: 'Novos Seguidores', v: '+'+formatCompact(totalNewFollowers), c: 'green' },
+                { l: 'Engajamento Médio', v: avgEngagement.toFixed(2)+'%', c: 'pink' },
+                { l: 'Alcance Total', v: formatCompact(totalReach), c: 'cyan' },
+                { l: 'Interações Totais', v: formatCompact(totalInteractions), c: 'yellow' },
+                { l: 'Posts Publicados', v: totalPosts, c: 'teal' },
+                { l: 'Impressões Totais', v: formatCompact(totalImpressions), c: 'indigo' }
+            ];
+            
+            const sAggCont = document.getElementById('socialReportSummaryAggregated');
+            sAggCont.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 text-white";
+            sAggCont.innerHTML = sRepKpis.map((k, i) => window.renderKpiCard(k.l, k.v, k.c, i)).join('');
+            
             const labels = filtered.map(r => { const d = r.dataFim || r.data; return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}); }); const dataTotalFollowers = filtered.map(r => r.seguidores); const dataNewFollowers = filtered.map(r => r.novosSeguidores); const dataReach = filtered.map(r => r.alcance); const dataInteractions = filtered.map(r => r.interacoes);
             if(socialReportCharts.growth) socialReportCharts.growth.destroy(); const ctxGrowth = document.getElementById('socialGrowthChart').getContext('2d'); socialReportCharts.growth = new Chart(ctxGrowth, { type: 'line', data: { labels: labels, datasets: [ { label: 'Total Seguidores', data: dataTotalFollowers, borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.05)', fill: true, tension: 0.4, yAxisID: 'y' }, { label: 'Novos (Barras)', data: dataNewFollowers, type: 'bar', backgroundColor: '#4ade80', yAxisID: 'y1' } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { position: 'left', grid: { color: '#1e293b' }, ticks: { color: '#ec4899' } }, y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#4ade80' } }, x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } } } } });
             if(socialReportCharts.engagement) socialReportCharts.engagement.destroy(); const ctxEng = document.getElementById('socialEngagementChart').getContext('2d'); socialReportCharts.engagement = new Chart(ctxEng, { type: 'bar', data: { labels: labels, datasets: [ { label: 'Alcance', data: dataReach, backgroundColor: '#06b6d4', }, { label: 'Interações', data: dataInteractions, backgroundColor: '#fbbf24', } ] }, options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } } });
