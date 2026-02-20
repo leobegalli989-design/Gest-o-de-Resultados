@@ -79,74 +79,139 @@
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
-        /* Sidebar Item - Estilo Tech Animado */
+        /* Sidebar Item - Estilo Caixinha Animada (Novo) */
         .sidebar-item {
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-right: 2px solid transparent;
-            margin-bottom: 6px;
-            border-radius: 0.5rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 0.75rem;
             position: relative;
             overflow: hidden;
-        }
-        
-        /* Linha inferior animada no hover */
-        .sidebar-item::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 0%; height: 1px;
-            background: #06b6d4;
-            transition: width 0.4s ease;
-            box-shadow: 0 0 8px #06b6d4;
-        }
-        .sidebar-item:hover::after {
-            width: 100%;
-        }
-        
-        .sidebar-item:hover {
-            background-color: rgba(6, 182, 212, 0.08);
-            color: #22d3ee; /* Cyan 400 */
-            transform: translateX(8px);
-            box-shadow: -4px 0 15px -3px rgba(6, 182, 212, 0.2);
-        }
-        
-        .sidebar-item.active {
-            background: linear-gradient(90deg, rgba(6, 182, 212, 0.2) 0%, transparent 100%);
-            border-left: 3px solid #06b6d4;
-            color: #fff;
-            text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
-            transform: translateX(4px);
+            border: 1px solid rgba(51, 65, 85, 0.4); /* Slate 700 / Transparente */
+            background: rgba(15, 23, 42, 0.4); /* Slate 900 / Vidro */
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
 
-        /* Animação dos Ícones (Desenhos) da Sidebar */
+        /* Animação dos Ícones Base */
         .sidebar-item svg {
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0.7;
+            opacity: 0.6;
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
         }
         .sidebar-item:hover svg {
             transform: scale(1.3) rotate(-10deg);
             opacity: 1;
-            filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8));
-            color: #06b6d4;
         }
         .sidebar-item.active svg {
             transform: scale(1.15);
             opacity: 1;
-            filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.9));
-            color: #22d3ee;
         }
 
-        /* Efeito Exclusivo no botão Sair (Vermelho) */
-        .sidebar-item.text-red-400:hover svg {
+        /* Títulos de Seção (Subtítulos) */
+        .sidebar-header {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            margin-top: 2rem;
+            padding-left: 0.5rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-header::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: pulseHeaderDot 2s infinite;
+        }
+        @keyframes pulseHeaderDot {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        /* THEME CYAN (Tráfego / Clientes) */
+        .header-cyan { color: #22d3ee; }
+        .header-cyan::before { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
+        .sidebar-item.theme-cyan:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            background: rgba(6, 182, 212, 0.1);
+            color: #22d3ee;
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2), inset 0 0 10px rgba(6, 182, 212, 0.1);
+        }
+        .sidebar-item.theme-cyan.active {
+            border-color: #06b6d4;
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.2) 0%, rgba(15, 23, 42, 0) 100%);
+            color: #fff;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3), inset 0 0 12px rgba(6, 182, 212, 0.2);
+        }
+        .sidebar-item.theme-cyan:hover svg, .sidebar-item.theme-cyan.active svg { color: #06b6d4; filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8)); }
+
+        /* THEME PINK (Social) */
+        .header-pink { color: #f472b6; }
+        .header-pink::before { background: #ec4899; box-shadow: 0 0 8px #ec4899; }
+        .sidebar-item.theme-pink:hover {
+            border-color: rgba(236, 72, 153, 0.5);
+            background: rgba(236, 72, 153, 0.1);
+            color: #f472b6;
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2), inset 0 0 10px rgba(236, 72, 153, 0.1);
+        }
+        .sidebar-item.theme-pink.active {
+            border-color: #ec4899;
+            background: linear-gradient(90deg, rgba(236, 72, 153, 0.2) 0%, rgba(15, 23, 42, 0) 100%);
+            color: #fff;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3), inset 0 0 12px rgba(236, 72, 153, 0.2);
+        }
+        .sidebar-item.theme-pink:hover svg, .sidebar-item.theme-pink.active svg { color: #ec4899; filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.8)); }
+
+        /* THEME EMERALD (Gestão) */
+        .header-emerald { color: #34d399; }
+        .header-emerald::before { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .sidebar-item.theme-emerald:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2), inset 0 0 10px rgba(16, 185, 129, 0.1);
+        }
+        .sidebar-item.theme-emerald.active {
+            border-color: #10b981;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, rgba(15, 23, 42, 0) 100%);
+            color: #fff;
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3), inset 0 0 12px rgba(16, 185, 129, 0.2);
+        }
+        .sidebar-item.theme-emerald:hover svg, .sidebar-item.theme-emerald.active svg { color: #10b981; filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.8)); }
+
+        /* THEME PURPLE (Inteligência) */
+        .header-purple { color: #c084fc; }
+        .header-purple::before { background: #a855f7; box-shadow: 0 0 8px #a855f7; }
+        
+        /* THEME RED (Logout) */
+        .sidebar-item.theme-red { margin-top: 2rem; }
+        .sidebar-item.theme-red:hover {
+            border-color: rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.1);
             color: #f87171;
-            filter: drop-shadow(0 0 6px rgba(248, 113, 113, 0.8));
-            transform: scale(1.3) rotate(10deg);
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2), inset 0 0 10px rgba(239, 68, 68, 0.1);
         }
-        .sidebar-item.text-red-400::after {
-            background: #ef4444;
-            box-shadow: 0 0 8px #ef4444;
-        }
+        .sidebar-item.theme-red:hover svg { color: #ef4444; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); }
         
         /* Calendario */
         .calendar-day {
@@ -169,25 +234,39 @@
         /* Alpha Index Sidebar */
         .alpha-sidebar {
             position: sticky;
-            top: 20px;
+            top: 50%;
+            transform: translateY(-50%);
             height: fit-content;
             max-height: 80vh;
             overflow-y: auto;
+            animation: fadeInRightAlpha 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .alpha-sidebar::-webkit-scrollbar {
+            display: none;
+        }
+        @keyframes fadeInRightAlpha {
+            from { opacity: 0; transform: translate(20px, -50%); }
+            to { opacity: 1; transform: translate(0, -50%); }
         }
         .alpha-link {
             display: block;
             text-align: center;
-            font-size: 10px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 800;
             color: #64748b;
-            padding: 2px 6px;
-            border-radius: 4px;
-            transition: all 0.2s;
+            padding: 6px 4px;
+            margin-bottom: 2px;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
         }
         .alpha-link:hover, .alpha-link.active {
             background-color: rgba(6, 182, 212, 0.2);
             color: #22d3ee;
+            transform: scale(1.2) translateX(-4px);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
         }
         
         /* Login Page */
@@ -204,27 +283,28 @@
             width: 100%;
             height: 100%;
             z-index: 0; 
-            opacity: 0.4;
+            opacity: 0.8;
         }
         
-        /* Floating Pieces */
+        /* Floating Pieces - Marketing Icons */
         .futuristic-piece {
             position: absolute;
-            width: 60px;
-            height: 60px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #67e8f9 0%, #06b6d4 100%); /* Cyan gradient */
-            box-shadow: 0 0 20px #06b6d4, inset 0 0 10px rgba(255, 255, 255, 0.6);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1;
-            opacity: 0.6;
-            filter: blur(1px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             animation: floatPiece 15s ease-in-out infinite alternate, pulsePiece 4s ease-in-out infinite;
         }
 
-        .piece-1 { top: 10%; left: 10%; transform: scale(0.8); }
-        .piece-2 { bottom: 15%; right: 10%; width: 120px; height: 120px; background: radial-gradient(circle at 70% 70%, #22d3ee 0%, #0891b2 100%); animation-delay: 2s; opacity: 0.4; }
-        .piece-3 { top: 40%; left: 5%; transform: scale(0.5); animation-delay: 4s; }
-        .piece-4 { bottom: 10%; left: 30%; width: 40px; height: 40px; animation-delay: 6s; background: white; box-shadow: 0 0 15px white; }
+        .piece-1 { top: 15%; left: 10%; width: 70px; height: 70px; color: #06b6d4; border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 20px rgba(6, 182, 212, 0.2); }
+        .piece-2 { bottom: 20%; right: 12%; width: 90px; height: 90px; animation-delay: -2s; color: #ec4899; border-color: rgba(236, 72, 153, 0.3); box-shadow: 0 0 20px rgba(236, 72, 153, 0.2); }
+        .piece-3 { top: 25%; right: 15%; width: 60px; height: 60px; animation-delay: -5s; color: #8b5cf6; border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); }
+        .piece-4 { bottom: 15%; left: 20%; width: 80px; height: 80px; animation-delay: -8s; color: #10b981; border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
 
         @keyframes floatPiece {
             0% { transform: translate(0, 0) rotate(0deg); }
@@ -232,11 +312,184 @@
         }
 
         @keyframes pulsePiece {
-            0% { box-shadow: 0 0 15px #06b6d4, inset 0 0 5px rgba(255, 255, 255, 0.4); }
-            50% { box-shadow: 0 0 30px #22d3ee, inset 0 0 10px rgba(255, 255, 255, 0.8); }
-            100% { box-shadow: 0 0 15px #06b6d4, inset 0 0 5px rgba(255, 255, 255, 0.4); }
+            0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+            50% { filter: drop-shadow(0 0 15px currentColor); }
         }
         
+        /* --- Animações e Estilos da Logo (Novo) --- */
+        .logo-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            animation: floatLogo 3s ease-in-out infinite;
+            z-index: 1;
+        }
+        /* Borda giratória neon */
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 14px;
+            background: conic-gradient(from 0deg, transparent 0%, #06b6d4 25%, transparent 50%, #ec4899 75%, transparent 100%);
+            z-index: -2;
+            animation: spinBorder 3s linear infinite;
+        }
+        /* Fundo escuro interno da logo */
+        .logo-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0px;
+            border-radius: 12px;
+            background: #0f172a;
+            z-index: -1;
+        }
+        .logo-wrapper:hover {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* Efeito do traçado do 'N' */
+        .n-path {
+            stroke-dasharray: 60;
+            stroke-dashoffset: 60;
+            animation: dashLoop 3s ease-in-out infinite alternate;
+            stroke: #22d3ee;
+            filter: drop-shadow(0 0 4px #22d3ee);
+        }
+        @keyframes dashLoop {
+            0% { stroke-dashoffset: 60; fill: transparent; }
+            50% { stroke-dashoffset: 0; fill: rgba(34, 211, 238, 0.3); }
+            100% { stroke-dashoffset: -60; fill: transparent; }
+        }
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        @keyframes spinBorder {
+            100% { transform: rotate(360deg); }
+        }
+        /* Brilho infinito no texto Novan */
+        .logo-text {
+            background: linear-gradient(to right, #e2e8f0 20%, #22d3ee 40%, #22d3ee 60%, #e2e8f0 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shineText 4s linear infinite;
+        }
+        @keyframes shineText {
+            to { background-position: 200% center; }
+        }
+
+        /* --- Animações e Estilos da Logo (Login) --- */
+        .login-logo-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+            animation: floatLogo 3s ease-in-out infinite;
+            z-index: 1;
+            margin: 0 auto 1.5rem auto;
+        }
+        .login-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 23px;
+            background: conic-gradient(from 0deg, transparent 0%, #06b6d4 25%, transparent 50%, #ec4899 75%, transparent 100%);
+            z-index: -2;
+            animation: spinBorder 3s linear infinite;
+        }
+        .login-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0px;
+            border-radius: 20px;
+            background: #0f172a;
+            z-index: -1;
+        }
+
+        /* --- Animações dos Títulos das Páginas --- */
+        .title-wrapper {
+            position: relative;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+            margin-right: 12px;
+            z-index: 1;
+        }
+        .title-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 12px;
+            background: conic-gradient(from 0deg, transparent 0%, #06b6d4 25%, transparent 50%, #ec4899 75%, transparent 100%);
+            z-index: -2;
+            animation: spinBorder 3s linear infinite;
+        }
+        .title-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0px;
+            border-radius: 10px;
+            background: #0f172a;
+            z-index: -1;
+        }
+        .title-wrapper.pink-theme { box-shadow: 0 0 12px rgba(236, 72, 153, 0.3); }
+        
+        .title-path {
+            stroke-dasharray: 80;
+            stroke-dashoffset: 80;
+            animation: dashTitle 3s ease-in-out infinite alternate;
+            stroke: #22d3ee;
+            filter: drop-shadow(0 0 3px #22d3ee);
+        }
+        .title-path-pink {
+            stroke-dasharray: 80;
+            stroke-dashoffset: 80;
+            animation: dashTitlePink 3s ease-in-out infinite alternate;
+            stroke: #f472b6;
+            filter: drop-shadow(0 0 3px #f472b6);
+        }
+        
+        @keyframes dashTitle {
+            0% { stroke-dashoffset: 80; fill: transparent; }
+            50% { stroke-dashoffset: 0; fill: rgba(34, 211, 238, 0.2); }
+            100% { stroke-dashoffset: -80; fill: transparent; }
+        }
+        @keyframes dashTitlePink {
+            0% { stroke-dashoffset: 80; fill: transparent; }
+            50% { stroke-dashoffset: 0; fill: rgba(244, 114, 182, 0.2); }
+            100% { stroke-dashoffset: -80; fill: transparent; }
+        }
+        
+        .title-text-glow {
+            background: linear-gradient(to right, #ffffff 20%, #22d3ee 40%, #22d3ee 60%, #ffffff 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shineText 4s linear infinite;
+        }
+        .title-text-glow-pink {
+            background: linear-gradient(to right, #ffffff 20%, #f472b6 40%, #f472b6 60%, #ffffff 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shineText 4s linear infinite;
+        }
+
         .chart-container {
             min-height: 250px;
             width: 100%;
@@ -246,7 +499,7 @@
         }
 
         /* Inputs, Selects e Textareas Futuristas */
-        input, select, textarea {
+        input, textarea {
             background-color: #0f172a !important;
             border: 1px solid #334155 !important;
             color: #f1f5f9 !important;
@@ -254,44 +507,121 @@
             outline: none !important;
         }
         
-        input:hover, select:hover, textarea:hover {
+        input:hover, textarea:hover {
             border-color: #06b6d4 !important;
             background-color: #1e293b !important;
             box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.15) !important;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, textarea:focus {
             border-color: #06b6d4 !important;
             box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2), 0 0 15px rgba(6, 182, 212, 0.3) !important;
             background-color: #020617 !important;
             transform: translateY(-2px);
         }
 
-        /* Estilização específica e Animação para as Listas de Seleção (<select>) */
-        select {
-            appearance: none; /* Remove o estilo padrão feio do navegador */
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            /* Seta customizada em SVG (Ciano) */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2306b6d4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 1rem center !important;
-            background-size: 1.2em 1.2em !important;
-            padding-right: 2.5rem !important; /* Espaço para não encostar na seta */
-            cursor: pointer;
+        /* --- Custom Select Component (Animado e Vidro) --- */
+        select.select-hidden {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 50% !important;
+            opacity: 0 !important;
+            width: 1px !important;
+            height: 1px !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
         }
 
-        /* Anima o ícone (seta vira para cima e muda para Ciano Claro) quando clicado/aberto */
-        select:focus {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2322d3ee'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 15l7-7 7 7'%3E%3C/path%3E%3C/svg%3E") !important;
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            user-select: none;
         }
-
-        /* Corrigindo a cor de fundo das opções suspensas */
-        select option {
+        .custom-select-trigger {
             background-color: #0f172a;
-            color: #e2e8f0;
-            padding: 12px;
-            font-weight: 500;
+            border: 1px solid #334155;
+            color: #f1f5f9;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            position: relative;
+            overflow: hidden;
+            min-height: 42px;
+        }
+        
+        .custom-select-trigger:hover {
+            border-color: #06b6d4 !important;
+            background-color: #1e293b;
+            box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.15) !important;
+        }
+        
+        .custom-select-wrapper.open .custom-select-trigger {
+            border-color: #06b6d4 !important;
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2), 0 0 15px rgba(6, 182, 212, 0.3) !important;
+            background-color: #020617 !important;
+        }
+
+        .custom-select-wrapper.open {
+            z-index: 999;
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid #06b6d4;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(6, 182, 212, 0.25);
+            z-index: 99999;
+            max-height: 250px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-15px) scale(0.95) rotateX(-10deg);
+            transform-origin: top center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .custom-select-wrapper.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1) rotateX(0);
+        }
+        
+        .custom-select-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+            color: #94a3b8;
+            font-size: 0.875rem;
+            opacity: 0;
+        }
+        .custom-select-option:last-child {
+            border-bottom: none;
+        }
+        .custom-select-option:hover {
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.15) 0%, transparent 100%);
+            color: #22d3ee;
+            padding-left: 1.5rem;
+            border-left: 2px solid #06b6d4;
+        }
+        .custom-select-option.selected {
+            color: #06b6d4;
+            font-weight: 600;
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        @keyframes slideInOption {
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         /* Modal Transitions */
@@ -382,21 +712,29 @@
     <!-- Tela de Login -->
     <div id="login-page" class="flex items-center justify-center min-h-screen w-full">
         <canvas id="matrixCanvas"></canvas>
-        <div class="futuristic-piece piece-1"></div>
-        <div class="futuristic-piece piece-2"></div>
-        <div class="futuristic-piece piece-3"></div>
-        <div class="futuristic-piece piece-4"></div>
+        
+        <!-- Ícones Flutuantes de Marketing -->
+        <div class="futuristic-piece piece-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> <!-- Gráfico -->
+        </div>
+        <div class="futuristic-piece piece-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg> <!-- Cursor/Tráfego -->
+        </div>
+        <div class="futuristic-piece piece-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg> <!-- Coração/Engajamento -->
+        </div>
+        <div class="futuristic-piece piece-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg> <!-- Megafone/Ads -->
+        </div>
 
         <!-- Cartão Login Estilo Glass -->
         <div class="bg-slate-900/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md z-10 border border-slate-700/50">
-            <div class="flex justify-center mb-4">
-                <div class="w-16 h-16 bg-novan-primary rounded-full flex items-center justify-center shadow-neon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </div>
+            <div class="login-logo-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 20V4l14 16V4" class="n-path" />
+                </svg>
             </div>
-            <h1 class="text-3xl font-bold text-center text-white mb-2 tracking-wide">Novan Agency</h1>
+            <h1 class="text-3xl font-bold text-center text-white mb-2 tracking-wide logo-text">Novan Agency</h1>
             <p class="text-center text-cyan-400 mb-8 text-sm uppercase tracking-widest">Portal de Gestão</p>
             
             <form id="loginForm" class="space-y-5">
@@ -424,54 +762,58 @@
     <div id="dashboard-container" class="hidden contents">
         <!-- Sidebar - Dark Blue Theme -->
         <aside id="sidebar" class="bg-[#0f172a] text-gray-300 w-full lg:w-64 flex-shrink-0 p-4 border-r border-slate-800">
-            <div class="flex items-center gap-3 mb-8 px-2 border-b border-slate-800 pb-4">
-                <div class="bg-novan-primary p-1.5 rounded-lg shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            <div class="flex items-center gap-4 mb-8 px-2 border-b border-slate-800 pb-4">
+                <div class="logo-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 20V4l14 16V4" class="n-path" />
                     </svg>
                 </div>
-                <span class="text-2xl font-bold text-white tracking-tight">Novan</span>
+                <span class="text-2xl font-bold tracking-tight logo-text">Novan</span>
             </div>
-            <nav class="space-y-1">
+            <nav class="space-y-1 px-1">
                 <!-- Seção Principal -->
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Principal</p>
-                <div id="nav-clientes" class="sidebar-item p-3 flex items-center active" onclick="switchTab('clientes')" data-tab="clientes">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                <div class="sidebar-header header-cyan !mt-0">Principal</div>
+                
+                <div id="nav-clientes" class="sidebar-item theme-cyan active" onclick="switchTab('clientes')" data-tab="clientes">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
                     Clientes
                 </div>
-                <div id="nav-resultados-trafego" class="sidebar-item p-3 flex items-center" onclick="switchTab('resultados-trafego')" data-tab="resultados-trafego">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2v14a2 2 0 002 2z" /></svg>
+                <div id="nav-resultados-trafego" class="sidebar-item theme-cyan" onclick="switchTab('resultados-trafego')" data-tab="resultados-trafego">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-2 7v-4m-2 2h4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2v14a2 2 0 002 2z" /></svg>
                     Res. Tráfego
                 </div>
-                <div id="nav-resultados-social" class="sidebar-item p-3 flex items-center" onclick="switchTab('resultados-social')" data-tab="resultados-social">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                <div id="nav-resultados-social" class="sidebar-item theme-pink" onclick="switchTab('resultados-social')" data-tab="resultados-social">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
                     Res. Social
                 </div>
 
                 <!-- Seção Gestão -->
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Gestão</p>
-                <div id="nav-calendario" class="sidebar-item p-3 flex items-center" onclick="switchTab('calendario')" data-tab="calendario">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <div class="sidebar-header header-emerald">Gestão</div>
+                
+                <div id="nav-calendario" class="sidebar-item theme-emerald" onclick="switchTab('calendario')" data-tab="calendario">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     Calendário
                 </div>
-                <div id="nav-gestao" class="sidebar-item p-3 flex items-center" onclick="switchTab('gestao')" data-tab="gestao">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
+                <div id="nav-gestao" class="sidebar-item theme-emerald" onclick="switchTab('gestao')" data-tab="gestao">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
                     Tarefas
                 </div>
 
                 <!-- Seção Inteligência -->
-                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Inteligência</p>
-                <div id="nav-relatorios" class="sidebar-item p-3 flex items-center" onclick="switchTab('relatorios')" data-tab="relatorios">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                <div class="sidebar-header header-purple">Inteligência</div>
+                
+                <!-- Mantém Tráfego = Ciano e Social = Pink para conexão visual constante -->
+                <div id="nav-relatorios" class="sidebar-item theme-cyan" onclick="switchTab('relatorios')" data-tab="relatorios">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
                     Insights Tráfego
                 </div>
-                <div id="nav-relatorios-social" class="sidebar-item p-3 flex items-center" onclick="switchTab('relatorios-social')" data-tab="relatorios-social">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                <div id="nav-relatorios-social" class="sidebar-item theme-pink" onclick="switchTab('relatorios-social')" data-tab="relatorios-social">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
                     Insights Social
                 </div>
 
-                <div onclick="handleLogout()" class="sidebar-item p-3 flex items-center mt-12 text-red-400 hover:text-red-300 hover:bg-red-900/20 border border-transparent hover:border-red-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                <div onclick="handleLogout()" class="sidebar-item theme-red">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     Sair
                 </div>
             </nav>
@@ -483,8 +825,16 @@
             <!-- Tab: Clientes -->
             <section id="clientes" class="tab-content">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-                    <h1 class="text-3xl font-bold text-white tracking-wide">
-                        <span class="text-novan-primary">#</span> Clientes
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" class="title-path"></path>
+                                <circle cx="9" cy="7" r="4" class="title-path"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" class="title-path"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" class="title-path"></path>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow">Clientes</span>
                     </h1>
                     <div class="flex gap-2">
                         <button onclick="toggleOrphanModal()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
@@ -536,15 +886,15 @@
                 <!-- Client List Block with Alpha Index -->
                 <div class="mt-8 flex gap-4">
                     <div class="flex-grow">
-                        <div class="flex justify-start space-x-4 mb-6 border-b border-slate-700 pb-2">
-                            <button onclick="setListingCategory('traffic')" id="list_tab_traffic" class="pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition">TRÁFEGO</button>
-                            <button onclick="setListingCategory('social')" id="list_tab_social" class="pb-2 text-sm font-bold text-gray-500 hover:text-white transition">SOCIAL</button>
+                        <div class="flex justify-start space-x-4 mb-6 border-b border-slate-700 pb-4">
+                            <button onclick="setListingCategory('traffic')" id="list_tab_traffic" class="px-6 py-2 rounded-lg text-xs font-bold tracking-widest uppercase transition-all duration-300 border border-slate-400 text-white bg-slate-800 hover:border-cyan-500 hover:text-cyan-400 hover:bg-cyan-900/30 hover:shadow-[0_0_12px_rgba(6,182,212,0.5)]">Tráfego</button>
+                            <button onclick="setListingCategory('social')" id="list_tab_social" class="px-6 py-2 rounded-lg text-xs font-bold tracking-widest uppercase transition-all duration-300 border border-slate-700 text-slate-500 bg-transparent hover:border-pink-500 hover:text-pink-400 hover:bg-pink-900/30 hover:shadow-[0_0_12px_rgba(236,72,153,0.5)]">Social</button>
                         </div>
                         <div id="clientList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 scroll-mt-20"></div>
                         <p id="noClients" class="text-center text-slate-500 mt-12 hidden italic">Nenhum registro encontrado.</p>
                     </div>
                     <!-- Menu Lateral (Índice Alfabético) -->
-                    <div id="alphaIndexSidebar" class="hidden md:flex flex-col gap-1 w-10 alpha-sidebar bg-slate-900/50 backdrop-blur-sm p-1 rounded-lg border border-slate-800">
+                    <div id="alphaIndexSidebar" class="hidden md:flex flex-col gap-1 w-12 alpha-sidebar bg-slate-900/50 backdrop-blur-sm p-1 rounded-lg border border-slate-800">
                         <!-- Index injected here by JS -->
                     </div>
                 </div>
@@ -553,7 +903,16 @@
             <!-- Tab: Resultados Tráfego -->
             <section id="resultados-trafego" class="tab-content">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-white tracking-wide"><span class="text-novan-primary">#</span> Performance Tráfego</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" class="title-path"></circle>
+                                <circle cx="12" cy="12" r="6" class="title-path"></circle>
+                                <circle cx="12" cy="12" r="2" class="title-path"></circle>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow">Performance Tráfego</span>
+                    </h1>
                     <button onclick="document.getElementById('campaignForm').reset(); document.getElementById('res_id_edit').value=''; document.querySelector('input[name=\'traffic_type_date\'][value=\'daily\']').checked=true; toggleTrafficDateMode(); toggleResultForm();" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                         Novo Resultado
@@ -624,7 +983,14 @@
             <!-- Tab: Resultados Social -->
             <section id="resultados-social" class="tab-content">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-white tracking-wide"><span class="text-novan-primary">#</span> Performance Social</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper pink-theme">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" class="title-path-pink"></path>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow-pink">Performance Social</span>
+                    </h1>
                     <button onclick="toggleSocialResultForm()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                         Novo Resultado Social
@@ -673,7 +1039,15 @@
             <!-- Tab: Insights Tráfego -->
             <section id="relatorios" class="tab-content">
                 <div class="flex flex-col lg:flex-row justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-white"><span class="text-novan-primary">#</span> Insights Tráfego</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" class="title-path"></polyline>
+                                <polyline points="17 6 23 6 23 12" class="title-path"></polyline>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow">Insights Tráfego</span>
+                    </h1>
                     <div class="flex gap-2 mt-4 lg:mt-0">
                         <button onclick="exportReportMobile()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
@@ -723,7 +1097,14 @@
             <!-- Tab: Insights Social -->
             <section id="relatorios-social" class="tab-content">
                 <div class="flex flex-col lg:flex-row justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-white"><span class="text-novan-primary">#</span> Insights Social</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper pink-theme">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" class="title-path-pink"></polyline>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow-pink">Insights Social</span>
+                    </h1>
                     <div class="flex gap-2 mt-4 lg:mt-0">
                         <button onclick="exportSocialReportMobile()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
@@ -771,7 +1152,17 @@
             <!-- Calendario -->
             <section id="calendario" class="tab-content">
                 <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-white"><span class="text-novan-primary">#</span> Calendário</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" class="title-path"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6" class="title-path"></line>
+                                <line x1="8" y1="2" x2="8" y2="6" class="title-path"></line>
+                                <line x1="3" y1="10" x2="21" y2="10" class="title-path"></line>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow">Calendário</span>
+                    </h1>
                     <div class="flex gap-2"><button onclick="changeMonth(-1)" class="bg-slate-800 p-2 rounded hover:bg-slate-700 text-white">◀</button><span id="currentMonthYear" class="text-xl font-bold text-cyan-400 min-w-[200px] text-center flex items-center justify-center"></span><button onclick="changeMonth(1)" class="bg-slate-800 p-2 rounded hover:bg-slate-700 text-white">▶</button></div>
                 </div>
                 <div class="mb-4"><select id="filterClient" onchange="renderCalendar()" class="p-2 rounded bg-slate-800 border-slate-700 text-white w-full md:w-auto"><option value="">Todos os Clientes</option></select></div>
@@ -809,7 +1200,15 @@
             <!-- Gestão -->
             <section id="gestao" class="tab-content">
                 <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-white"><span class="text-novan-primary">#</span> Gestão de Tarefas</h1>
+                    <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
+                        <div class="title-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 11l3 3L22 4" class="title-path"></path>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" class="title-path"></path>
+                            </svg>
+                        </div>
+                        <span class="title-text-glow">Gestão de Tarefas</span>
+                    </h1>
                     <button onclick="toggleTaskForm()" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         Nova Tarefa
@@ -954,24 +1353,196 @@
         window.lastSocialStats = null;
         let currentListingTab = 'traffic';
         let matrixInterval;
+        let customUIInitialized = false;
 
+        // Lógica de Custom Select Engine
+        window.setupCustomSelects = () => {
+            document.querySelectorAll('select:not(.no-custom-select)').forEach(select => {
+                if (select.closest('.custom-select-wrapper')) {
+                    window.updateCustomSelect(select);
+                    return;
+                }
+                const wrapper = document.createElement('div');
+                wrapper.className = 'custom-select-wrapper relative';
+                if(select.classList.contains('w-full')) wrapper.classList.add('w-full');
+                if(select.classList.contains('flex-grow')) wrapper.classList.add('flex-grow');
+                if(select.classList.contains('w-1/2')) wrapper.classList.add('w-1/2');
+                
+                select.parentNode.insertBefore(wrapper, select);
+                select.classList.add('select-hidden');
+                wrapper.appendChild(select);
+
+                const trigger = document.createElement('div');
+                trigger.className = `custom-select-trigger ${select.className.replace('select-hidden', '')}`;
+                trigger.classList.remove('w-full', 'w-1/2', 'flex-grow'); 
+                trigger.innerHTML = `<span class="truncate pr-4 w-full text-left font-medium"></span><svg class="w-4 h-4 text-cyan-500 transition-transform duration-300 arrow absolute right-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'custom-select-options custom-scrollbar';
+
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(optionsContainer);
+
+                window.updateCustomSelect(select);
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = wrapper.classList.contains('open');
+                    document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+                    document.querySelectorAll('.custom-select-trigger .arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+                    if (!isOpen) {
+                        wrapper.classList.add('open');
+                        trigger.querySelector('.arrow').style.transform = 'rotate(180deg)';
+                        const opts = optionsContainer.querySelectorAll('.custom-select-option');
+                        opts.forEach((opt, i) => {
+                            opt.style.animation = 'none';
+                            opt.offsetHeight; 
+                            opt.style.animation = `slideInOption 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards ${i * 0.03}s`;
+                        });
+                    }
+                });
+            });
+        };
+
+        window.updateCustomSelect = (select) => {
+            const wrapper = select.closest('.custom-select-wrapper');
+            if (!wrapper) return;
+            const optionsContainer = wrapper.querySelector('.custom-select-options');
+            const triggerSpan = wrapper.querySelector('.custom-select-trigger span');
+            optionsContainer.innerHTML = '';
+            triggerSpan.innerHTML = select.options[select.selectedIndex]?.text || 'Selecione...';
+            if (select.options[select.selectedIndex]?.value === '') triggerSpan.style.color = '#94a3b8';
+            else triggerSpan.style.color = '#f1f5f9';
+
+            Array.from(select.options).forEach((option, index) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = `custom-select-option ${option.selected ? 'selected' : ''}`;
+                optDiv.innerHTML = option.text;
+                optDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    select.selectedIndex = index;
+                    window.updateCustomSelect(select);
+                    select.dispatchEvent(new Event('change'));
+                    wrapper.classList.remove('open');
+                    wrapper.querySelector('.arrow').style.transform = 'rotate(0deg)';
+                });
+                optionsContainer.appendChild(optDiv);
+            });
+        };
+
+        window.initCustomUI = () => {
+            if(customUIInitialized) return;
+            customUIInitialized = true;
+            
+            // Intercepta alterações de valor via Javascript
+            const originalSelectSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set;
+            Object.defineProperty(HTMLSelectElement.prototype, 'value', {
+                set: function(val) {
+                    originalSelectSetter.call(this, val);
+                    if (this.closest('.custom-select-wrapper')) window.updateCustomSelect(this);
+                },
+                get: Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').get
+            });
+            
+            // Re-sincroniza ao resetar formulários
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('reset', () => { setTimeout(() => { form.querySelectorAll('select').forEach(s => { if(s.closest('.custom-select-wrapper')) window.updateCustomSelect(s); }); }, 10); });
+            });
+            
+            // Fecha as caixas quando clicar fora
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+                document.querySelectorAll('.custom-select-trigger .arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+            });
+            window.setupCustomSelects();
+        };
+
+        let animationFrameId;
         function startMatrix() {
             const canvas = document.getElementById('matrixCanvas');
             if(!canvas) return;
             const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const drops = Array(Math.floor(canvas.width/20)).fill(1);
-            if(matrixInterval) clearInterval(matrixInterval);
-            matrixInterval = setInterval(() => { ctx.fillStyle = 'rgba(2, 6, 23, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#06b6d4'; ctx.font = '14px monospace'; drops.forEach((y, i) => { const text = String.fromCharCode(0x30A0 + Math.random() * 96); ctx.fillText(text, i * 20, y * 20); if (y * 20 > canvas.height && Math.random() > 0.98) drops[i] = 0; drops[i]++; }); }, 50);
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            let particles = [];
+            const particleCount = Math.floor((canvas.width * canvas.height) / 12000); // Densidade baseada na tela
+            
+            for(let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1.0,
+                    vy: (Math.random() - 0.5) * 1.0,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? '#06b6d4' : '#ec4899' // Cyan ou Pink (Tráfego / Social)
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                for(let i = 0; i < particles.length; i++) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                    
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    
+                    // Conexões (Networking / Dados)
+                    for(let j = i + 1; j < particles.length; j++) {
+                        let p2 = particles[j];
+                        let dx = p.x - p2.x;
+                        let dy = p.y - p2.y;
+                        let dist = Math.sqrt(dx*dx + dy*dy);
+                        
+                        if(dist < 150) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            
+                            let grad = ctx.createLinearGradient(p.x, p.y, p2.x, p2.y);
+                            let alpha = 1 - (dist / 150);
+                            
+                            let color1 = p.color === '#06b6d4' ? `rgba(6, 182, 212, ${alpha})` : `rgba(236, 72, 153, ${alpha})`;
+                            let color2 = p2.color === '#06b6d4' ? `rgba(6, 182, 212, ${alpha})` : `rgba(236, 72, 153, ${alpha})`;
+                            
+                            grad.addColorStop(0, color1);
+                            grad.addColorStop(1, color2);
+                            
+                            ctx.strokeStyle = grad;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                animationFrameId = requestAnimationFrame(draw);
+            }
+            if(animationFrameId) cancelAnimationFrame(animationFrameId);
+            draw();
         }
 
-        function stopMatrix() { if(matrixInterval) clearInterval(matrixInterval); }
+        function stopMatrix() { 
+            if(animationFrameId) cancelAnimationFrame(animationFrameId); 
+        }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
                 stopMatrix();
                 await initAppContent();
+                window.initCustomUI();
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('dashboard-container').classList.remove('hidden');
                 document.getElementById('dashboard-container').classList.add('flex');
@@ -1119,7 +1690,23 @@
         window.switchTab = (id) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); const tab = document.getElementById(id); if (tab) tab.classList.add('active'); document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active')); const nav = document.getElementById(`nav-${id}`); if(nav) nav.classList.add('active'); };
         window.toggleFormCategory = (type) => { const btnTraffic = document.getElementById('form_btn_traffic'); const btnSocial = document.getElementById('form_btn_social'); const trafficFields = document.getElementById('trafficFields'); const socialFields = document.getElementById('socialMediaFields'); const hiddenType = document.getElementById('cli_service_type'); hiddenType.value = type; if(type === 'traffic') { btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition"; btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition"; trafficFields.classList.remove('hidden'); socialFields.classList.add('hidden'); } else { btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition"; btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition"; socialFields.classList.remove('hidden'); trafficFields.classList.add('hidden'); } };
         window.toggleClientForm = () => document.getElementById('clientRegistrationContainer').classList.toggle('hidden');
-        window.setListingCategory = (type) => { currentListingTab = type; const tabTraffic = document.getElementById('list_tab_traffic'); const tabSocial = document.getElementById('list_tab_social'); if(type === 'traffic') { tabTraffic.className = "pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition"; tabSocial.className = "pb-2 text-sm font-bold text-gray-500 hover:text-white transition"; } else { tabSocial.className = "pb-2 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 transition"; tabTraffic.className = "pb-2 text-sm font-bold text-gray-500 hover:text-white transition"; } renderClientList(); };
+        window.setListingCategory = (type) => { 
+            currentListingTab = type; 
+            const tabTraffic = document.getElementById('list_tab_traffic'); 
+            const tabSocial = document.getElementById('list_tab_social'); 
+            const baseClass = "px-6 py-2 rounded-lg text-xs font-bold tracking-widest uppercase transition-all duration-300 border ";
+            const trafficHover = "hover:border-cyan-500 hover:text-cyan-400 hover:bg-cyan-900/30 hover:shadow-[0_0_12px_rgba(6,182,212,0.5)]";
+            const socialHover = "hover:border-pink-500 hover:text-pink-400 hover:bg-pink-900/30 hover:shadow-[0_0_12px_rgba(236,72,153,0.5)]";
+            
+            if(type === 'traffic') { 
+                tabTraffic.className = baseClass + "border-slate-400 text-white bg-slate-800 " + trafficHover; 
+                tabSocial.className = baseClass + "border-slate-700 text-slate-500 bg-transparent " + socialHover; 
+            } else { 
+                tabSocial.className = baseClass + "border-slate-400 text-white bg-slate-800 " + socialHover; 
+                tabTraffic.className = baseClass + "border-slate-700 text-slate-500 bg-transparent " + trafficHover; 
+            } 
+            renderClientList(); 
+        };
         
         // --- UPDATED RENDER CLIENT LIST WITH ALPHA SORT AND SIDEBAR ---
         window.renderClientList = () => { 
@@ -1163,25 +1750,32 @@
                     anchorId = `client-anchor-${currentLetter}`;
                 }
 
+                // Ajuste no botão de Multiserviço para caber perfeitamente
                 let actionButton = hasOtherService ? 
-                    `<span class="bg-slate-900 border border-cyan-500/30 text-cyan-400 text-[9px] uppercase font-bold py-2 rounded flex items-center justify-center cursor-default">Multiserviço ✨</span>` : 
-                    `<button onclick="toggleServiceType('${c.id}', '${otherType}')" class="bg-slate-700 hover:bg-slate-600 text-amber-400 text-[10px] uppercase font-bold py-2 rounded transition border border-transparent hover:border-amber-400/30">Ativar ${otherType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</button>`; 
+                    `<span class="bg-slate-900/80 border border-cyan-500/30 text-cyan-400 text-[9px] uppercase font-bold py-1.5 px-0 rounded-md flex items-center justify-center cursor-default tracking-widest w-full text-center truncate">MULTI ✨</span>` : 
+                    `<button onclick="toggleServiceType('${c.id}', '${otherType}')" class="bg-slate-700/80 hover:bg-slate-600 text-amber-400 text-[9px] uppercase font-bold py-1.5 px-0 rounded-md transition border border-transparent hover:border-amber-400/30 tracking-widest w-full text-center truncate">+ ${otherType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</button>`; 
                 
+                const statusIndicator = isActive 
+                    ? `<span class="relative flex h-3 w-3" title="Ativo"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 shadow-[0_0_8px_#22c55e]"></span></span>` 
+                    : `<span class="relative flex h-3 w-3" title="Inativo"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" style="animation-duration: 2s;"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-600 shadow-[0_0_10px_#ef4444]"></span></span>`;
+
+                // Removido o filtro "grayscale" que impedia a cor vermelha de aparecer
                 container.innerHTML += `
-                    <div ${anchorId ? `id="${anchorId}"` : ''} class="group relative bg-slate-800/80 p-5 rounded-xl border-t-2 border-b border-r border-l border-slate-700/50 hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-cyan-900/20 overflow-hidden ${!isActive ? 'opacity-60 grayscale' : ''}" style="border-top-color: ${cardColor}">
+                    <div ${anchorId ? `id="${anchorId}"` : ''} class="group relative bg-slate-800/80 p-4 rounded-xl border-t-2 border-b border-r border-l border-slate-700/50 hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-cyan-900/20 overflow-hidden ${!isActive ? 'opacity-60' : ''}" style="border-top-color: ${cardColor}">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-lg text-white group-hover:text-cyan-400 transition">${c.nome}</h4>
-                            <span class="w-2 h-2 rounded-full ${isActive ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500'}"></span>
+                            <h4 class="font-bold text-base text-white group-hover:text-cyan-400 transition truncate pr-2">${c.nome}</h4>
+                            ${statusIndicator}
                         </div>
-                        <p class="text-xs text-gray-400 mb-4 font-mono tracking-tight">${c.serviceType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</p>
-                        <div class="grid grid-cols-2 gap-2 mt-4 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity">
-                            <button onclick="viewClientDetails('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] uppercase font-bold py-2 rounded transition">Ver</button>
+                        <p class="text-[10px] text-gray-400 mb-4 font-mono tracking-tight">${c.serviceType === 'traffic' ? 'TRÁFEGO' : 'SOCIAL'}</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-1.5 mt-auto relative z-10 opacity-70 group-hover:opacity-100 transition-opacity">
+                            <button onclick="viewClientDetails('${c.id}')" class="bg-slate-700/80 hover:bg-slate-600 text-white text-[9px] uppercase font-bold py-1.5 px-1 rounded-md transition tracking-wider w-full flex items-center justify-center truncate">Ver Info</button>
                             ${actionButton}
-                            <button onclick="openCredentialsModal('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-300 text-[10px] uppercase font-bold py-2 rounded transition flex items-center justify-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Acessos
+                            <button onclick="openCredentialsModal('${c.id}')" class="bg-slate-700/80 hover:bg-slate-600 text-indigo-300 text-[9px] uppercase font-bold py-1.5 px-1 rounded-md transition flex items-center justify-center gap-1 tracking-wider w-full truncate">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Acessos
                             </button>
-                            <button onclick="editClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-indigo-400 text-[10px] uppercase font-bold py-2 rounded transition">Edit</button>
-                            <button onclick="deleteClient('${c.id}')" class="bg-slate-700 hover:bg-slate-600 text-red-400 text-[10px] uppercase font-bold py-2 rounded transition">Del</button>
+                            <button onclick="editClient('${c.id}')" class="bg-slate-700/80 hover:bg-slate-600 text-indigo-400 text-[9px] uppercase font-bold py-1.5 px-1 rounded-md transition tracking-wider w-full flex items-center justify-center truncate">Editar</button>
+                            <button onclick="toggleClientStatus('${c.id}', ${isActive})" class="bg-slate-700/80 hover:bg-slate-600 ${isActive ? 'text-orange-400' : 'text-green-400'} text-[9px] uppercase font-bold py-1.5 px-1 rounded-md transition tracking-wider w-full flex items-center justify-center truncate">${isActive ? 'Inativar' : 'Ativar'}</button>
+                            <button onclick="deleteClient('${c.id}')" class="bg-slate-700/80 hover:bg-slate-600 text-red-400 text-[9px] uppercase font-bold py-1.5 px-1 rounded-md transition tracking-wider w-full flex items-center justify-center truncate">Excluir</button>
                         </div>
                     </div>`; 
             });
@@ -1367,9 +1961,9 @@
         };
 
         window.viewTaskDetails = (id) => { const t = tasks.find(item => item.id === id); if(!t) return; const cli = clients.find(c => c.id === t.clientId); const content = `<div class="p-4 bg-slate-950 rounded-lg space-y-3 text-sm text-gray-300 border border-slate-800"><p><strong>Cliente:</strong> <span class="text-white">${cli?.nome || 'N/A'}</span></p><p><strong>Tipo:</strong> <span class="text-cyan-400">${t.type}</span></p><p><strong>Data/Hora:</strong> ${new Date(t.date).toLocaleString('pt-BR')}</p><p><strong>Status:</strong> ${t.status}</p><hr class="border-slate-800 my-2"/><p class="text-xs text-gray-500 uppercase font-bold">Observações:</p><p class="text-gray-300 italic whitespace-pre-wrap bg-slate-900/50 p-3 rounded border border-slate-800">${t.notes || 'Sem descrição.'}</p></div>`; document.getElementById('summaryModal').classList.remove('hidden'); document.getElementById('summaryModal').classList.add('flex'); document.getElementById('summaryTitle').textContent = "Detalhes da Tarefa"; document.getElementById('summaryContent').innerHTML = content; };
-        window.renderTaskManagement = () => { const board = document.getElementById('taskManagementBoard'); if(!board) return; board.innerHTML = ''; const columns = [{ id: 'Pendente', title: 'Pendente', icon: '⏳', color: 'red', bg: 'bg-red-900/10', border: 'border-red-500' }, { id: 'Em Andamento', title: 'Em Andamento', icon: '🚀', color: 'amber', bg: 'bg-amber-900/10', border: 'border-amber-500' }, { id: 'Concluido', title: 'Concluído', icon: '✅', color: 'emerald', bg: 'bg-emerald-900/10', border: 'border-emerald-500' }]; columns.forEach(col => { const columnTasks = tasks.filter(t => t.status === col.id); if (col.id === 'Concluido') columnTasks.sort((a, b) => new Date(b.date) - new Date(a.date)); else columnTasks.sort((a, b) => new Date(a.date) - new Date(b.date)); board.innerHTML += `<div class="${col.bg} backdrop-blur-sm p-4 rounded-xl min-h-[400px] border-t-4 ${col.border} shadow-lg flex flex-col transition-all duration-300 hover:bg-opacity-20"><h3 class="text-sm font-bold text-${col.color}-400 mb-4 flex justify-between items-center uppercase tracking-wider"><span class="flex items-center gap-2 text-lg">${col.icon} ${col.title}</span><span class="bg-slate-900/80 px-3 py-1 rounded-full text-white text-xs border border-slate-700 font-mono">${columnTasks.length}</span></h3><div class="space-y-3 flex-grow custom-scrollbar overflow-y-auto pr-1" style="max-height: 600px;">${columnTasks.map(t => { const cli = clients.find(c => c.id === t.clientId); return `<div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700 shadow-lg hover:shadow-${col.color}-500/20 hover:border-${col.color}-500/50 transition-all duration-300 transform hover:-translate-y-1 relative group"><button onclick="viewTaskDetails('${t.id}')" class="absolute top-3 right-14 text-slate-500 hover:text-cyan-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Ver Detalhes"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button><button onclick="editTask('${t.id}')" class="absolute top-3 right-8 text-slate-500 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button><button onclick="deleteTask('${t.id}')" class="absolute top-3 right-2 text-slate-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button><div class="text-[10px] text-${col.color}-400 font-bold uppercase tracking-wide mb-1 pr-16 truncate flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-${col.color}-500 inline-block animate-pulse"></span>${cli?.nome || 'Geral'}</div><div class="text-sm text-white font-medium mb-3 line-clamp-2">${t.type}</div><div class="flex justify-between items-center mt-3 border-t border-slate-700/50 pt-3"><span class="text-[10px] text-gray-400 flex items-center gap-1">📅 ${new Date(t.date).toLocaleDateString()}</span><select onchange="updateTaskStatus('${t.id}', this.value)" class="text-[10px] bg-slate-900 text-${col.color}-300 rounded-lg px-2 py-1 border border-slate-700 focus:ring-0 cursor-pointer hover:bg-slate-800 transition shadow-inner"><option value="Pendente" ${col.id === 'Pendente' ? 'selected' : ''}>⏳ Pendente</option><option value="Em Andamento" ${col.id === 'Em Andamento' ? 'selected' : ''}>🚀 Andamento</option><option value="Concluido" ${col.id === 'Concluido' ? 'selected' : ''}>✅ Concluído</option></select></div></div>`; }).join('')}</div></div>`; }); };
+        window.renderTaskManagement = () => { const board = document.getElementById('taskManagementBoard'); if(!board) return; board.innerHTML = ''; const columns = [{ id: 'Pendente', title: 'Pendente', icon: '⏳', color: 'red', bg: 'bg-red-900/10', border: 'border-red-500' }, { id: 'Em Andamento', title: 'Em Andamento', icon: '🚀', color: 'amber', bg: 'bg-amber-900/10', border: 'border-amber-500' }, { id: 'Concluido', title: 'Concluído', icon: '✅', color: 'emerald', bg: 'bg-emerald-900/10', border: 'border-emerald-500' }]; columns.forEach(col => { const columnTasks = tasks.filter(t => t.status === col.id); if (col.id === 'Concluido') columnTasks.sort((a, b) => new Date(b.date) - new Date(a.date)); else columnTasks.sort((a, b) => new Date(a.date) - new Date(b.date)); board.innerHTML += `<div class="${col.bg} backdrop-blur-sm p-4 rounded-xl min-h-[400px] border-t-4 ${col.border} shadow-lg flex flex-col transition-all duration-300 hover:bg-opacity-20"><h3 class="text-sm font-bold text-${col.color}-400 mb-4 flex justify-between items-center uppercase tracking-wider"><span class="flex items-center gap-2 text-lg">${col.icon} ${col.title}</span><span class="bg-slate-900/80 px-3 py-1 rounded-full text-white text-xs border border-slate-700 font-mono">${columnTasks.length}</span></h3><div class="space-y-3 flex-grow custom-scrollbar overflow-y-auto pr-1" style="max-height: 600px;">${columnTasks.map(t => { const cli = clients.find(c => c.id === t.clientId); return `<div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700 shadow-lg hover:shadow-${col.color}-500/20 hover:border-${col.color}-500/50 transition-all duration-300 transform hover:-translate-y-1 relative group"><button onclick="viewTaskDetails('${t.id}')" class="absolute top-3 right-14 text-slate-500 hover:text-cyan-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Ver Detalhes"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button><button onclick="editTask('${t.id}')" class="absolute top-3 right-8 text-slate-500 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all p-1" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button><button onclick="deleteTask('${t.id}')" class="absolute top-3 right-2 text-slate-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button><div class="text-[10px] text-${col.color}-400 font-bold uppercase tracking-wide mb-1 pr-16 truncate flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-${col.color}-500 inline-block animate-pulse"></span>${cli?.nome || 'Geral'}</div><div class="text-sm text-white font-medium mb-3 line-clamp-2">${t.type}</div><div class="flex justify-between items-center mt-3 border-t border-slate-700/50 pt-3"><span class="text-[10px] text-gray-400 flex items-center gap-1">📅 ${new Date(t.date).toLocaleDateString()}</span><select onchange="updateTaskStatus('${t.id}', this.value)" class="no-custom-select text-[10px] bg-slate-900 text-${col.color}-300 rounded-lg px-2 py-1 border border-slate-700 focus:ring-0 cursor-pointer transition shadow-inner"><option value="Pendente" ${col.id === 'Pendente' ? 'selected' : ''}>⏳ Pendente</option><option value="Em Andamento" ${col.id === 'Em Andamento' ? 'selected' : ''}>🚀 Andamento</option><option value="Concluido" ${col.id === 'Concluido' ? 'selected' : ''}>✅ Concluído</option></select></div></div>`; }).join('')}</div></div>`; }); window.setupCustomSelects(); };
         window.updateTaskStatus = async (id, s) => { await updateDoc(doc(db, 'users', userId, 'tasks', id), { status: s }); };
-        window.populateClientSelects = () => { ['res_cliente', 'task_cliente', 'filterClient', 'report_cliente', 'report_social_cliente', 'results_filter_cliente', 'soc_cliente', 'social_filter_cliente'].forEach(id => { const s = document.getElementById(id); if (!s) return; const current = s.value; s.innerHTML = id.includes('filter') || id.includes('report') ? '<option value="">Todos</option>' : '<option value="">Selecione...</option>'; const sortedClients = [...clients].sort((a, b) => a.nome.localeCompare(b.nome)); sortedClients.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nome; if (c.id === current) o.selected = true; s.appendChild(o); }); }); };
+        window.populateClientSelects = () => { ['res_cliente', 'task_cliente', 'filterClient', 'report_cliente', 'report_social_cliente', 'results_filter_cliente', 'soc_cliente', 'social_filter_cliente'].forEach(id => { const s = document.getElementById(id); if (!s) return; const current = s.value; s.innerHTML = id.includes('filter') || id.includes('report') ? '<option value="">Todos</option>' : '<option value="">Selecione...</option>'; const sortedClients = [...clients].sort((a, b) => a.nome.localeCompare(b.nome)); sortedClients.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nome; if (c.id === current) o.selected = true; s.appendChild(o); }); if (s.closest('.custom-select-wrapper')) { window.updateCustomSelect(s); } }); window.setupCustomSelects(); };
         window.maskPhone = (i) => { let v = i.value.replace(/\D/g, ''); v = v.replace(/^(\d{2})(\d)/g, '($1) $2'); v = v.replace(/(\d{5})(\d)/, '$1-$2'); i.value = v; };
         window.closeSummaryModal = () => document.getElementById('summaryModal').classList.add('hidden');
 
