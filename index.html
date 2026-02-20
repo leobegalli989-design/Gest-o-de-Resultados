@@ -213,22 +213,45 @@
         }
         .sidebar-item.theme-red:hover svg { color: #ef4444; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); }
         
-        /* Calendario */
+        /* Calendario Premium (Novo) */
+        #calendarGrid {
+            gap: 8px; /* Espaçamento maior entre os dias */
+        }
         .calendar-day {
-            min-height: 120px; 
-            border: 1px solid #1e293b;
-            background-color: #0f172a;
-            transition: all 0.2s;
+            min-height: 110px; 
+            border: 1px solid rgba(51, 65, 85, 0.4);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 0.75rem; /* Mais arredondado */
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: #94a3b8;
             position: relative;
-            cursor: pointer; /* Indica que é clicável */
+            cursor: pointer;
+            overflow: hidden;
         }
         .calendar-day:hover {
-            transform: translateY(-2px);
-            background-color: #1e293b;
-            border-color: #06b6d4;
-            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
+            transform: translateY(-4px) scale(1.02);
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(6, 182, 212, 0.6);
+            box-shadow: 0 10px 20px -5px rgba(6, 182, 212, 0.2), inset 0 0 10px rgba(6, 182, 212, 0.1);
             z-index: 10;
+        }
+        .calendar-day.is-today {
+            border-color: #06b6d4;
+            box-shadow: inset 0 0 15px rgba(6, 182, 212, 0.15);
+        }
+        .calendar-day.is-today .day-number {
+            color: #22d3ee;
+            font-weight: 900;
+            text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+        }
+        .calendar-day.is-selected {
+            border-color: #22d3ee;
+            ring: 2px;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4), inset 0 0 20px rgba(34, 211, 238, 0.2);
+            transform: scale(1.03);
+            z-index: 11;
         }
         
         /* Alpha Index Sidebar */
@@ -705,6 +728,30 @@
             letter-spacing: 4px;
             text-transform: uppercase;
         }
+
+        /* Animações Especiais para Tarefas (Novo) */
+        @keyframes shineProgress {
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+        .task-card-progress {
+            background: linear-gradient(90deg, rgba(15,23,42,1) 0%, rgba(30,41,59,1) 50%, rgba(15,23,42,1) 100%);
+            background-size: 200% auto;
+            animation: shineProgress 3s linear infinite;
+            border-left: 4px solid #f59e0b; /* Amber 500 */
+        }
+        .task-card-completed {
+            background: linear-gradient(135deg, rgba(15,23,42,1) 0%, rgba(6,78,59,0.3) 100%);
+            border-left: 4px solid #10b981; /* Emerald 500 */
+            opacity: 0.8;
+        }
+        .task-card-overdue {
+            border-left: 4px solid #ef4444; /* Red 500 */
+            background: rgba(127,29,29,0.1);
+        }
+        .task-card-pending {
+            border-left: 4px solid #64748b; /* Slate 500 */
+        }
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen text-slate-200">
@@ -1166,30 +1213,48 @@
                     <div class="flex gap-2"><button onclick="changeMonth(-1)" class="bg-slate-800 p-2 rounded hover:bg-slate-700 text-white">◀</button><span id="currentMonthYear" class="text-xl font-bold text-cyan-400 min-w-[200px] text-center flex items-center justify-center"></span><button onclick="changeMonth(1)" class="bg-slate-800 p-2 rounded hover:bg-slate-700 text-white">▶</button></div>
                 </div>
                 <div class="mb-4"><select id="filterClient" onchange="renderCalendar()" class="p-2 rounded bg-slate-800 border-slate-700 text-white w-full md:w-auto"><option value="">Todos os Clientes</option></select></div>
-                <div class="grid grid-cols-7 gap-1 text-center text-gray-500 text-xs font-bold uppercase mb-2"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sab</div></div>
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+                <div class="grid grid-cols-7 gap-2 text-center text-gray-400 text-xs font-bold uppercase mb-3 tracking-wider"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sab</div></div>
+                <div id="calendarGrid" class="grid grid-cols-7"></div>
                 
                 <!-- Área de Resumo do Dia -->
-                <div id="calendarSummary" class="mt-8 bg-slate-900/50 p-6 rounded-xl border border-slate-800 transition-all">
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
-                            Resumo do Dia: <span id="summaryDateDisplay" class="text-cyan-400 ml-1"></span>
+                <div id="calendarSummary" class="mt-10 bg-slate-900/40 backdrop-blur-md p-6 lg:p-8 rounded-2xl border border-slate-800 shadow-2xl transition-all relative overflow-hidden hidden">
+                    <!-- Detalhe de fundo do resumo -->
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 relative z-10">
+                        <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                            <div class="bg-cyan-900/50 p-2 rounded-lg border border-cyan-500/30">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg>
+                            </div>
+                            Agenda: <span id="summaryDateDisplay" class="text-cyan-400"></span>
                         </h3>
-                        <!-- Filtro de Checkboxes -->
-                        <div class="flex flex-wrap gap-4 items-center bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
-                            <span class="text-[10px] text-gray-400 font-bold uppercase mr-2">Exibir:</span>
-                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                <input type="checkbox" name="taskFilter" value="Pendente" checked onchange="renderDaySummaryList()" class="form-checkbox h-4 w-4 text-cyan-500 rounded bg-slate-900 border-slate-600 focus:ring-0 focus:ring-offset-0 focus:border-cyan-500 transition duration-150 ease-in-out">
-                                <span class="text-xs text-gray-300 group-hover:text-cyan-400 transition">Pendentes</span>
+                        
+                        <!-- Filtro de Checkboxes Moderno (Smart Pills) -->
+                        <div class="flex flex-wrap gap-3 items-center bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50 backdrop-blur-sm shadow-inner">
+                            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mr-1">Filtrar:</span>
+                            
+                            <label class="relative cursor-pointer group">
+                                <input type="checkbox" name="taskFilter" value="Pendente" checked onchange="renderDaySummaryList()" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider transition-all duration-300 peer-checked:bg-cyan-900/30 peer-checked:border-cyan-500 peer-checked:text-cyan-400 group-hover:border-cyan-500/50 peer-checked:shadow-[0_0_12px_rgba(6,182,212,0.3)] flex items-center gap-2 transform active:scale-95">
+                                    <div class="w-2 h-2 rounded-full bg-slate-600 transition-all duration-300 peer-checked:bg-cyan-400 peer-checked:shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
+                                    Pendentes
+                                </div>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                <input type="checkbox" name="taskFilter" value="Em Andamento" checked onchange="renderDaySummaryList()" class="form-checkbox h-4 w-4 text-amber-500 rounded bg-slate-900 border-slate-600 focus:ring-0 focus:ring-offset-0 focus:border-amber-500 transition duration-150 ease-in-out">
-                                <span class="text-xs text-gray-300 group-hover:text-amber-400 transition">Andamento</span>
+                            
+                            <label class="relative cursor-pointer group">
+                                <input type="checkbox" name="taskFilter" value="Em Andamento" checked onchange="renderDaySummaryList()" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider transition-all duration-300 peer-checked:bg-amber-900/30 peer-checked:border-amber-500 peer-checked:text-amber-400 group-hover:border-amber-500/50 peer-checked:shadow-[0_0_12px_rgba(245,158,11,0.3)] flex items-center gap-2 transform active:scale-95">
+                                    <div class="w-2 h-2 rounded-full bg-slate-600 transition-all duration-300 peer-checked:bg-amber-400 peer-checked:shadow-[0_0_8px_rgba(251,191,36,0.8)]"></div>
+                                    Andamento
+                                </div>
                             </label>
-                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                <input type="checkbox" name="taskFilter" value="Concluido" checked onchange="renderDaySummaryList()" class="form-checkbox h-4 w-4 text-emerald-500 rounded bg-slate-900 border-slate-600 focus:ring-0 focus:ring-offset-0 focus:border-emerald-500 transition duration-150 ease-in-out">
-                                <span class="text-xs text-gray-300 group-hover:text-emerald-400 transition">Concluídos</span>
+
+                            <label class="relative cursor-pointer group">
+                                <input type="checkbox" name="taskFilter" value="Concluido" checked onchange="renderDaySummaryList()" class="peer sr-only">
+                                <div class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider transition-all duration-300 peer-checked:bg-emerald-900/30 peer-checked:border-emerald-500 peer-checked:text-emerald-400 group-hover:border-emerald-500/50 peer-checked:shadow-[0_0_12px_rgba(16,185,129,0.3)] flex items-center gap-2 transform active:scale-95">
+                                    <div class="w-2 h-2 rounded-full bg-slate-600 transition-all duration-300 peer-checked:bg-emerald-400 peer-checked:shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                                    Concluídos
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -1828,6 +1893,8 @@
             const myMonth = currentMonth.getMonth();
             const today = new Date();
             today.setHours(0,0,0,0);
+            
+            const localTodayStr = toLocalISO(today);
 
             document.getElementById('currentMonthYear').textContent = currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
             grid.innerHTML = '';
@@ -1836,58 +1903,80 @@
             const last = new Date(myYear, myMonth + 1, 0).getDate();
             const filter = document.getElementById('filterClient').value;
 
-            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-20 border-none bg-transparent cursor-default"></div>';
+            for (let i = 0; i < first; i++) grid.innerHTML += '<div class="calendar-day opacity-10 border-none bg-transparent cursor-default pointer-events-none"></div>';
             
             for (let d = 1; d <= last; d++) {
                 const dateStr = `${myYear}-${String(myMonth+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 let dayTasks = tasks.filter(t => t.date.startsWith(dateStr));
                 if(filter) dayTasks = dayTasks.filter(t => t.clientId === filter);
                 
+                const isToday = dateStr === localTodayStr;
+                const isSelected = dateStr === currentSummaryDateStr && !document.getElementById('calendarSummary').classList.contains('hidden');
+
                 const tasksHtml = dayTasks.map(t => {
                     const taskDate = new Date(t.date);
                     taskDate.setHours(0,0,0,0);
                     const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
-                    const bgClass = isOverdue ? 'bg-red-600 text-white animate-pulse shadow-[0_0_5px_rgba(220,38,38,0.8)]' : (t.status === 'Concluido' ? 'text-center text-[10px]' : 'bg-cyan-900/50 border border-cyan-500/30 text-cyan-200');
-                    const content = t.status === 'Concluido' ? '✅' : t.type;
                     
-                    return `<div class="${bgClass} text-[9px] truncate px-1 rounded-sm mb-0.5 cursor-pointer hover:opacity-80" title="${t.status}: ${t.notes || ''}">${content}</div>`;
+                    // Pílulas de tarefas refinadas
+                    let bgClass = "bg-slate-800/80 border border-slate-600/50 text-slate-300";
+                    let dotClass = "bg-slate-400";
+                    let icon = "";
+
+                    if (isOverdue) {
+                        bgClass = "bg-red-900/40 border border-red-500/50 text-red-200";
+                        dotClass = "bg-red-500 animate-pulse";
+                    } else if (t.status === 'Concluido') {
+                        bgClass = "bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 opacity-60";
+                        icon = "✓";
+                        dotClass = "hidden";
+                    } else if (t.status === 'Em Andamento') {
+                        bgClass = "bg-amber-900/40 border border-amber-500/50 text-amber-200";
+                        dotClass = "bg-amber-400 animate-ping opacity-75"; // Radar effect
+                    }
+
+                    return `<div class="text-[10px] px-1.5 py-0.5 rounded-full mb-1 truncate flex items-center gap-1.5 shadow-sm ${bgClass}" title="${t.status}: ${t.notes || ''}">
+                        ${dotClass !== 'hidden' ? `<span class="relative flex h-1.5 w-1.5 shrink-0"><span class="absolute inline-flex h-full w-full rounded-full ${dotClass}"></span><span class="relative inline-flex rounded-full h-1.5 w-1.5 ${dotClass.replace('animate-pulse', '').replace('animate-ping opacity-75', '')}"></span></span>` : ''}
+                        ${icon ? `<span class="font-bold shrink-0">${icon}</span>` : ''}
+                        <span class="truncate">${t.type}</span>
+                    </div>`;
                 }).join('');
 
-                // onclick moved to the outer div
                 grid.innerHTML += `
-                    <div class="calendar-day p-1 text-xs relative group flex flex-col justify-between cursor-pointer" onclick="viewDaySummary('${dateStr}')">
-                        <div class="flex justify-between items-start">
-                            <span class="text-slate-600 hover:text-cyan-400 transition p-1">
-                                <!-- Eye icon removed/minimized since entire cell is clickable -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </span>
-                            <span class="font-bold text-slate-600 group-hover:text-cyan-400">${d}</span>
+                    <div id="cal-day-${dateStr}" class="calendar-day p-2 relative group flex flex-col cursor-pointer ${isToday ? 'is-today' : ''} ${isSelected ? 'is-selected' : ''}" onclick="viewDaySummary('${dateStr}')">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="day-number text-sm font-bold text-slate-500 transition-colors group-hover:text-cyan-300">${d}</span>
+                            ${dayTasks.length > 0 ? `<span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 rounded-full font-mono group-hover:bg-cyan-900/50 group-hover:text-cyan-200 transition-colors">${dayTasks.length}</span>` : ''}
                         </div>
-                        <div class="mt-1 space-y-1 overflow-y-auto max-h-[80px] custom-scrollbar pointer-events-none">${tasksHtml}</div>
+                        <div class="flex-grow overflow-y-auto custom-scrollbar space-y-0.5 pr-1" style="max-height: 70px;">
+                            ${tasksHtml}
+                        </div>
                     </div>`;
             }
         };
 
         // Função Principal para Abrir o Resumo do Dia
         window.viewDaySummary = (dateStr) => {
+            // Remove seleção anterior
+            if(currentSummaryDateStr) {
+                const prev = document.getElementById(`cal-day-${currentSummaryDateStr}`);
+                if(prev) prev.classList.remove('is-selected');
+            }
+            
             currentSummaryDateStr = dateStr;
             const container = document.getElementById('calendarSummary');
             const displayDate = document.getElementById('summaryDateDisplay');
-            const selectedDate = new Date(dateStr + "T00:00:00");
+            const selectedDate = new Date(dateStr + "T12:00:00"); // Fix fuso horário para exibição correta
             
+            // Adiciona seleção nova
+            const current = document.getElementById(`cal-day-${dateStr}`);
+            if(current) current.classList.add('is-selected');
+
             container.classList.remove('hidden');
             displayDate.textContent = selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             
-            // Certifica-se de que os checkboxes estão marcados na primeira abertura
-            // Se quiser persistir o estado, pode remover este bloco.
-            /* document.querySelectorAll('input[name="taskFilter"]').forEach(cb => cb.checked = true);
-            */
-            
             renderDaySummaryList();
-            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
         // Renderiza a lista com base na data atual selecionada e nos CHECKBOXES ativos
@@ -1902,57 +1991,65 @@
             const activeFilters = Array.from(document.querySelectorAll('input[name="taskFilter"]:checked')).map(cb => cb.value);
 
             let dayTasks = tasks.filter(t => t.date.startsWith(currentSummaryDateStr));
-            
-            // Filtra se a tarefa está nos status selecionados
             dayTasks = dayTasks.filter(t => activeFilters.includes(t.status));
-            
             dayTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
             list.innerHTML = '';
 
             if (dayTasks.length === 0) {
-                list.innerHTML = '<p class="text-gray-500 italic text-center py-4">Nenhuma tarefa encontrada com este filtro.</p>';
+                list.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 px-4 text-center bg-slate-900/50 rounded-xl border border-dashed border-slate-700">
+                    <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 4l-2 2m0 0l-2-2m2 2V5" /></svg></div>
+                    <p class="text-slate-400 font-medium">Sua agenda está limpa.</p>
+                    <p class="text-xs text-slate-500 mt-1">Nenhuma tarefa atende aos filtros atuais para este dia.</p>
+                </div>`;
             } else {
+                list.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10"; // Usar Grid para os cards
+                
                 dayTasks.forEach(t => {
                     const client = clients.find(c => c.id === t.clientId);
                     const taskDate = new Date(t.date);
                     taskDate.setHours(0,0,0,0);
                     const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
                     
-                    let statusColor = "text-gray-400";
-                    let borderClass = "border-slate-700";
-                    let bgClass = "bg-slate-800";
+                    let cardClass = "task-card-pending";
+                    let statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-slate-700 text-slate-300">Pendente</span>`;
+                    let titleStyle = "text-white";
                     
                     if (isOverdue) {
-                        statusColor = "text-red-400 font-bold uppercase tracking-wider animate-pulse";
-                        borderClass = "border-red-500/50";
-                        bgClass = "bg-red-900/10";
+                        cardClass = "task-card-overdue shadow-[0_0_15px_rgba(239,68,68,0.15)]";
+                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-red-900/80 text-red-300 border border-red-500/50 animate-pulse flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg> Atrasado</span>`;
                     } else if (t.status === 'Concluido') {
-                        statusColor = "text-emerald-400 font-bold";
-                        borderClass = "border-emerald-500/30";
-                        bgClass = "bg-emerald-900/10";
+                        cardClass = "task-card-completed";
+                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Concluído</span>`;
+                        titleStyle = "text-emerald-400 line-through decoration-emerald-500/50";
                     } else if (t.status === 'Em Andamento') {
-                        statusColor = "text-amber-400 font-bold";
-                        borderClass = "border-amber-500/30";
-                    } else {
-                        statusColor = "text-cyan-400";
+                        cardClass = "task-card-progress shadow-[0_0_15px_rgba(245,158,11,0.1)]";
+                        statusBadge = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-900/50 text-amber-300 border border-amber-500/50 flex items-center gap-1"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span> Andamento</span>`;
                     }
 
                     list.innerHTML += `
-                        <div class="p-4 rounded-lg border ${borderClass} ${bgClass} flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-opacity-80">
+                        <div class="${cardClass} rounded-xl p-5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group">
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-xs font-bold text-white bg-slate-900 px-2 py-0.5 rounded border border-slate-700">${client?.nome || 'Geral'}</span>
-                                    <span class="text-xs text-gray-500">${t.date.split('T')[1]}</span>
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex flex-col gap-1.5">
+                                        ${statusBadge}
+                                        <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider font-mono">${client?.nome || 'Geral'}</span>
+                                    </div>
+                                    <span class="text-xs font-mono text-slate-500 bg-slate-900/80 px-2 py-1 rounded-md border border-slate-700/50">⏱️ ${t.date.split('T')[1]}</span>
                                 </div>
-                                <h4 class="text-sm font-semibold text-gray-200">${t.type}</h4>
-                                <p class="text-xs text-gray-400 mt-1 italic">${t.notes || 'Sem observações.'}</p>
+                                <h4 class="text-lg font-bold mb-2 ${titleStyle} group-hover:text-cyan-300 transition-colors">${t.type}</h4>
+                                <div class="bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/30">
+                                    <p class="text-[11px] text-slate-400 italic line-clamp-2 leading-relaxed">${t.notes || 'Nenhuma observação detalhada para esta tarefa.'}</p>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                <span class="text-xs ${statusColor}">${isOverdue ? '⚠️ ATRASADO' : t.status}</span>
-                                <div class="flex gap-2">
-                                    ${t.status !== 'Concluido' ? `<button onclick="updateTaskStatus('${t.id}', 'Concluido')" class="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition">Concluir</button>` : ''}
-                                    <button onclick="viewTaskDetails('${t.id}')" class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs transition">Ver</button>
-                                </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-slate-700/50 flex justify-end gap-2">
+                                <button onclick="viewTaskDetails('${t.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition-colors border border-slate-600">Ver Infos</button>
+                                ${t.status !== 'Concluido' ? `
+                                <button onclick="updateTaskStatus('${t.id}', 'Concluido')" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white rounded-lg text-xs font-bold transition-all shadow-lg hover:shadow-emerald-500/25 flex items-center gap-1 group-hover:scale-105">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Concluir
+                                </button>` : ''}
                             </div>
                         </div>
                     `;
