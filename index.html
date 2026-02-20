@@ -763,6 +763,16 @@
             animation: slideUpFade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             opacity: 0;
         }
+
+        /* Animação Live Metrics (Novo) */
+        @keyframes livePulse {
+            0% { box-shadow: inset 0 0 0 rgba(6, 182, 212, 0); background-color: rgba(30, 41, 59, 1); }
+            50% { box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.4); background-color: rgba(6, 182, 212, 0.15); border-color: #06b6d4; }
+            100% { box-shadow: inset 0 0 0 rgba(6, 182, 212, 0); background-color: rgba(30, 41, 59, 1); }
+        }
+        .metric-update {
+            animation: livePulse 0.6s ease-out;
+        }
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen text-slate-200">
@@ -978,43 +988,144 @@
                 </div>
 
                 <!-- Modal de Resultados Tráfego -->
-                <div id="resultFormContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all duration-300">
-                    <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl w-full max-w-4xl border border-cyan-500/30 relative overflow-y-auto max-h-[90vh]">
+                <div id="resultFormContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-all duration-300">
+                    <div class="bg-slate-900 p-6 md:p-8 rounded-2xl shadow-[0_0_40px_rgba(6,182,212,0.15)] w-full max-w-5xl border border-cyan-500/30 relative overflow-y-auto max-h-[90vh] custom-scrollbar">
                         <button onclick="toggleResultForm()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-                        <h2 class="text-sm font-bold mb-6 text-cyan-400 uppercase tracking-widest border-b border-slate-700 pb-2">Input Tráfego Pago</h2>
-                        <form id="campaignForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        
+                        <div class="flex items-center gap-4 mb-8 pb-4 border-b border-slate-700/50">
+                            <div class="bg-cyan-500/20 p-3 rounded-xl border border-cyan-500/40">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white tracking-wide">Registro de Tráfego</h2>
+                                <p class="text-cyan-400 text-xs font-semibold tracking-widest uppercase mt-1">Métricas e Conversões</p>
+                            </div>
+                        </div>
+
+                        <form id="campaignForm" class="space-y-6">
                             <input type="hidden" id="res_id_edit" value=""> 
-                            <div class="col-span-1 md:col-span-4 flex items-center gap-4 bg-slate-800/50 p-2 rounded-lg border border-slate-700 mb-2">
-                                <span class="text-xs font-bold text-slate-400 uppercase ml-2">Tipo de Registro:</span>
-                                <label class="inline-flex items-center cursor-pointer"><input type="radio" name="traffic_type_date" value="daily" checked onchange="toggleTrafficDateMode()" class="accent-cyan-500 h-4 w-4"><span class="ml-2 text-sm text-gray-300">Diário</span></label>
-                                <label class="inline-flex items-center cursor-pointer"><input type="radio" name="traffic_type_date" value="period" onchange="toggleTrafficDateMode()" class="accent-cyan-500 h-4 w-4"><span class="ml-2 text-sm text-gray-300">Período</span></label>
+                            
+                            <!-- BLOCO 1: Contexto e Configuração -->
+                            <div class="bg-slate-800/40 p-5 rounded-xl border border-slate-700/50 relative overflow-hidden group">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> 1. Setup da Campanha</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="col-span-1 md:col-span-4 flex items-center gap-4 bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                        <span class="text-xs font-bold text-cyan-400 uppercase ml-1"><span class="animate-pulse inline-block w-2 h-2 bg-cyan-500 rounded-full mr-1"></span>Tipo de Registro:</span>
+                                        <label class="inline-flex items-center cursor-pointer hover:text-white transition"><input type="radio" name="traffic_type_date" value="daily" checked onchange="toggleTrafficDateMode()" class="accent-cyan-500 h-4 w-4"><span class="ml-2 text-sm text-gray-300">Diário</span></label>
+                                        <label class="inline-flex items-center cursor-pointer hover:text-white transition"><input type="radio" name="traffic_type_date" value="period" onchange="toggleTrafficDateMode()" class="accent-cyan-500 h-4 w-4"><span class="ml-2 text-sm text-gray-300">Período</span></label>
+                                    </div>
+                                    <div id="traffic_daily_input" class="col-span-1 md:col-span-2"><input type="date" id="res_data" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 text-white focus:border-cyan-500 outline-none transition-all" /></div>
+                                    <div id="traffic_period_input" class="col-span-1 md:col-span-2 hidden gap-2"><input type="date" id="res_data_inicio" class="w-1/2 p-3 rounded-lg bg-slate-900 border-slate-700 text-white" /><input type="date" id="res_data_fim" class="w-1/2 p-3 rounded-lg bg-slate-900 border-slate-700 text-white" /></div>
+                                    <div class="col-span-1 md:col-span-2"><select id="res_cliente" required class="w-full p-3 rounded-lg"><option value="">Cliente</option></select></div>
+                                    <div class="col-span-1 md:col-span-2"><select id="res_plataforma" required class="w-full p-3 rounded-lg"><option value="Meta">Meta Ads</option><option value="Google">Google Ads</option><option value="TikTok">TikTok Ads</option><option value="LinkedIn">LinkedIn Ads</option></select></div>
+                                    <div class="col-span-1 md:col-span-2">
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg></div>
+                                            <input type="text" id="res_campanha" placeholder="Nome da Campanha (Opcional)" class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:border-cyan-500 transition-colors" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="traffic_daily_input" class="col-span-1"><input type="date" id="res_data" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 text-white focus:border-cyan-500 outline-none transition-all" /></div>
-                            <div id="traffic_period_input" class="col-span-1 hidden flex gap-2"><input type="date" id="res_data_inicio" class="w-1/2 p-3 rounded-lg bg-slate-900 border-slate-700 text-white" /><input type="date" id="res_data_fim" class="w-1/2 p-3 rounded-lg bg-slate-900 border-slate-700 text-white" /></div>
-                            <select id="res_cliente" required class="p-3 rounded-lg"><option value="">Cliente</option></select>
-                            <select id="res_plataforma" required class="p-3 rounded-lg"><option value="Meta">Meta</option><option value="Google">Google</option></select>
-                            <input type="number" step="0.01" id="res_investimento" placeholder="Gasto (R$)" required class="p-3 rounded-lg" />
-                            <input type="number" id="res_impressoes" placeholder="Impressões" required class="p-3 rounded-lg" />
-                            <input type="number" id="res_alcance" placeholder="Alcance" required class="p-3 rounded-lg" />
-                            <input type="number" id="res_cliques" placeholder="Cliques" required class="p-3 rounded-lg" />
-                            <input type="number" step="0.01" id="res_vendas" placeholder="Retorno (R$)" required class="p-3 rounded-lg" />
-                            <div class="col-span-1 md:col-span-2 flex items-center space-x-2">
-                                <select id="res_conversion_type" required class="p-3 rounded-lg w-1/2"><option value="">Conversão</option><option value="Ligue">Ligue</option><option value="Mensagem">Mensagem</option><option value="Compras">Compras</option><option value="Formulario">Formulário</option></select>
-                                <input type="number" id="res_conversion_count" placeholder="Qtd" required class="p-3 rounded-lg flex-grow" />
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- BLOCO 2: Topo do Funil -->
+                                <div class="bg-slate-800/40 p-5 rounded-xl border border-slate-700/50 relative overflow-hidden group">
+                                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> 2. Topo do Funil (Alcance)</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                            <input type="number" step="0.01" id="res_investimento" placeholder="Investimento (Gasto R$)" required class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:border-red-500 transition-colors" />
+                                        </div>
+                                        <div class="flex gap-4">
+                                            <div class="relative flex-1">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
+                                                <input type="number" id="res_impressoes" placeholder="Impressões" required class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white transition-colors" />
+                                            </div>
+                                            <div class="relative flex-1">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg></div>
+                                                <input type="number" id="res_alcance" placeholder="Alcance" required class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white transition-colors" />
+                                            </div>
+                                        </div>
+                                        <div class="relative w-full">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg></div>
+                                            <input type="number" id="res_cliques" placeholder="Cliques no Link" required class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:border-orange-500 transition-colors" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BLOCO 3: Conversão e Retorno -->
+                                <div class="bg-slate-800/40 p-5 rounded-xl border border-slate-700/50 relative overflow-hidden group">
+                                    <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> 3. Fundo do Funil (Conversão)</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                            <input type="number" step="0.01" id="res_vendas" placeholder="Faturamento Bruto / Retorno (R$)" required class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:border-emerald-500 transition-colors" />
+                                        </div>
+                                        <div class="flex gap-4 items-center">
+                                            <div class="w-1/2">
+                                                <select id="res_conversion_type" required class="w-full p-3 rounded-lg bg-slate-900 border-slate-700">
+                                                    <option value="">Ação Principal</option>
+                                                    <option value="Compras">🛒 Compras (E-com)</option>
+                                                    <option value="Mensagem">💬 Mensagens (WA/Direct)</option>
+                                                    <option value="Leads">📝 Leads (Formulário)</option>
+                                                    <option value="Ligacoes">📞 Ligações</option>
+                                                </select>
+                                            </div>
+                                            <div class="relative w-1/2">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg></div>
+                                                <input type="number" id="res_conversion_count" placeholder="Qtd Conversões" required class="w-full pl-10 p-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:border-purple-500 transition-colors" />
+                                            </div>
+                                        </div>
+                                        <textarea id="res_observacoes" placeholder="Observações e aprendizados do dia/período..." class="w-full p-3 rounded-lg bg-slate-900 border-slate-700 h-[60px] resize-none"></textarea>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- Métricas Calculadas -->
-                            <div class="col-span-1 md:col-span-4 grid grid-cols-2 md:grid-cols-6 gap-2 bg-slate-800 rounded-lg border border-slate-700 p-2">
-                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">ROAS</p><p id="roas_calc" class="font-bold text-green-400 text-sm">0.00x</p></div>
-                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CPA</p><p id="cpa_calc" class="font-bold text-red-400 text-sm">R$ 0.00</p></div>
-                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CPC</p><p id="cpc_calc" class="font-bold text-cyan-400 text-sm">R$ 0.00</p></div>
-                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CTR</p><p id="ctr_calc" class="font-bold text-yellow-400 text-sm">0.00%</p></div>
-                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">FREQ</p><p id="freq_calc" class="font-bold text-blue-400 text-sm">0.00</p></div>
-                                <div class="text-center"><p class="text-[10px] text-slate-400 uppercase">CONV %</p><p id="tx_conv_calc" class="font-bold text-purple-400 text-sm">0.00%</p></div>
+
+                            <!-- BLOCO 4: Dashboard em Tempo Real -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 relative shadow-inner mt-4">
+                                <div class="absolute -top-3 left-4 bg-slate-900 px-2 text-[10px] font-bold text-cyan-500 uppercase tracking-widest border border-cyan-500/30 rounded">Simulador em Tempo Real</div>
+                                <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mt-2">
+                                    <div class="live-metric-box bg-slate-800/80 rounded-lg p-3 border border-slate-700 transition-all text-center group">
+                                        <p class="text-[9px] text-slate-400 uppercase tracking-wider mb-1 flex justify-center items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>ROAS</p>
+                                        <p id="roas_calc" class="font-bold text-green-400 text-base group-hover:scale-110 transition-transform">0.00x</p>
+                                    </div>
+                                    <div class="live-metric-box bg-slate-800/80 rounded-lg p-3 border border-slate-700 transition-all text-center group">
+                                        <p class="text-[9px] text-slate-400 uppercase tracking-wider mb-1 flex justify-center items-center gap-1"><span class="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>CPA</p>
+                                        <p id="cpa_calc" class="font-bold text-indigo-400 text-base group-hover:scale-110 transition-transform">R$ 0,00</p>
+                                    </div>
+                                    <div class="live-metric-box bg-slate-800/80 rounded-lg p-3 border border-slate-700 transition-all text-center group">
+                                        <p class="text-[9px] text-slate-400 uppercase tracking-wider mb-1 flex justify-center items-center gap-1"><span class="w-1.5 h-1.5 bg-cyan-500 rounded-full"></span>CPC</p>
+                                        <p id="cpc_calc" class="font-bold text-cyan-400 text-base group-hover:scale-110 transition-transform">R$ 0,00</p>
+                                    </div>
+                                    <div class="live-metric-box bg-slate-800/80 rounded-lg p-3 border border-slate-700 transition-all text-center group">
+                                        <p class="text-[9px] text-slate-400 uppercase tracking-wider mb-1 flex justify-center items-center gap-1"><span class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>CTR</p>
+                                        <p id="ctr_calc" class="font-bold text-yellow-400 text-base group-hover:scale-110 transition-transform">0.00%</p>
+                                    </div>
+                                    <div class="live-metric-box bg-slate-800/80 rounded-lg p-3 border border-slate-700 transition-all text-center group">
+                                        <p class="text-[9px] text-slate-400 uppercase tracking-wider mb-1 flex justify-center items-center gap-1"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>FREQ</p>
+                                        <p id="freq_calc" class="font-bold text-blue-400 text-base group-hover:scale-110 transition-transform">0.00</p>
+                                    </div>
+                                    <div class="live-metric-box bg-slate-800/80 rounded-lg p-3 border border-slate-700 transition-all text-center group">
+                                        <p class="text-[9px] text-slate-400 uppercase tracking-wider mb-1 flex justify-center items-center gap-1"><span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>CONV</p>
+                                        <p id="tx_conv_calc" class="font-bold text-purple-400 text-base group-hover:scale-110 transition-transform">0.00%</p>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- (Removido Input IA) -->
-                            <textarea id="res_observacoes" placeholder="Observações..." class="p-3 rounded-lg col-span-1 md:col-span-4 h-16 resize-none"></textarea>
-                            <button type="submit" id="resultsSubmitButton" class="col-span-1 md:col-span-2 bg-novan-primary hover:bg-novan-hover text-white font-bold p-3 rounded-lg transition-colors">REGISTRAR TRÁFEGO</button>
-                            <div class="col-span-1 md:col-span-2 flex gap-2"><button type="button" onclick="generateDailySummary()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold p-3 rounded-lg text-xs">RESUMO DIA</button></div>
+
+                            <div class="flex flex-col md:flex-row gap-4 mt-6 pt-4 border-t border-slate-800">
+                                <button type="button" onclick="generateDailySummary()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold p-4 rounded-xl transition-colors border border-slate-700 hover:border-slate-500 flex justify-center items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> RESUMO DO DIA
+                                </button>
+                                <button type="submit" id="resultsSubmitButton" class="flex-[2] bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black p-4 rounded-xl transition-all shadow-lg shadow-cyan-900/50 hover:shadow-cyan-500/30 flex justify-center items-center gap-2 text-lg tracking-wide">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> SALVAR RESULTADO
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -1793,7 +1904,31 @@
         // --- CORE FUNCTIONS ---
         window.toggleServiceType = async (id, newType) => { const client = clients.find(c => c.id === id); if (!client) return; let types = client.serviceTypes || [client.serviceType]; if (!types.includes(newType)) { types.push(newType); await updateDoc(doc(db, 'users', userId, 'clients', id), { serviceTypes: types }); showMessage(`Serviço ${newType.toUpperCase()} ativado!`); } };
         window.attachCalculationListeners = () => { ['res_investimento', 'res_impressoes', 'res_cliques', 'res_alcance', 'res_vendas', 'res_conversion_count'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', calculateLiveMetrics); }); };
-        window.calculateLiveMetrics = () => { const inv = parseFloat(document.getElementById('res_investimento').value) || 0; const imps = parseFloat(document.getElementById('res_impressoes').value) || 0; const clicks = parseFloat(document.getElementById('res_cliques').value) || 0; const reach = parseFloat(document.getElementById('res_alcance').value) || 0; const sales = parseFloat(document.getElementById('res_vendas').value) || 0; const conv = parseFloat(document.getElementById('res_conversion_count').value) || 0; document.getElementById('roas_calc').textContent = (inv > 0 ? sales / inv : 0).toFixed(2) + 'x'; document.getElementById('cpa_calc').textContent = formatCurrency(conv > 0 ? inv / conv : 0); document.getElementById('cpc_calc').textContent = formatCurrency(clicks > 0 ? inv / clicks : 0); document.getElementById('ctr_calc').textContent = (imps > 0 ? (clicks / imps) * 100 : 0).toFixed(2) + '%'; document.getElementById('freq_calc').textContent = (reach > 0 ? imps / reach : 0).toFixed(2); document.getElementById('tx_conv_calc').textContent = (clicks > 0 ? (conv / clicks) * 100 : 0).toFixed(2) + '%'; };
+        
+        window.calculateLiveMetrics = () => { 
+            const inv = parseFloat(document.getElementById('res_investimento').value) || 0; 
+            const imps = parseFloat(document.getElementById('res_impressoes').value) || 0; 
+            const clicks = parseFloat(document.getElementById('res_cliques').value) || 0; 
+            const reach = parseFloat(document.getElementById('res_alcance').value) || 0; 
+            const sales = parseFloat(document.getElementById('res_vendas').value) || 0; 
+            const conv = parseFloat(document.getElementById('res_conversion_count').value) || 0; 
+            
+            document.getElementById('roas_calc').textContent = (inv > 0 ? sales / inv : 0).toFixed(2) + 'x'; 
+            document.getElementById('cpa_calc').textContent = formatCurrency(conv > 0 ? inv / conv : 0); 
+            document.getElementById('cpc_calc').textContent = formatCurrency(clicks > 0 ? inv / clicks : 0); 
+            document.getElementById('ctr_calc').textContent = (imps > 0 ? (clicks / imps) * 100 : 0).toFixed(2) + '%'; 
+            document.getElementById('freq_calc').textContent = (reach > 0 ? imps / reach : 0).toFixed(2); 
+            document.getElementById('tx_conv_calc').textContent = (clicks > 0 ? (conv / clicks) * 100 : 0).toFixed(2) + '%'; 
+            
+            // Ativa Animação de Pulsar
+            const dashBoxes = document.querySelectorAll('.live-metric-box');
+            dashBoxes.forEach(box => {
+                box.classList.remove('metric-update');
+                void box.offsetWidth; // Force reflow para reiniciar animação
+                box.classList.add('metric-update');
+            });
+        };
+
         window.switchTab = (id) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); const tab = document.getElementById(id); if (tab) tab.classList.add('active'); document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active')); const nav = document.getElementById(`nav-${id}`); if(nav) nav.classList.add('active'); };
         window.toggleFormCategory = (type) => { const btnTraffic = document.getElementById('form_btn_traffic'); const btnSocial = document.getElementById('form_btn_social'); const trafficFields = document.getElementById('trafficFields'); const socialFields = document.getElementById('socialMediaFields'); const hiddenType = document.getElementById('cli_service_type'); hiddenType.value = type; if(type === 'traffic') { btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition"; btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition"; trafficFields.classList.remove('hidden'); socialFields.classList.add('hidden'); } else { btnSocial.className = "flex-1 py-2 rounded-lg font-semibold bg-novan-primary text-white shadow-neon transition"; btnTraffic.className = "flex-1 py-2 rounded-lg font-semibold bg-slate-700 text-gray-400 border border-slate-600 transition"; socialFields.classList.remove('hidden'); trafficFields.classList.add('hidden'); } };
         window.toggleClientForm = () => document.getElementById('clientRegistrationContainer').classList.toggle('hidden');
@@ -1945,7 +2080,36 @@
                 const client = clients.find(c => c.id === res.clientId); 
                 const color = client?.color || '#06b6d4'; 
                 const dateDisplay = (res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim) ? `${new Date(res.dataInicio+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} - ${new Date(res.dataFim+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}` : new Date(res.data+'T12:00:00').toLocaleDateString('pt-BR'); 
-                list.innerHTML += `<div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}"><div class="flex justify-between items-center mb-2"><div><div class="flex items-center gap-2"><span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span><span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700 flex items-center gap-1">${res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim ? '📅' : ''} ${dateDisplay}</span></div></div><div class="flex items-center gap-4"><div class="text-right"><span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span><span class="text-[9px] uppercase text-gray-500">ROAS</span></div><div class="flex gap-1"><button onclick="editResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button><button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></div></div><div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs"><div class="text-gray-400">Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></div><div class="text-gray-400">Retorno: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></div><div class="text-gray-400 hidden md:block">CPC: <span class="text-cyan-400">${formatCurrency(res.cpc || (res.cliques > 0 ? res.investimento / res.cliques : 0))}</span></div><div class="text-gray-400 hidden md:block">CTR: <span class="text-yellow-400">${(res.ctr || (res.impressoes > 0 ? (res.cliques / res.impressoes) * 100 : 0)).toFixed(2)}%</span></div><div class="text-gray-400 hidden md:block">Freq: <span class="text-blue-400">${(res.frequency || (res.alcance > 0 ? res.impressoes / res.alcance : 0)).toFixed(2)}</span></div></div></div>`; 
+                
+                list.innerHTML += `
+                <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-b border-r border-slate-700 shadow hover:bg-slate-700 transition-all group" style="border-left-color: ${color}">
+                    <div class="flex justify-between items-center mb-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${client?.nome || 'Cliente'}</span>
+                                <span class="text-[10px] text-gray-500 font-mono bg-slate-900 px-1 rounded border border-slate-700 flex items-center gap-1">${res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim ? '📅' : ''} ${dateDisplay}</span>
+                                ${res.campanha ? `<span class="text-[10px] text-cyan-300 font-mono bg-cyan-900/20 px-1.5 rounded border border-cyan-500/30 truncate max-w-[150px] flex items-center gap-1" title="${res.campanha}"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg> ${res.campanha}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-right">
+                                <span class="block text-lg font-bold ${res.roas >= 1 ? 'text-green-400' : 'text-red-400'}">${(res.roas || 0).toFixed(2)}x</span>
+                                <span class="text-[9px] uppercase text-gray-500">ROAS</span>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editResult('${res.id}')" class="p-2 text-slate-600 hover:text-indigo-400 transition-colors rounded-full hover:bg-slate-900/50" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                                <button onclick="deleteResult('${res.id}')" class="p-2 text-slate-600 hover:text-red-500 transition-colors rounded-full hover:bg-slate-900/50" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-700/50 text-xs">
+                        <div class="text-gray-400">Gasto: <span class="text-white font-medium">${formatCurrency(res.investimento)}</span></div>
+                        <div class="text-gray-400">Retorno: <span class="text-emerald-400 font-medium">${formatCurrency(res.vendas)}</span></div>
+                        <div class="text-gray-400 hidden md:block">CPC: <span class="text-cyan-400">${formatCurrency(res.cpc || (res.cliques > 0 ? res.investimento / res.cliques : 0))}</span></div>
+                        <div class="text-gray-400 hidden md:block">CTR: <span class="text-yellow-400">${(res.ctr || (res.impressoes > 0 ? (res.cliques / res.impressoes) * 100 : 0)).toFixed(2)}%</span></div>
+                        <div class="text-gray-400 hidden md:block">Freq: <span class="text-blue-400">${(res.frequency || (res.alcance > 0 ? res.impressoes / res.alcance : 0)).toFixed(2)}</span></div>
+                    </div>
+                </div>`; 
             }); 
         };
         window.toggleSocialResultForm = () => document.getElementById('socialResultFormContainer').classList.toggle('hidden');
@@ -1988,7 +2152,35 @@
             }); 
         };
         window.editSocialResult = (id) => { const res = socialResults.find(r => r.id === id); if (!res) return; document.getElementById('soc_id_edit').value = res.id; if (res.dataInicio && res.dataFim) { document.getElementById('soc_data_inicio').value = res.dataInicio; document.getElementById('soc_data_fim').value = res.dataFim; } else { document.getElementById('soc_data_inicio').value = res.data; document.getElementById('soc_data_fim').value = res.data; } document.getElementById('soc_cliente').value = res.clientId; document.getElementById('soc_plataforma').value = res.plataforma; document.getElementById('soc_seguidores').value = res.seguidores; document.getElementById('soc_novos_seguidores').value = res.novosSeguidores; document.getElementById('soc_alcance').value = res.alcance; document.getElementById('soc_impressoes').value = res.impressoes; document.getElementById('soc_interacoes').value = res.interacoes; document.getElementById('soc_posts').value = res.posts; document.getElementById('soc_stories_views').value = res.storiesViews || ""; document.getElementById('soc_reels_views').value = res.reelsViews || ""; document.getElementById('soc_observacoes').value = res.observacoes || ""; toggleSocialResultForm(); };
-        window.editResult = (id) => { const res = results.find(r => r.id === id); if (!res) return; document.getElementById('res_id_edit').value = res.id; if (res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim) { document.querySelector('input[name="traffic_type_date"][value="period"]').checked = true; document.getElementById('res_data_inicio').value = res.dataInicio; document.getElementById('res_data_fim').value = res.dataFim; } else { document.querySelector('input[name="traffic_type_date"][value="daily"]').checked = true; document.getElementById('res_data').value = res.dataFim || res.data; } toggleTrafficDateMode(); document.getElementById('res_cliente').value = res.clientId; document.getElementById('res_plataforma').value = res.plataforma; document.getElementById('res_investimento').value = res.investimento; document.getElementById('res_impressoes').value = res.impressoes; document.getElementById('res_alcance').value = res.alcance; document.getElementById('res_cliques').value = res.cliques; document.getElementById('res_vendas').value = res.vendas; document.getElementById('res_conversion_type').value = res.conversionType || ""; document.getElementById('res_conversion_count').value = res.conversionCount || ""; document.getElementById('res_observacoes').value = res.observacoes || ""; toggleResultForm(); };
+        window.editResult = (id) => { 
+            const res = results.find(r => r.id === id); 
+            if (!res) return; 
+            document.getElementById('res_id_edit').value = res.id; 
+            
+            if (res.dataInicio && res.dataFim && res.dataInicio !== res.dataFim) { 
+                document.querySelector('input[name="traffic_type_date"][value="period"]').checked = true; 
+                document.getElementById('res_data_inicio').value = res.dataInicio; 
+                document.getElementById('res_data_fim').value = res.dataFim; 
+            } else { 
+                document.querySelector('input[name="traffic_type_date"][value="daily"]').checked = true; 
+                document.getElementById('res_data').value = res.dataFim || res.data; 
+            } 
+            toggleTrafficDateMode(); 
+            
+            document.getElementById('res_cliente').value = res.clientId; 
+            document.getElementById('res_plataforma').value = res.plataforma; 
+            document.getElementById('res_campanha').value = res.campanha || ""; 
+            document.getElementById('res_investimento').value = res.investimento; 
+            document.getElementById('res_impressoes').value = res.impressoes; 
+            document.getElementById('res_alcance').value = res.alcance; 
+            document.getElementById('res_cliques').value = res.cliques; 
+            document.getElementById('res_vendas').value = res.vendas; 
+            document.getElementById('res_conversion_type').value = res.conversionType || ""; 
+            document.getElementById('res_conversion_count').value = res.conversionCount || ""; 
+            document.getElementById('res_observacoes').value = res.observacoes || ""; 
+            
+            toggleResultForm(); 
+        };
         window.deleteResult = (id) => { window.pendingDeleteId = id; window.pendingDeleteCollection = 'results'; document.getElementById('confirmationModal').classList.remove('hidden'); document.getElementById('confirmationModal').classList.add('flex'); };
         window.deleteSocialResult = (id) => { window.pendingDeleteId = id; window.pendingDeleteCollection = 'social_results'; document.getElementById('confirmationModal').classList.remove('hidden'); document.getElementById('confirmationModal').classList.add('flex'); };
         window.deleteTask = (id) => { window.pendingDeleteId = id; window.pendingDeleteCollection = 'tasks'; document.getElementById('confirmationModal').classList.remove('hidden'); document.getElementById('confirmationModal').classList.add('flex'); };
@@ -2491,7 +2683,58 @@
 
         const forms = [
             { id: 'clientForm', handler: async (e) => { e.preventDefault(); const id = document.getElementById('cli_id_edit').value; const type = document.getElementById('cli_service_type').value; const data = { nome: document.getElementById('cli_nome').value, responsavel: document.getElementById('cli_responsavel').value, telefone: document.getElementById('cli_telefone').value, link: document.getElementById('cli_link').value, serviceType: type, observacoes: document.getElementById('cli_observacoes').value, active: true }; if(type === 'traffic') { data.plataformaTraffic = document.getElementById('cli_plataforma_traffic').value; data.budgetValueTraffic = parseFloat(document.getElementById('cli_budget_value_traffic').value) || 0; data.budgetTypeTraffic = document.getElementById('cli_budget_type_traffic').value; data.conversionGoalsTraffic = document.getElementById('cli_conversion_goals_traffic').value; } else { data.smFee = parseFloat(document.getElementById('cli_sm_fee').value) || 0; data.smPlatform = document.getElementById('cli_sm_platform').value; data.smNeeds = document.getElementById('cli_sm_needs').value; } if(id) await updateDoc(doc(db, 'users', userId, 'clients', id), data); else { data.color = `hsl(${Math.random() * 360}, 70%, 50%)`; await addDoc(clientsCollection, data); } showMessage("Salvo com sucesso!"); e.target.reset(); document.getElementById('cli_id_edit').value = ""; toggleFormCategory('traffic'); }},
-            { id: 'campaignForm', handler: async (e) => { e.preventDefault(); const id = document.getElementById('res_id_edit').value; const inv = parseFloat(document.getElementById('res_investimento').value) || 0; const fat = parseFloat(document.getElementById('res_vendas').value) || 0; const conv = parseInt(document.getElementById('res_conversion_count').value) || 0; const imps = parseInt(document.getElementById('res_impressoes').value) || 0; const reach = parseInt(document.getElementById('res_alcance').value) || 0; const clicks = parseInt(document.getElementById('res_cliques').value) || 0; const dateType = document.querySelector('input[name="traffic_type_date"]:checked').value; let dataInicio, dataFim; if (dateType === 'daily') { const singleDate = document.getElementById('res_data').value; dataInicio = singleDate; dataFim = singleDate; } else { dataInicio = document.getElementById('res_data_inicio').value; dataFim = document.getElementById('res_data_fim').value; } const data = { data: dataFim, dataInicio: dataInicio, dataFim: dataFim, clientId: document.getElementById('res_cliente').value, plataforma: document.getElementById('res_plataforma').value, investimento: inv, vendas: fat, impressoes: imps, alcance: reach, cliques: clicks, conversionCount: conv, conversionType: document.getElementById('res_conversion_type').value, observacoes: document.getElementById('res_observacoes').value, roas: inv > 0 ? fat / inv : 0, cpa: conv > 0 ? inv / conv : 0, cpc: clicks > 0 ? inv / clicks : 0, ctr: imps > 0 ? (clicks / imps) * 100 : 0, frequency: reach > 0 ? imps / reach : 0, conversionRate: clicks > 0 ? (conv / clicks) * 100 : 0 }; if(id) await updateDoc(doc(db, 'users', userId, 'results', id), data); else await addDoc(resultsCollection, data); showMessage("Tráfego salvo!"); e.target.reset(); document.getElementById('res_id_edit').value = ""; toggleResultForm(); }},
+            { id: 'campaignForm', handler: async (e) => { 
+                e.preventDefault(); 
+                const id = document.getElementById('res_id_edit').value; 
+                const inv = parseFloat(document.getElementById('res_investimento').value) || 0; 
+                const fat = parseFloat(document.getElementById('res_vendas').value) || 0; 
+                const conv = parseInt(document.getElementById('res_conversion_count').value) || 0; 
+                const imps = parseInt(document.getElementById('res_impressoes').value) || 0; 
+                const reach = parseInt(document.getElementById('res_alcance').value) || 0; 
+                const clicks = parseInt(document.getElementById('res_cliques').value) || 0; 
+                const dateType = document.querySelector('input[name="traffic_type_date"]:checked').value; 
+                
+                let dataInicio, dataFim; 
+                if (dateType === 'daily') { 
+                    const singleDate = document.getElementById('res_data').value; 
+                    dataInicio = singleDate; 
+                    dataFim = singleDate; 
+                } else { 
+                    dataInicio = document.getElementById('res_data_inicio').value; 
+                    dataFim = document.getElementById('res_data_fim').value; 
+                } 
+                
+                const data = { 
+                    data: dataFim, 
+                    dataInicio: dataInicio, 
+                    dataFim: dataFim, 
+                    clientId: document.getElementById('res_cliente').value, 
+                    plataforma: document.getElementById('res_plataforma').value, 
+                    campanha: document.getElementById('res_campanha').value, // Campo Novo
+                    investimento: inv, 
+                    vendas: fat, 
+                    impressoes: imps, 
+                    alcance: reach, 
+                    cliques: clicks, 
+                    conversionCount: conv, 
+                    conversionType: document.getElementById('res_conversion_type').value, 
+                    observacoes: document.getElementById('res_observacoes').value, 
+                    roas: inv > 0 ? fat / inv : 0, 
+                    cpa: conv > 0 ? inv / conv : 0, 
+                    cpc: clicks > 0 ? inv / clicks : 0, 
+                    ctr: imps > 0 ? (clicks / imps) * 100 : 0, 
+                    frequency: reach > 0 ? imps / reach : 0, 
+                    conversionRate: clicks > 0 ? (conv / clicks) * 100 : 0 
+                }; 
+                
+                if(id) await updateDoc(doc(db, 'users', userId, 'results', id), data); 
+                else await addDoc(resultsCollection, data); 
+                
+                showMessage("Tráfego salvo!"); 
+                e.target.reset(); 
+                document.getElementById('res_id_edit').value = ""; 
+                toggleResultForm(); 
+            }},
             { id: 'socialResultForm', handler: async (e) => { e.preventDefault(); const id = document.getElementById('soc_id_edit').value; const alcance = parseInt(document.getElementById('soc_alcance').value) || 0; const interacoes = parseInt(document.getElementById('soc_interacoes').value) || 0; const data = { dataInicio: document.getElementById('soc_data_inicio').value, dataFim: document.getElementById('soc_data_fim').value, data: document.getElementById('soc_data_fim').value, clientId: document.getElementById('soc_cliente').value, plataforma: document.getElementById('soc_plataforma').value, seguidores: parseInt(document.getElementById('soc_seguidores').value) || 0, novosSeguidores: parseInt(document.getElementById('soc_novos_seguidores').value) || 0, alcance: alcance, impressoes: parseInt(document.getElementById('soc_impressoes').value) || 0, interacoes: interacoes, posts: parseInt(document.getElementById('soc_posts').value) || 0, storiesViews: parseInt(document.getElementById('soc_stories_views').value) || 0, reelsViews: parseInt(document.getElementById('soc_reels_views').value) || 0, observacoes: document.getElementById('soc_observacoes').value, engagementRate: alcance > 0 ? (interacoes / alcance) * 100 : 0 }; if(id) await updateDoc(doc(db, 'users', userId, 'social_results', id), data); else await addDoc(socialResultsCollection, data); showMessage("Social Media salvo!"); e.target.reset(); document.getElementById('soc_id_edit').value = ""; toggleSocialResultForm(); }},
             { id: 'taskForm', handler: async (e) => { e.preventDefault(); const id = document.getElementById('task_id_edit').value; const data = { clientId: document.getElementById('task_cliente').value, type: document.getElementById('task_tipo').value, date: document.getElementById('task_data').value, status: document.getElementById('task_status').value, notes: document.getElementById('task_observacoes').value }; if(id) { await updateDoc(doc(db, 'users', userId, 'tasks', id), data); showMessage("Tarefa atualizada!"); } else { await addDoc(tasksCollection, data); showMessage("Tarefa criada!"); } e.target.reset(); document.getElementById('task_id_edit').value = ''; document.getElementById('taskFormContainer').classList.add('hidden'); }}
         ];
