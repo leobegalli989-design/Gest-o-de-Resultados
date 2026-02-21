@@ -826,6 +826,42 @@
             animation: slideUpFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             opacity: 0;
         }
+        
+        /* --- Animações para Botões de Ação Principais (Novo) --- */
+        @keyframes pulseGlowCyan {
+            0%, 100% { box-shadow: 0 0 10px rgba(6, 182, 212, 0.3), 0 0 20px rgba(6, 182, 212, 0.1); }
+            50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6), 0 0 35px rgba(6, 182, 212, 0.3); }
+        }
+        @keyframes pulseGlowPink {
+            0%, 100% { box-shadow: 0 0 10px rgba(236, 72, 153, 0.3), 0 0 20px rgba(236, 72, 153, 0.1); }
+            50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.6), 0 0 35px rgba(236, 72, 153, 0.3); }
+        }
+        @keyframes btnShineContinuous {
+            0% { left: -100%; }
+            15% { left: 200%; }
+            100% { left: 200%; }
+        }
+        .btn-animate-cyan {
+            animation: pulseGlowCyan 3s infinite ease-in-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+        }
+        .btn-animate-pink {
+            animation: pulseGlowPink 3s infinite ease-in-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(236, 72, 153, 0.4);
+        }
+        .btn-animate-cyan::after, .btn-animate-pink::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: btnShineContinuous 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            transform: skewX(-20deg);
+        }
     </style>
 </head>
 <body class="flex flex-col lg:flex-row min-h-screen text-slate-200">
@@ -950,7 +986,7 @@
                         <span class="title-text-glow">Clientes</span>
                     </h1>
                     <div class="flex gap-2">
-                        <button onclick="toggleClientForm()" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                        <button onclick="toggleClientForm()" class="btn-animate-cyan bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                             Novo Cliente
                         </button>
@@ -1129,7 +1165,7 @@
                         </div>
                         <span class="title-text-glow">Performance Tráfego</span>
                     </h1>
-                    <button onclick="document.getElementById('campaignForm').reset(); document.getElementById('res_id_edit').value=''; document.querySelector('input[name=\'traffic_type_date\'][value=\'daily\']').checked=true; toggleTrafficDateMode(); toggleResultForm();" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                    <button onclick="document.getElementById('campaignForm').reset(); document.getElementById('res_id_edit').value=''; document.querySelector('input[name=\'traffic_type_date\'][value=\'daily\']').checked=true; toggleTrafficDateMode(); toggleResultForm();" class="btn-animate-cyan bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                         Novo Resultado
                     </button>
@@ -1308,7 +1344,7 @@
                         </div>
                         <span class="title-text-glow-pink">Performance Social</span>
                     </h1>
-                    <button onclick="toggleSocialResultForm()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                    <button onclick="toggleSocialResultForm()" class="btn-animate-pink bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                         Novo Resultado Social
                     </button>
@@ -1737,7 +1773,7 @@
                         </div>
                         <span class="title-text-glow">Gestão de Tarefas</span>
                     </h1>
-                    <button onclick="toggleTaskForm()" class="bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                    <button onclick="toggleTaskForm()" class="btn-animate-cyan bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         Nova Tarefa
                     </button>
