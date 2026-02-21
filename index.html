@@ -1586,12 +1586,21 @@
                     </div>
                 </div>
                 
-                <div class="bg-slate-800/60 p-6 rounded-xl mb-8 border border-pink-500/20 relative z-30">
-                    <div class="flex flex-wrap gap-4 items-end">
-                        <div class="flex-grow min-w-[200px]"><label class="text-xs font-bold text-pink-400 mb-1 block uppercase">Cliente</label><select id="report_social_cliente" class="w-full p-2 rounded-lg bg-slate-900 border-slate-700"><option value="">Todos</option></select></div>
+                <!-- Painel de Filtros Futurista (Social) -->
+                <div class="bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl mb-8 border border-pink-500/30 shadow-[0_0_40px_rgba(236,72,153,0.1)] relative group z-30">
+                    <div class="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-pink-500 to-transparent opacity-50"></div>
+                        <div class="absolute -top-24 -right-24 w-48 h-48 bg-pink-500/10 rounded-full blur-3xl"></div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 items-end relative z-10">
+                        <div class="flex-grow min-w-[200px]">
+                            <label class="text-[10px] font-black text-pink-400 mb-2 flex items-center gap-1 uppercase tracking-widest"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M7 14v-4a5 5 0 0110 0v4M7 14l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg> Cliente Alvo</label>
+                            <select id="report_social_cliente" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white shadow-inner focus:border-pink-500 transition-colors"><option value="">Todos os Clientes</option></select>
+                        </div>
                         <div class="min-w-[180px]">
-                            <label class="text-xs font-bold text-pink-400 mb-1 block uppercase">Período</label>
-                            <select id="report_social_range" onchange="applyDateRange('report_social', this.value)" class="w-full p-2 rounded-lg bg-slate-900 border-slate-700 text-sm">
+                            <label class="text-[10px] font-black text-pink-400 mb-2 flex items-center gap-1 uppercase tracking-widest"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 10h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> Range Dinâmico</label>
+                            <select id="report_social_range" onchange="applyDateRange('report_social', this.value)" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-700 text-white shadow-inner focus:border-pink-500 transition-colors">
                                 <option value="custom">Personalizado</option>
                                 <option value="today">Hoje</option>
                                 <option value="yesterday">Ontem</option>
@@ -1607,9 +1616,17 @@
                                 <option value="max">Máximo</option>
                             </select>
                         </div>
-                        <div><label class="text-xs font-bold text-pink-400 mb-1 block uppercase">Início</label><input type="date" id="report_social_start_date" class="p-2 rounded-lg bg-slate-900 border-slate-700" /></div>
-                        <div><label class="text-xs font-bold text-pink-400 mb-1 block uppercase">Fim</label><input type="date" id="report_social_end_date" class="p-2 rounded-lg bg-slate-900 border-slate-700" /></div>
-                        <button onclick="generateSocialReport()" class="bg-pink-600 text-white p-2 rounded-lg px-6 font-bold hover:shadow-neon-pink transition">GERAR</button>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-500 mb-2 block uppercase tracking-widest">Início</label>
+                            <input type="date" id="report_social_start_date" class="p-3 rounded-xl bg-slate-950 border border-slate-700 text-white shadow-inner focus:border-pink-500 transition-colors" />
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-500 mb-2 block uppercase tracking-widest">Fim</label>
+                            <input type="date" id="report_social_end_date" class="p-3 rounded-xl bg-slate-950 border border-slate-700 text-white shadow-inner focus:border-pink-500 transition-colors" />
+                        </div>
+                        <button onclick="generateSocialReport()" class="bg-gradient-to-r from-pink-600 to-rose-400 text-white p-3 rounded-xl px-8 font-black tracking-[0.2em] uppercase hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] transition-all transform hover:-translate-y-1 flex items-center gap-2 border border-pink-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> PROCESSAR
+                        </button>
                     </div>
                 </div>
 
@@ -2481,10 +2498,13 @@
             filtered.sort((a, b) => new Date(b.dataFim || b.data) - new Date(a.dataFim || a.data)); 
             const summary = filtered.reduce((acc, r) => { acc.gasto += r.investimento; acc.vendas += r.vendas; acc.conv += r.conversionCount || 0; acc.imp += r.impressoes; acc.cliques += r.cliques || 0; acc.alcance += r.alcance || 0; return acc; }, { gasto: 0, vendas: 0, conv: 0, imp: 0, cliques: 0, alcance: 0 }); 
             
+            const ticketMedioRes = summary.conv > 0 ? summary.vendas / summary.conv : 0;
+
             const kpis = [
                 { l: 'Investimento', v: formatCurrency(summary.gasto), c: 'red' },
                 { l: 'Retorno', v: formatCurrency(summary.vendas), c: 'emerald' },
                 { l: 'ROAS', v: (summary.gasto > 0 ? summary.vendas / summary.gasto : 0).toFixed(2) + 'x', c: 'yellow' },
+                { l: 'Ticket Médio', v: formatCurrency(ticketMedioRes), c: 'green' },
                 { l: 'CPA', v: formatCurrency(summary.conv > 0 ? summary.gasto / summary.conv : 0), c: 'indigo' },
                 { l: 'CPC Médio', v: formatCurrency(summary.cliques > 0 ? summary.gasto / summary.cliques : 0), c: 'cyan' },
                 { l: 'CTR Médio', v: (summary.imp > 0 ? (summary.cliques / summary.imp) * 100 : 0).toFixed(2) + '%', c: 'purple' },
@@ -2493,7 +2513,7 @@
                 { l: 'Cliques', v: formatCompact(summary.cliques), c: 'orange' },
                 { l: 'Conversões', v: formatCompact(summary.conv), c: 'teal' }
             ];
-            document.getElementById('kpiCardsContainer').className = "grid grid-cols-2 md:grid-cols-5 gap-3 mb-8 text-white";
+            document.getElementById('kpiCardsContainer').className = "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8 text-white";
             document.getElementById('kpiCardsContainer').innerHTML = kpis.map((k, i) => window.renderKpiCard(k.l, k.v, k.c, i)).join('');
             
             list.innerHTML = ''; 
@@ -2517,6 +2537,7 @@
                 const lucroColor = lucro >= 0 ? 'text-emerald-400' : 'text-red-400';
                 
                 const cpaNum = res.cpa || (res.conversionCount > 0 ? res.investimento / res.conversionCount : 0);
+                const ticketMedioCard = res.conversionCount > 0 ? res.vendas / res.conversionCount : 0;
                 const cpcNum = res.cpc || (res.cliques > 0 ? res.investimento / res.cliques : 0);
                 const ctrNum = res.ctr || (res.impressoes > 0 ? (res.cliques / res.impressoes) * 100 : 0);
                 const freqNum = res.frequency || (res.alcance > 0 ? res.impressoes / res.alcance : 0);
@@ -2592,6 +2613,7 @@
                         
                         <!-- Mini KPIs Inferiores -->
                         <div class="flex gap-4 font-mono">
+                            <span class="text-slate-500" title="Ticket Médio">TM: <strong class="text-emerald-400">${formatCurrency(ticketMedioCard)}</strong></span>
                             <span class="text-slate-500" title="Custo por Clique">CPC: <strong class="text-cyan-400">${formatCurrency(cpcNum)}</strong></span>
                             <span class="text-slate-500 hidden md:inline" title="Click-Through Rate">CTR: <strong class="text-yellow-400">${ctrNum.toFixed(2)}%</strong></span>
                             <span class="text-slate-500 hidden lg:inline" title="Frequência">Freq: <strong class="text-blue-400">${freqNum.toFixed(2)}</strong></span>
@@ -3039,6 +3061,7 @@
             
             const roas = stats.gasto > 0 ? stats.vendas / stats.gasto : 0;
             const cpa = stats.conv > 0 ? stats.gasto / stats.conv : 0;
+            const ticketMedio = stats.conv > 0 ? stats.vendas / stats.conv : 0;
             const cpm = stats.imp > 0 ? (stats.gasto / stats.imp) * 1000 : 0;
             const cpc = stats.cliques > 0 ? stats.gasto / stats.cliques : 0;
             const ctr = stats.imp > 0 ? (stats.cliques / stats.imp) * 100 : 0;
@@ -3049,6 +3072,7 @@
                 { l: 'Faturamento', v: formatCurrency(stats.vendas), c: 'emerald' },
                 { l: 'Gasto Ads', v: formatCurrency(stats.gasto), c: 'red' },
                 { l: 'ROAS', v: roas.toFixed(2) + 'x', c: 'yellow' },
+                { l: 'Ticket Médio', v: formatCurrency(ticketMedio), c: 'green' },
                 { l: 'CPA Médio', v: formatCurrency(cpa), c: 'indigo' },
                 { l: 'Conversões', v: formatCompact(stats.conv), c: 'teal' },
                 { l: 'Taxa Conv.', v: convRate.toFixed(2) + '%', c: 'pink' },
