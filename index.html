@@ -714,6 +714,10 @@
             top: 0 !important;
             left: 0 !important;
             z-index: -100 !important; /* Esconde visualmente mas permite renderização */
+            text-rendering: optimizeLegibility !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            transform: translateZ(0) !important; /* Força renderização por hardware e remove blur */
         }
 
         /* Força a remoção de desfoque e transparências que quebram o html2canvas */
@@ -787,8 +791,10 @@
             background: rgba(127,29,29,0.1);
         }
         .task-card-pending {
+            background: linear-gradient(90deg, rgba(15,23,42,1) 0%, rgba(30,58,138,0.4) 50%, rgba(15,23,42,1) 100%);
+            background-size: 200% auto;
+            animation: shineProgress 3s linear infinite;
             border-left: 4px solid #3b82f6; /* Blue 500 */
-            background: rgba(30,58,138,0.1);
         }
 
         /* --- Animações KPIs --- */
@@ -2787,8 +2793,8 @@
                     const isOverdue = (t.status === 'Pendente' || t.status === 'Em Andamento') && taskDate < today;
                     
                     // Pílulas de tarefas refinadas
-                    let bgClass = "bg-slate-800/80 border border-slate-600/50 text-slate-300";
-                    let dotClass = "bg-slate-400";
+                    let bgClass = "bg-blue-900/30 border border-blue-500/40 text-blue-300";
+                    let dotClass = "bg-blue-400 animate-ping opacity-75";
                     let icon = "";
 
                     if (isOverdue) {
@@ -3372,7 +3378,7 @@
         window.exportMobile = async (elementId, filename) => { 
             const element = document.getElementById(elementId); 
             if(!element) return; 
-            showMessage("Gerando formato Stories em Alta Resolução..."); 
+            showMessage("Gerando formato Stories em Ultra HD..."); 
             
             const originalStyle = element.getAttribute('style') || ""; 
             const originalClass = element.className; 
@@ -3380,29 +3386,44 @@
             // Aplica a classe que formata o design para exportação
             element.classList.add('export-mobile'); 
             
-            // Aguarda o DOM e os gráficos ajustarem o layout
-            await new Promise(r => setTimeout(r, 800)); 
+            // Força a renderização otimizada de fontes no elemento pai
+            element.style.textRendering = "optimizeLegibility";
+            element.style.webkitFontSmoothing = "antialiased";
+            
+            // Aguarda o DOM e os gráficos ajustarem o layout completamente 
+            // (1.5s garante que as animações de resize do Chart.js terminem, evitando gráficos borrados)
+            await new Promise(r => setTimeout(r, 1500)); 
             
             try { 
                 const canvas = await html2canvas(element, { 
-                    scale: 2, // 2x Resolução garante nitidez absoluta, mesmo após compressão do WhatsApp
+                    scale: 3, // 3x Resolução garante nitidez absoluta (Ultra HD) e elimina fontes cerrilhadas
                     useCORS: true, 
+                    allowTaint: true,
                     backgroundColor: '#020617', 
                     logging: false, 
-                    windowWidth: 1080 
+                    windowWidth: 1080,
+                    imageTimeout: 0, // Sem limite de tempo para renderizar os assets
+                    onclone: (clonedDoc) => {
+                        // Garante que o elemento clonado não tenha transformações que causam sub-pixel blur
+                        const clonedElement = clonedDoc.getElementById(elementId);
+                        if(clonedElement) {
+                            clonedElement.style.transform = 'none';
+                        }
+                    }
                 }); 
                 
                 const link = document.createElement('a'); 
                 link.download = `${filename}_MOBILE_${new Date().toISOString().split('T')[0]}.png`; 
-                link.href = canvas.toDataURL('image/png', 1.0); 
+                link.href = canvas.toDataURL('image/png', 1.0); // Compressão de Qualidade Máxima (1.0)
                 link.click(); 
-                showMessage("Download Concluído! 📱 Imagem nítida e pronta."); 
+                showMessage("Download Concluído! 📱 Imagem perfeitamente nítida."); 
             } catch (err) { 
                 showMessage("Erro ao exportar. Tente novamente.", true); 
                 console.error(err);
             } finally { 
                 element.className = originalClass; 
                 element.setAttribute('style', originalStyle); 
+                // Restaura o tamanho dos gráficos emitindo um evento de redimensionamento global
                 window.dispatchEvent(new Event('resize')); 
             } 
         };
