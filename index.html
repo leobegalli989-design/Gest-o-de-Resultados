@@ -2129,6 +2129,40 @@
         </div>
     </div>
 
+    <!-- NOVO: Modal de Confirmação de Upload no Drive -->
+    <div id="driveConfirmModal" class="fixed inset-0 bg-black/90 hidden items-center justify-center p-4 z-[80] backdrop-blur-md">
+        <div class="bg-slate-900 p-8 rounded-2xl w-full max-w-md border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)] relative transition-all duration-300">
+            <button onclick="closeDriveConfirmModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-700/50">
+                <div class="bg-blue-500/20 p-3 rounded-full border border-blue-500/40">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">Upload no Drive</h3>
+                    <p class="text-[10px] text-blue-400 font-black uppercase tracking-widest mt-1">Checklist de Conclusão</p>
+                </div>
+            </div>
+            
+            <p class="text-gray-300 mb-6 text-sm leading-relaxed">Antes de marcar esta tarefa como concluída, confirme se todos os arquivos referentes a ela (designs, vídeos, copys, relatórios) já foram <strong>upados e organizados</strong> na pasta do cliente no Google Drive.</p>
+            
+            <label id="driveConfirmBox" class="flex items-center gap-3 p-4 rounded-xl border border-slate-700 bg-slate-800/50 cursor-pointer hover:bg-slate-800 hover:border-cyan-500/50 transition-colors mb-6 group">
+                <div class="relative flex items-center justify-center w-6 h-6 shrink-0">
+                    <input type="checkbox" id="driveConfirmCheck" class="peer appearance-none w-6 h-6 border-2 border-slate-500 rounded-md checked:border-cyan-500 checked:bg-cyan-500 transition-colors cursor-pointer">
+                    <svg class="absolute w-4 h-4 text-slate-900 pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                </div>
+                <span class="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Sim, confirmo o upload dos arquivos.</span>
+            </label>
+            
+            <div class="flex gap-3">
+                <button onclick="closeDriveConfirmModal()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition border border-slate-700 text-sm">Ainda Não</button>
+                <button onclick="confirmDriveUploadAndComplete()" class="flex-[2] py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl font-bold shadow-lg shadow-cyan-900/40 transition text-sm flex items-center justify-center gap-2 transform active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                    Confirmar Conclusão
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
@@ -3214,6 +3248,54 @@
         window.deleteSocialResult = (id) => { window.pendingDeleteId = id; window.pendingDeleteCollection = 'social_results'; document.getElementById('confirmationModal').classList.remove('hidden'); document.getElementById('confirmationModal').classList.add('flex'); };
         window.deleteTask = (id) => { window.pendingDeleteId = id; window.pendingDeleteCollection = 'tasks'; document.getElementById('confirmationModal').classList.remove('hidden'); document.getElementById('confirmationModal').classList.add('flex'); };
         window.closeConfirmModal = () => { document.getElementById('confirmationModal').classList.add('hidden'); document.getElementById('confirmationModal').classList.remove('flex'); window.pendingDeleteId = null; window.pendingDeleteCollection = null; };
+        
+        // --- FUNÇÕES DE CHECKLIST DO DRIVE PARA TAREFAS ---
+        window.pendingCompleteTaskId = null;
+        window.pendingCompleteTaskData = null;
+
+        window.closeDriveConfirmModal = () => {
+            document.getElementById('driveConfirmModal').classList.add('hidden');
+            document.getElementById('driveConfirmModal').classList.remove('flex');
+            window.pendingCompleteTaskId = null;
+            window.pendingCompleteTaskData = null;
+        };
+
+        window.confirmDriveUploadAndComplete = async () => {
+            const isChecked = document.getElementById('driveConfirmCheck').checked;
+            const box = document.getElementById('driveConfirmBox');
+            
+            if (!isChecked) {
+                showMessage("Confirme a marcação antes de prosseguir.", true);
+                box.classList.add('border-red-500', 'bg-red-900/20');
+                setTimeout(() => box.classList.remove('border-red-500', 'bg-red-900/20'), 1500);
+                return;
+            }
+
+            // Contexto 1: Botão rápido do card (Tem ID pendente)
+            if (window.pendingCompleteTaskId) {
+                await updateDoc(doc(db, 'users', userId, 'tasks', window.pendingCompleteTaskId), { status: 'Concluido' });
+                showMessage("Tarefa concluída e upload confirmado!");
+                window.closeDriveConfirmModal();
+                return;
+            }
+
+            // Contexto 2: Formulário de Tarefa (Tem Data pendente)
+            if (window.pendingCompleteTaskData) {
+                const { id, data } = window.pendingCompleteTaskData;
+                if(id) { 
+                    await updateDoc(doc(db, 'users', userId, 'tasks', id), data); 
+                    showMessage("Tarefa atualizada e concluída!"); 
+                } else { 
+                    await addDoc(tasksCollection, data); 
+                    showMessage("Tarefa criada e concluída!"); 
+                } 
+                document.getElementById('taskForm').reset(); 
+                document.getElementById('task_id_edit').value = ''; 
+                document.getElementById('taskFormContainer').classList.add('hidden');
+                window.closeDriveConfirmModal();
+            }
+        };
+
         window.confirmDeleteAction = async () => { if(!window.pendingDeleteId) return; const delId = window.pendingDeleteId; const delColl = window.pendingDeleteCollection; closeConfirmModal(); try { await deleteDoc(doc(db, 'users', userId, delColl, delId)); showMessage("Item excluído com sucesso!"); if (delColl === 'credentials') { const clientId = document.getElementById('cred_client_id').value; if (clientId) { const q = query(credentialsCollection, where("clientId", "==", clientId)); const snapshot = await getDocs(q); currentCredentialsList = snapshot.docs.map(d => ({ id: d.id, ...d.data() })); renderCredentialsList(currentCredentialsList); } } } catch(e) { console.error(e); showMessage("Erro ao excluir.", true); } };
         window.generateDailySummary = async () => { const today = new Date().toISOString().split('T')[0]; const filtered = results.filter(r => r.data === today); if(!filtered.length) return showMessage("Sem dados para hoje.", true); const content = filtered.map(r => { const cli = clients.find(c => c.id === r.clientId); return `<div class="mb-2 pb-2 border-b border-gray-800 last:border-0"><span class="text-cyan-400 font-bold">${cli?.nome || 'Geral'}</span>: Gasto ${formatCurrency(r.investimento)} ➔ Retorno ${formatCurrency(r.vendas)} (${r.roas.toFixed(2)}x)</div>`; }).join(''); document.getElementById('summaryModal').classList.remove('hidden'); document.getElementById('summaryModal').classList.add('flex'); document.getElementById('summaryTitle').textContent = "Resumo Diário"; document.getElementById('summaryContent').innerHTML = content; };
         window.toggleTaskForm = () => { const c = document.getElementById('taskFormContainer'); if(c.classList.contains('hidden')) { document.getElementById('taskForm').reset(); document.getElementById('task_id_edit').value = ''; document.getElementById('taskFormTitle').textContent = 'Nova Tarefa'; } c.classList.toggle('hidden'); };
@@ -3513,7 +3595,17 @@
             window.setupCustomSelects(); 
         };
 
-        window.updateTaskStatus = async (id, s) => { await updateDoc(doc(db, 'users', userId, 'tasks', id), { status: s }); };
+        window.updateTaskStatus = async (id, s) => { 
+            if (s === 'Concluido') {
+                window.pendingCompleteTaskId = id;
+                document.getElementById('driveConfirmModal').classList.remove('hidden');
+                document.getElementById('driveConfirmModal').classList.add('flex');
+                document.getElementById('driveConfirmCheck').checked = false;
+                return; // Pausa e aguarda o Modal
+            }
+            await updateDoc(doc(db, 'users', userId, 'tasks', id), { status: s }); 
+        };
+        
         window.populateClientSelects = () => { ['res_cliente', 'task_cliente', 'filterClient', 'report_cliente', 'report_social_cliente', 'results_filter_cliente', 'soc_cliente', 'social_filter_cliente', 'vid_cliente', 'vid_filter_cliente'].forEach(id => { const s = document.getElementById(id); if (!s) return; const current = s.value; s.innerHTML = id.includes('filter') || id.includes('report') ? '<option value="">Todos</option>' : '<option value="">Selecione...</option>'; const sortedClients = [...clients].sort((a, b) => a.nome.localeCompare(b.nome)); sortedClients.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nome; if (c.id === current) o.selected = true; s.appendChild(o); }); if (s.closest('.custom-select-wrapper')) { window.updateCustomSelect(s); } }); window.setupCustomSelects(); };
         window.maskPhone = (i) => { let v = i.value.replace(/\D/g, ''); v = v.replace(/^(\d{2})(\d)/g, '($1) $2'); v = v.replace(/(\d{5})(\d)/, '$1-$2'); i.value = v; };
         window.closeSummaryModal = () => document.getElementById('summaryModal').classList.add('hidden');
@@ -4220,6 +4312,15 @@
                     status: document.getElementById('task_status').value, 
                     notes: document.getElementById('task_observacoes').value 
                 }; 
+                
+                // Se a tarefa está sendo movida para concluída via Formulário, aciona o Modal do Drive
+                if (data.status === 'Concluido') {
+                    window.pendingCompleteTaskData = { id, data };
+                    document.getElementById('driveConfirmModal').classList.remove('hidden');
+                    document.getElementById('driveConfirmModal').classList.add('flex');
+                    document.getElementById('driveConfirmCheck').checked = false;
+                    return; // Pausa e aguarda o Modal
+                }
                 
                 if(id) { 
                     await updateDoc(doc(db, 'users', userId, 'tasks', id), data); 
