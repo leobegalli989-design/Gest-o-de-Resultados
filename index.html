@@ -600,6 +600,43 @@
             animation: shineText 4s linear infinite;
         }
 
+        /* --- THEMES ADICIONAIS PARA OS TÍTULOS --- */
+        
+        /* Tema Emerald (Tráfego Resultados) */
+        .title-wrapper.emerald-theme { box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
+        .title-wrapper.emerald-theme::before { background: conic-gradient(from 0deg, transparent 0%, #10b981 25%, transparent 50%, #34d399 75%, transparent 100%); }
+        .title-path-emerald { stroke-dasharray: 80; stroke-dashoffset: 80; animation: dashTitleEmerald 3s ease-in-out infinite alternate; stroke: #34d399; filter: drop-shadow(0 0 3px #34d399); }
+        @keyframes dashTitleEmerald { 0% { stroke-dashoffset: 80; fill: transparent; } 50% { stroke-dashoffset: 0; fill: rgba(52, 211, 153, 0.2); } 100% { stroke-dashoffset: -80; fill: transparent; } }
+        .title-text-glow-emerald { background: linear-gradient(to right, #ffffff 20%, #34d399 40%, #34d399 60%, #ffffff 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineText 4s linear infinite; }
+
+        /* Tema Indigo (Calendário) */
+        .title-wrapper.indigo-theme { box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); }
+        .title-wrapper.indigo-theme::before { background: conic-gradient(from 0deg, transparent 0%, #6366f1 25%, transparent 50%, #818cf8 75%, transparent 100%); }
+        .title-path-indigo { stroke-dasharray: 80; stroke-dashoffset: 80; animation: dashTitleIndigo 3s ease-in-out infinite alternate; stroke: #818cf8; filter: drop-shadow(0 0 3px #818cf8); }
+        @keyframes dashTitleIndigo { 0% { stroke-dashoffset: 80; fill: transparent; } 50% { stroke-dashoffset: 0; fill: rgba(129, 140, 248, 0.2); } 100% { stroke-dashoffset: -80; fill: transparent; } }
+        .title-text-glow-indigo { background: linear-gradient(to right, #ffffff 20%, #818cf8 40%, #818cf8 60%, #ffffff 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineText 4s linear infinite; }
+
+        /* Tema Yellow (Gestão de Tarefas) */
+        .title-wrapper.yellow-theme { box-shadow: 0 0 12px rgba(234, 179, 8, 0.3); }
+        .title-wrapper.yellow-theme::before { background: conic-gradient(from 0deg, transparent 0%, #eab308 25%, transparent 50%, #facc15 75%, transparent 100%); }
+        .title-path-yellow { stroke-dasharray: 80; stroke-dashoffset: 80; animation: dashTitleYellow 3s ease-in-out infinite alternate; stroke: #facc15; filter: drop-shadow(0 0 3px #facc15); }
+        @keyframes dashTitleYellow { 0% { stroke-dashoffset: 80; fill: transparent; } 50% { stroke-dashoffset: 0; fill: rgba(250, 204, 21, 0.2); } 100% { stroke-dashoffset: -80; fill: transparent; } }
+        .title-text-glow-yellow { background: linear-gradient(to right, #ffffff 20%, #facc15 40%, #facc15 60%, #ffffff 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineText 4s linear infinite; }
+
+        /* Tema Purple (Insights Tráfego) */
+        .title-wrapper.purple-theme { box-shadow: 0 0 12px rgba(168, 85, 247, 0.3); }
+        .title-wrapper.purple-theme::before { background: conic-gradient(from 0deg, transparent 0%, #a855f7 25%, transparent 50%, #c084fc 75%, transparent 100%); }
+        .title-path-purple { stroke-dasharray: 80; stroke-dashoffset: 80; animation: dashTitlePurple 3s ease-in-out infinite alternate; stroke: #c084fc; filter: drop-shadow(0 0 3px #c084fc); }
+        @keyframes dashTitlePurple { 0% { stroke-dashoffset: 80; fill: transparent; } 50% { stroke-dashoffset: 0; fill: rgba(192, 132, 252, 0.2); } 100% { stroke-dashoffset: -80; fill: transparent; } }
+        .title-text-glow-purple { background: linear-gradient(to right, #ffffff 20%, #c084fc 40%, #c084fc 60%, #ffffff 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineText 4s linear infinite; }
+
+        /* Tema Rose (Insights Social) */
+        .title-wrapper.rose-theme { box-shadow: 0 0 12px rgba(244, 63, 94, 0.3); }
+        .title-wrapper.rose-theme::before { background: conic-gradient(from 0deg, transparent 0%, #f43f5e 25%, transparent 50%, #fb7185 75%, transparent 100%); }
+        .title-path-rose { stroke-dasharray: 80; stroke-dashoffset: 80; animation: dashTitleRose 3s ease-in-out infinite alternate; stroke: #fb7185; filter: drop-shadow(0 0 3px #fb7185); }
+        @keyframes dashTitleRose { 0% { stroke-dashoffset: 80; fill: transparent; } 50% { stroke-dashoffset: 0; fill: rgba(251, 113, 133, 0.2); } 100% { stroke-dashoffset: -80; fill: transparent; } }
+        .title-text-glow-rose { background: linear-gradient(to right, #ffffff 20%, #fb7185 40%, #fb7185 60%, #ffffff 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineText 4s linear infinite; }
+
         .chart-container {
             min-height: 250px;
             width: 100%;
@@ -1340,14 +1377,14 @@
             <section id="resultados-trafego" class="tab-content">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                     <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
-                        <div class="title-wrapper">
+                        <div class="title-wrapper emerald-theme">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10" class="title-path"></circle>
-                                <circle cx="12" cy="12" r="6" class="title-path"></circle>
-                                <circle cx="12" cy="12" r="2" class="title-path"></circle>
+                                <circle cx="12" cy="12" r="10" class="title-path-emerald"></circle>
+                                <circle cx="12" cy="12" r="6" class="title-path-emerald"></circle>
+                                <circle cx="12" cy="12" r="2" class="title-path-emerald"></circle>
                             </svg>
                         </div>
-                        <span class="title-text-glow">Performance Tráfego</span>
+                        <span class="title-text-glow-emerald">Performance Tráfego</span>
                     </h1>
                     <button onclick="transitionToForm(window.openNewTrafficForm, 'Inicializando Protocolo de Tráfego...')" class="btn-animate-cyan bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
@@ -1698,13 +1735,13 @@
             <section id="relatorios" class="tab-content">
                 <div class="flex flex-col lg:flex-row justify-between items-center mb-6">
                     <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
-                        <div class="title-wrapper">
+                        <div class="title-wrapper purple-theme">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" class="title-path"></polyline>
-                                <polyline points="17 6 23 6 23 12" class="title-path"></polyline>
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" class="title-path-purple"></polyline>
+                                <polyline points="17 6 23 6 23 12" class="title-path-purple"></polyline>
                             </svg>
                         </div>
-                        <span class="title-text-glow">Insights Tráfego</span>
+                        <span class="title-text-glow-purple">Insights Tráfego</span>
                     </h1>
                     <div class="flex gap-2 mt-4 lg:mt-0 flex-wrap justify-end">
                         <button onclick="shareWhatsAppTraffic()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.4)] flex items-center gap-2 transition-all transform hover:scale-105 border border-green-400/50 hover:shadow-[0_0_25px_rgba(34,197,94,0.6)]">
@@ -1828,12 +1865,12 @@
             <section id="relatorios-social" class="tab-content">
                 <div class="flex flex-col lg:flex-row justify-between items-center mb-6">
                     <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
-                        <div class="title-wrapper pink-theme">
+                        <div class="title-wrapper rose-theme">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" class="title-path-pink"></polyline>
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" class="title-path-rose"></polyline>
                             </svg>
                         </div>
-                        <span class="title-text-glow-pink">Insights Social</span>
+                        <span class="title-text-glow-rose">Insights Social</span>
                     </h1>
                     <div class="flex gap-2 mt-4 lg:mt-0 flex-wrap justify-end">
                         <button onclick="shareWhatsAppSocial()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.4)] flex items-center gap-2 transition-all transform hover:scale-105 border border-green-400/50 hover:shadow-[0_0_25px_rgba(34,197,94,0.6)]">
@@ -1904,15 +1941,15 @@
             <section id="calendario" class="tab-content">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
-                        <div class="title-wrapper">
+                        <div class="title-wrapper indigo-theme">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" class="title-path"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6" class="title-path"></line>
-                                <line x1="8" y1="2" x2="8" y2="6" class="title-path"></line>
-                                <line x1="3" y1="10" x2="21" y2="10" class="title-path"></line>
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" class="title-path-indigo"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6" class="title-path-indigo"></line>
+                                <line x1="8" y1="2" x2="8" y2="6" class="title-path-indigo"></line>
+                                <line x1="3" y1="10" x2="21" y2="10" class="title-path-indigo"></line>
                             </svg>
                         </div>
-                        <span class="title-text-glow">Calendário</span>
+                        <span class="title-text-glow-indigo">Calendário</span>
                     </h1>
                     <div class="flex gap-2"><button onclick="changeMonth(-1)" class="bg-slate-800/80 backdrop-blur-md p-2 rounded-xl border border-slate-700 hover:bg-slate-700 hover:border-cyan-500/50 hover:text-cyan-400 text-white transition-all shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><span id="currentMonthYear" class="text-xl font-bold text-cyan-400 min-w-[200px] text-center flex items-center justify-center uppercase tracking-widest drop-shadow-md"></span><button onclick="changeMonth(1)" class="bg-slate-800/80 backdrop-blur-md p-2 rounded-xl border border-slate-700 hover:bg-slate-700 hover:border-cyan-500/50 hover:text-cyan-400 text-white transition-all shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button></div>
                 </div>
@@ -1981,13 +2018,13 @@
             <section id="gestao" class="tab-content">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-3xl font-bold text-white tracking-wide flex items-center">
-                        <div class="title-wrapper">
+                        <div class="title-wrapper yellow-theme">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 11l3 3L22 4" class="title-path"></path>
-                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" class="title-path"></path>
+                                <path d="M9 11l3 3L22 4" class="title-path-yellow"></path>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" class="title-path-yellow"></path>
                             </svg>
                         </div>
-                        <span class="title-text-glow">Gestão de Tarefas</span>
+                        <span class="title-text-glow-yellow">Gestão de Tarefas</span>
                     </h1>
                     <button onclick="transitionToForm(toggleTaskForm, 'Acessando Painel de Tarefas...')" class="btn-animate-cyan bg-novan-primary hover:bg-novan-hover text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
