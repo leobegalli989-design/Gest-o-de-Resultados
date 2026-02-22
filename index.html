@@ -784,37 +784,92 @@
 
         /* --- ESTILOS DE EXPORTAÇÃO MOBILE (Story Format) --- */
         .export-mobile {
-            width: 1080px !important; /* Largura Story/HD Mobile */
+            width: 1080px !important; /* Largura HD */
             max-width: none !important;
-            height: auto !important;
-            min-height: 1920px !important;
-            padding: 80px 60px !important; /* Mais respiro lateral e superior */
+            height: max-content !important; /* GARANTE QUE NÃO CORTA O FINAL */
+            min-height: 1920px !important; /* Formato Story 9:16 para WhatsApp */
+            padding: 80px 60px 140px 60px !important; /* Respiro com espaço no fundo para logo */
             background-color: #020617 !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: -100 !important; /* Esconde visualmente mas permite renderização */
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%) !important;
             text-rendering: optimizeLegibility !important;
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
-            transform: translateZ(0) !important; /* Força renderização por hardware e remove blur */
         }
 
-        /* Força a remoção de desfoque e transparências que quebram o html2canvas */
-        .export-mobile * {
+        /* Títulos especiais que só aparecem na exportação */
+        .export-title {
+            display: none;
+        }
+        .export-mobile .export-title {
+            display: flex !important;
+            font-size: 42px !important;
+            margin-bottom: 60px !important;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-align: center;
+            color: #fff !important;
+        }
+        .export-mobile .export-title svg {
+            width: 48px !important;
+            height: 48px !important;
+            color: #06b6d4 !important;
+        }
+
+        /* Força a remoção de desfoque, animações e transparências que quebram o html2canvas */
+        .export-mobile, .export-mobile * {
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
+            animation: none !important; /* DESATIVA ANIMAÇÕES NO CLONE PARA GARANTIR VISIBILIDADE IMEDIATA */
+            transition: none !important;
+        }
+        .export-mobile .animate-kpi {
+            opacity: 1 !important; /* GARANTE QUE NADA FIQUE INVISÍVEL NA FOTO */
+            transform: none !important;
         }
 
-        /* Ajuste de Layout para Mobile */
+        /* Ajuste de Layout para Mobile (Perfeitamente Simétrico) */
         .export-mobile #reportSummaryAggregated, 
         .export-mobile #socialReportSummaryAggregated {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important; /* 2 colunas para KPIs */
-            gap: 30px !important;
+            gap: 25px !important; /* Espaçamento mais otimizado */
         }
+
+        /* Destaque ABSOLUTO para o Faturamento na primeira linha inteira */
+        .export-mobile #reportSummaryAggregated .animate-kpi:first-child {
+            grid-column: span 2 !important;
+            text-align: center !important;
+            align-items: center !important;
+            padding: 50px 30px !important;
+            background: linear-gradient(145deg, rgba(16,185,129,0.15) 0%, rgba(2,6,23,0.8) 100%) !important;
+            border-color: rgba(16,185,129,0.5) !important;
+        }
+        .export-mobile #reportSummaryAggregated .animate-kpi:first-child p.text-\[10px\] {
+            justify-content: center !important;
+            font-size: 32px !important;
+            color: #6ee7b7 !important; /* emerald-300 */
+        }
+        .export-mobile #reportSummaryAggregated .animate-kpi:first-child p.text-xl {
+            font-size: 84px !important;
+            color: #10b981 !important; /* emerald-500 */
+            text-shadow: 0 0 20px rgba(16,185,129,0.4) !important;
+        }
+
+        /* Demais caixas (Gasto, ROAS, Ticket, CPA, etc) */
+        .export-mobile .animate-kpi {
+            padding: 30px 20px !important; /* Ligeiramente menor para caber todos sem cortar */
+            border-radius: 20px !important;
+            border-width: 2px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+        .export-mobile .animate-kpi p.text-\[10px\] { font-size: 22px !important; margin-bottom: 12px !important; }
+        .export-mobile .animate-kpi p.text-xl { font-size: 46px !important; line-height: 1.1 !important; }
+        .export-mobile .animate-kpi .w-1\.5 { width: 14px !important; height: 14px !important; }
         
-        /* Força gráficos a ficarem um abaixo do outro */
+        /* Força gráficos a ficarem um abaixo do outro (Para exportações com gráficos) */
         .export-mobile .grid {
             display: flex !important;
             flex-direction: column !important;
@@ -1656,9 +1711,9 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
                             Relatório em Texto
                         </button>
-                        <button onclick="exportReportMobile()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.4)] flex items-center gap-2 transition-all transform hover:scale-105 border border-indigo-400/50 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)]">
+                        <button onclick="exportTrafficReportsMobile()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.4)] flex items-center gap-2 transition-all transform hover:scale-105 border border-indigo-400/50 hover:shadow-[0_0_25px_rgba(79,70,229,0.6)]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                            Exportar Imagem
+                            Exportar Imagens
                         </button>
                     </div>
                 </div>
@@ -1707,42 +1762,63 @@
                     </div>
                 </div>
 
-                <div id="report-export-container" class="bg-[#020617] p-6 lg:p-8 rounded-2xl border border-slate-800 relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-                    <!-- Resumo Agregado KPIs -->
-                    <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 mb-10 text-white"></div>
+                <div id="report-export-container" class="flex flex-col gap-6">
+                    <!-- PARTE 1: Resumo Agregado KPIs -->
+                    <div id="export-part-kpis" class="bg-[#020617] p-6 lg:p-8 rounded-2xl border border-slate-800 relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] transition-all">
+                        <h2 class="text-xl font-bold text-cyan-400 mb-6 uppercase tracking-widest border-b border-cyan-500/30 pb-2 export-title hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> 
+                            Resumo de Performance
+                        </h2>
+                        <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 text-white"></div>
+                    </div>
                     
-                    <!-- Grid de Gráficos Futuristas -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Chart 1: Financeiro -->
-                        <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-emerald-500/30 transition-colors shadow-lg group">
-                            <h3 class="text-[10px] font-black text-emerald-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span> Dinâmica Financeira (Gasto vs Retorno)
-                            </h3>
-                            <div class="chart-container"><canvas id="spendRevenueChart"></canvas></div>
-                        </div>
+                    <!-- PARTE 2: Financeiro e ROAS -->
+                    <div id="export-part-finance" class="bg-[#020617] p-6 lg:p-8 rounded-2xl border border-slate-800 relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] transition-all">
+                        <h2 class="text-xl font-bold text-emerald-400 mb-6 uppercase tracking-widest border-b border-emerald-500/30 pb-2 export-title hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            2. Dinâmica Financeira e ROAS
+                        </h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Chart 1: Financeiro -->
+                            <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-emerald-500/30 transition-colors shadow-lg group">
+                                <h3 class="text-[10px] font-black text-emerald-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse"></span> Dinâmica Financeira (Gasto vs Retorno)
+                                </h3>
+                                <div class="chart-container"><canvas id="spendRevenueChart"></canvas></div>
+                            </div>
 
-                        <!-- Chart 2: ROAS -->
-                        <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-yellow-500/30 transition-colors shadow-lg group">
-                            <h3 class="text-[10px] font-black text-yellow-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_#eab308] animate-pulse"></span> Tração de ROAS (Evolução Diária)
-                            </h3>
-                            <div class="chart-container"><canvas id="roasDailyChart"></canvas></div>
+                            <!-- Chart 2: ROAS -->
+                            <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-yellow-500/30 transition-colors shadow-lg group">
+                                <h3 class="text-[10px] font-black text-yellow-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_#eab308] animate-pulse"></span> Tração de ROAS (Evolução Diária)
+                                </h3>
+                                <div class="chart-container"><canvas id="roasDailyChart"></canvas></div>
+                            </div>
                         </div>
+                    </div>
 
-                        <!-- Chart 3: Eficiência (CPA x Conversão) -->
-                        <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-indigo-500/30 transition-colors shadow-lg group">
-                            <h3 class="text-[10px] font-black text-indigo-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_#6366f1] animate-pulse"></span> Eficiência de Funil (CPA vs Tx. Conversão)
-                            </h3>
-                            <div class="chart-container"><canvas id="cpaConvChart"></canvas></div>
-                        </div>
+                    <!-- PARTE 3: Funil e Tráfego -->
+                    <div id="export-part-funnel" class="bg-[#020617] p-6 lg:p-8 rounded-2xl border border-slate-800 relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] transition-all">
+                        <h2 class="text-xl font-bold text-indigo-400 mb-6 uppercase tracking-widest border-b border-indigo-500/30 pb-2 export-title hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            3. Eficiência de Funil e Tráfego
+                        </h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Chart 3: Eficiência (CPA x Conversão) -->
+                            <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-indigo-500/30 transition-colors shadow-lg group">
+                                <h3 class="text-[10px] font-black text-indigo-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_#6366f1] animate-pulse"></span> Eficiência de Funil (CPA vs Tx. Conversão)
+                                </h3>
+                                <div class="chart-container"><canvas id="cpaConvChart"></canvas></div>
+                            </div>
 
-                        <!-- Chart 4: Tráfego (Impressoes x Cliques) -->
-                        <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-cyan-500/30 transition-colors shadow-lg group">
-                            <h3 class="text-[10px] font-black text-cyan-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse"></span> Volume de Tráfego (Impressões vs Cliques)
-                            </h3>
-                            <div class="chart-container"><canvas id="impressionsClicksChart"></canvas></div>
+                            <!-- Chart 4: Tráfego (Impressoes x Cliques) -->
+                            <div class="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-cyan-500/30 transition-colors shadow-lg group">
+                                <h3 class="text-[10px] font-black text-cyan-400 mb-6 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4] animate-pulse"></span> Volume de Tráfego (Impressões vs Cliques)
+                                </h3>
+                                <div class="chart-container"><canvas id="impressionsClicksChart"></canvas></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3949,40 +4025,48 @@
 
         // --- SISTEMA DE EXPORTAÇÃO DE IMAGEM (ALTA RESOLUÇÃO) ---
         window.exportMobile = async (elementId, filename) => { 
-            const element = document.getElementById(elementId); 
-            if(!element) return; 
+            const originalElement = document.getElementById(elementId); 
+            if(!originalElement) return; 
             showMessage("Gerando formato Stories em Ultra HD..."); 
             
-            const originalStyle = element.getAttribute('style') || ""; 
-            const originalClass = element.className; 
+            // 1. CLONA O ELEMENTO PARA ISOLAR DO LAYOUT DA TELA (Evita cortes de altura)
+            const clone = originalElement.cloneNode(true);
+            clone.id = elementId + '-export-clone';
+            clone.classList.add('export-mobile'); 
             
-            // Aplica a classe que formata o design para exportação
-            element.classList.add('export-mobile'); 
+            // 2. CRIA UM CONTAINER INVISÍVEL NO BODY PARA RENDERIZAR
+            const exportContainer = document.createElement('div');
+            exportContainer.style.position = 'absolute';
+            exportContainer.style.top = '-9999px';
+            exportContainer.style.left = '-9999px';
+            exportContainer.style.width = '1080px';
+            exportContainer.style.zIndex = '-9999';
+            exportContainer.appendChild(clone);
+            document.body.appendChild(exportContainer);
             
-            // Força a renderização otimizada de fontes no elemento pai
-            element.style.textRendering = "optimizeLegibility";
-            element.style.webkitFontSmoothing = "antialiased";
+            // Força a renderização otimizada de fontes no clone
+            clone.style.textRendering = "optimizeLegibility";
+            clone.style.webkitFontSmoothing = "antialiased";
             
-            // Aguarda o DOM e os gráficos ajustarem o layout completamente 
-            // (1.5s garante que as animações de resize do Chart.js terminem, evitando gráficos borrados)
-            await new Promise(r => setTimeout(r, 1500)); 
+            // Aguarda o DOM do clone ser processado
+            await new Promise(r => setTimeout(r, 800)); 
             
+            // PEGA A ALTURA REAL DO CLONE APÓS ELE ESTICAR 100%
+            const realHeight = clone.scrollHeight;
+            clone.style.height = realHeight + 'px'; // Força a altura exata do canvas inteiro
+
             try { 
-                const canvas = await html2canvas(element, { 
-                    scale: 3, // 3x Resolução garante nitidez absoluta (Ultra HD) e elimina fontes cerrilhadas
+                const canvas = await html2canvas(clone, { 
+                    scale: 3, // 3x Resolução garante nitidez absoluta (Ultra HD)
                     useCORS: true, 
                     allowTaint: true,
                     backgroundColor: '#020617', 
                     logging: false, 
+                    width: 1080,
+                    height: realHeight,
                     windowWidth: 1080,
-                    imageTimeout: 0, // Sem limite de tempo para renderizar os assets
-                    onclone: (clonedDoc) => {
-                        // Garante que o elemento clonado não tenha transformações que causam sub-pixel blur
-                        const clonedElement = clonedDoc.getElementById(elementId);
-                        if(clonedElement) {
-                            clonedElement.style.transform = 'none';
-                        }
-                    }
+                    windowHeight: realHeight, // GARANTE QUE O FINAL DA IMAGEM NÃO CORTE
+                    imageTimeout: 0
                 }); 
                 
                 const link = document.createElement('a'); 
@@ -3994,13 +4078,24 @@
                 showMessage("Erro ao exportar. Tente novamente.", true); 
                 console.error(err);
             } finally { 
-                element.className = originalClass; 
-                element.setAttribute('style', originalStyle); 
-                // Restaura o tamanho dos gráficos emitindo um evento de redimensionamento global
-                window.dispatchEvent(new Event('resize')); 
+                // Limpa o clone invisível da memória independentemente de falhar ou dar certo
+                document.body.removeChild(exportContainer);
             } 
         };
-        window.exportReportMobile = () => window.exportMobile('report-export-container', 'relatorio_trafego_novan');
+        
+        // Exportador Sequencial do Tráfego (Somente KPIs)
+        window.exportTrafficReportsMobile = async () => {
+            const btnMsgBackup = document.getElementById('messageBox').innerHTML;
+            showMessage("⏳ Preparando imagem Ultra HD com os KPIs... Aguarde não feche a tela.", false);
+            
+            // Pausa inicial para o sistema ajustar fontes e gráficos
+            await new Promise(r => setTimeout(r, 800)); 
+            
+            await window.exportMobile('export-part-kpis', 'relatorio_kpis_performance');
+            
+            showMessage("✅ Imagem exportada com sucesso! Envie no seu WhatsApp.");
+        };
+
         window.exportSocialReportMobile = () => window.exportMobile('social-report-export-container', 'relatorio_social_novan');
 
         // --- SISTEMA DE COMPARTILHAMENTO WHATSAPP (TEXTO) ---
