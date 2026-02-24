@@ -1806,7 +1806,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> 
                             Resumo de Performance
                         </h2>
-                        <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 text-white"></div>
+                        <div id="reportSummaryAggregated" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 text-white"></div>
                     </div>
                     
                     <!-- PARTE 2: Financeiro e ROAS -->
@@ -3060,9 +3060,11 @@
                 { l: 'Tx. Conv.', v: (summary.cliques > 0 ? (summary.conv / summary.cliques) * 100 : 0).toFixed(2) + '%', c: 'pink' },
                 { l: 'Freq. Méd', v: (summary.alcance > 0 ? summary.imp / summary.alcance : 0).toFixed(2), c: 'blue' },
                 { l: 'Cliques', v: formatCompact(summary.cliques), c: 'orange' },
-                { l: 'Conversões', v: formatCompact(summary.conv), c: 'teal' }
+                { l: 'Conversões', v: formatCompact(summary.conv), c: 'teal' },
+                { l: 'Impressões', v: formatCompact(summary.imp), c: 'indigo' },
+                { l: 'Alcance', v: formatCompact(summary.alcance), c: 'blue' }
             ];
-            document.getElementById('kpiCardsContainer').className = "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8 text-white";
+            document.getElementById('kpiCardsContainer').className = "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 mb-8 text-white";
             document.getElementById('kpiCardsContainer').innerHTML = kpis.map((k, i) => window.renderKpiCard(k.l, k.v, k.c, i)).join('');
             
             list.innerHTML = ''; 
@@ -3829,7 +3831,8 @@
                 { l: 'Cliques', v: formatCompact(stats.cliques), c: 'orange' },
                 { l: 'CTR Médio', v: ctr.toFixed(2) + '%', c: 'purple' },
                 { l: 'CPC Médio', v: formatCurrency(cpc), c: 'cyan' },
-                { l: 'Impressões', v: formatCompact(stats.imp), c: 'blue' }
+                { l: 'Impressões', v: formatCompact(stats.imp), c: 'blue' },
+                { l: 'Alcance', v: formatCompact(stats.alcance), c: 'indigo' }
             ];
             
             const aggCont = document.getElementById('reportSummaryAggregated');
