@@ -50,6 +50,58 @@
             scroll-behavior: smooth;
         }
 
+        /* =========================================
+           ANIMAÇÕES CONTÍNUAS DOS ÍCONES (MENU LATERAL)
+           ========================================= */
+        
+        @keyframes pulseCircle {
+            0%, 100% { fill: transparent; stroke-width: 2; transform: scale(1); }
+            50% { fill: currentColor; stroke-width: 1; transform: scale(1.1); }
+        }
+        .anim-clientes circle { animation: pulseCircle 2.5s ease-in-out infinite; transform-origin: center; }
+
+        @keyframes floatPulse {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-2px) scale(1.05); opacity: 1; }
+        }
+        .anim-trafego { animation: floatPulse 3s ease-in-out infinite; }
+
+        @keyframes pulseLens {
+            0%, 100% { transform: scale(0.9); stroke-width: 2; }
+            50% { transform: scale(1.1); stroke-width: 1.5; }
+        }
+        .anim-social path { animation: pulseLens 2s ease-in-out infinite; transform-origin: center; }
+
+        @keyframes bounceHook {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .anim-calendario .hook-1 { animation: bounceHook 1.5s ease-in-out infinite; }
+        .anim-calendario .hook-2 { animation: bounceHook 1.5s ease-in-out 0.3s infinite; }
+
+        @keyframes drawCheck {
+            0% { stroke-dashoffset: 20; opacity: 0; }
+            20% { opacity: 1; }
+            50%, 100% { stroke-dashoffset: 0; opacity: 1; }
+        }
+        .anim-tarefas polyline {
+            stroke-dasharray: 20;
+            stroke-dashoffset: 20;
+            animation: drawCheck 2.5s ease-out infinite;
+        }
+
+        @keyframes swingReel {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        .anim-videos { animation: swingReel 3s ease-in-out infinite; transform-origin: center; }
+
+        @keyframes slideOut {
+            0%, 100% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(4px); opacity: 0.7; }
+        }
+        .anim-sair .arrow-part { animation: slideOut 1.5s ease-in-out infinite; }
+
         /* Scrollbar Futurista */
         ::-webkit-scrollbar {
             width: 8px;
@@ -1150,18 +1202,25 @@
                 <div class="sidebar-header header-cyan !mt-0">Principal</div>
                 
                 <div id="nav-clientes" class="sidebar-item theme-cyan active" onclick="switchTab('clientes')" data-tab="clientes">
-                    <span class="menu-emoji">👽</span> Clientes
+                    <span class="menu-emoji text-cyan-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-clientes inline-block">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </span> Clientes
                 </div>
                 <div id="nav-resultados-trafego" class="sidebar-item theme-cyan" onclick="switchTab('resultados-trafego')" data-tab="resultados-trafego">
                     <span class="menu-emoji text-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" class="animate-pulse inline-block" stroke="none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" class="anim-trafego inline-block" stroke="none">
                             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                         </svg>
                     </span> Res. Tráfego
                 </div>
                 <div id="nav-resultados-social" class="sidebar-item theme-pink" onclick="switchTab('resultados-social')" data-tab="resultados-social">
                     <span class="menu-emoji text-pink-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-social inline-block">
                             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -1173,17 +1232,40 @@
                 <div class="sidebar-header header-emerald">Gestão</div>
                 
                 <div id="nav-calendario" class="sidebar-item theme-emerald" onclick="switchTab('calendario')" data-tab="calendario">
-                    <span class="menu-emoji">📅</span> Calendário
+                    <span class="menu-emoji text-emerald-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-calendario inline-block">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line class="hook-1" x1="16" y1="2" x2="16" y2="6"></line>
+                            <line class="hook-2" x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </span> Calendário
                 </div>
                 <div id="nav-gestao" class="sidebar-item theme-emerald" onclick="switchTab('gestao')" data-tab="gestao">
-                    <span class="menu-emoji">🎯</span> Tarefas
+                    <span class="menu-emoji text-emerald-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-tarefas inline-block">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                    </span> Tarefas
                 </div>
 
                 <!-- Seção Produção -->
                 <div class="sidebar-header header-orange">Produção</div>
                 
                 <div id="nav-controle-videos" class="sidebar-item theme-orange" onclick="switchTab('controle-videos')" data-tab="controle-videos">
-                    <span class="menu-emoji">🎬</span> Vídeos & Posts
+                    <span class="menu-emoji text-orange-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-videos inline-block">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <line x1="2" y1="7" x2="7" y2="7"></line>
+                            <line x1="2" y1="17" x2="7" y2="17"></line>
+                            <line x1="17" y1="17" x2="22" y2="17"></line>
+                            <line x1="17" y1="7" x2="22" y2="7"></line>
+                        </svg>
+                    </span> Vídeos & Posts
                 </div>
 
                 <!-- Seção Inteligência -->
@@ -1192,14 +1274,14 @@
                 <!-- Mantém Tráfego = Ciano e Social = Pink para conexão visual constante -->
                 <div id="nav-relatorios" class="sidebar-item theme-cyan" onclick="switchTab('relatorios')" data-tab="relatorios">
                     <span class="menu-emoji text-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" class="animate-pulse inline-block" stroke="none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" class="anim-trafego inline-block" stroke="none">
                             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                         </svg>
                     </span> Insights Tráfego
                 </div>
                 <div id="nav-relatorios-social" class="sidebar-item theme-pink" onclick="switchTab('relatorios-social')" data-tab="relatorios-social">
                     <span class="menu-emoji text-pink-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-social inline-block">
                             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -1208,7 +1290,13 @@
                 </div>
 
                 <div onclick="handleLogout()" class="sidebar-item theme-red">
-                    <span class="menu-emoji">🚪</span> Sair
+                    <span class="menu-emoji text-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anim-sair inline-block">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline class="arrow-part" points="16 17 21 12 16 7"></polyline>
+                            <line class="arrow-part" x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </span> Sair
                 </div>
             </nav>
         </aside>
